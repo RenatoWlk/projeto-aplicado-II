@@ -1,0 +1,27 @@
+.custom-header {
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+  background-color: #c62828;
+  border-radius: 15px 15px 0px 0px;
+  gap: 0.5em;
+}
+
+.custom-header-label {
+  font-family: 'Poppins', sans-serif;
+  flex-grow: 1; 
+  text-align: center;
+  color: white;
+  font-weight: bold;
+}
+
+.header-button {
+  background-color: #c62828;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3em;
+}

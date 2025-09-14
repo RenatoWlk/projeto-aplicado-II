@@ -1,0 +1,219 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.create-post-container {
+  display: flex;
+  flex-direction: row;
+  padding-left: 1rem;
+}
+
+/* ----------------------------- CAMPAIGNS ----------------------------- */
+.post {
+  border-left: 3px solid #ccc;
+  border-left-color: #e74c3c;
+}
+
+/* ----------------------------- OFFERS ----------------------------- */
+.offer {
+  border-left: 3px solid #ccc;
+  border-left-color: #48a2dd;
+}
+
+.offer-discount {
+  font-weight: bold;
+  font-size: large;
+  color: #d9534f;
+}
+
+.offer-valid-until {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* ----------------------------- NEARBY BLOODBANKS ----------------------------- */
+.bloodbank {
+  border-left: 3px solid #ccc;
+  border-left-color: #8e44ad;
+}
+
+/* ----------------------------- STATS ----------------------------- */
+.stat {
+  background-color: #ffffff;
+  margin: 10px;
+  padding: 10px;
+  border: 2px solid #dadada;
+  border-radius: 8px;
+}
+
+.stat h4 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  flex: 1 1 160px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 16px;
+  padding-top: 34px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.stat-icon {
+  font-size: 28px;
+  color: #e53935;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ----------------------------- ACHIEVEMENTS ----------------------------- */
+.achievements-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.achievement-square-card {
+  width: 120px;
+  height: 90px;
+  border-radius: 16px;
+  background-color: #ccc;
+  color: white;
+  text-align: center;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.achievement-square-card:hover {
+  transform: scale(1.05);
+}
+
+.achievement-icon {
+  font-size: 32px;
+  color: #ffffff;
+}
+
+.achievement-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.achievement-title {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.achievement-points {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.dashboard-section-achievements {
+  position: relative;
+}
+
+/* --------------------- ACHIEVEMENTS TOOLTIP (description) --------------------- */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  max-width: 200px;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  text-align: center;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  z-index: 9999 !important;
+}
+
+.tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltip,
+.tooltip-container:focus-within .tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dashboard-section-achievements,
+.dashboard-section-achievements .section-content,
+.dashboard-section-achievements .achievements,
+.dashboard-section-achievements .achievements-grid {
+  overflow: visible !important;
+}
+
+.dashboard-section-posts .section-content,
+.dashboard-section-offers .section-content,
+.dashboard-section-nearby-bloodbanks .section-content,
+.dashboard-section-stats .section-content {
+  overflow-y: auto;
+}
+
+/* ----------------------------- RARITIES ----------------------------- */
+.comum { background-color: #9fbac7; }
+.raro { background-color: #64b5f6; }
+.épico { background-color: #ba68c8; }
+.lendário { background: linear-gradient(to right, #FFD200, #F7971E); }
+.mítico { background: linear-gradient(to right, #004e92, #000428); }

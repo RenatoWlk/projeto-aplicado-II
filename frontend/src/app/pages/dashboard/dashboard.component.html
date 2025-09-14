@@ -1,0 +1,211 @@
+<div class="dashboard-container">
+
+  <!-- =================== -->
+  <!-- BLOODBANK DASHBOARD -->
+  <!-- =================== -->
+  <app-bloodbank-dashboard *ngIf="userRole === roles.Bloodbank"></app-bloodbank-dashboard>
+
+  <!-- ================= -->
+  <!-- CAMPAIGNS SECTION -->
+  <!-- ================= -->
+  <section class="app-card card-overflow">
+    <div class="app-card-header">
+      <i class="fas fa-book-medical app-card-icon"></i>
+      <h2 class="app-card-title">{{ postsSectionTitle }}</h2>
+    </div>
+
+    <app-preloader *ngIf="loadingPosts" type="skeleton-cards" [count]="3" [size]="'large'" [visible]="true"></app-preloader>
+
+    <div class="cards-grid-large cards-grid-overflow-large">
+      <article class="card post" *ngFor="let post of posts">
+        <header class="card-header">
+          <h3 class="card-title dashboard-card-title">{{ post.title }}</h3>
+          <p class="card-subtitle">
+            <time [attr.datetime]="post.startDate">{{ post.startDate | date: 'dd/MM/yyyy' }}</time>
+            até
+            <time [attr.datetime]="post.endDate">{{ post.endDate | date: 'dd/MM/yyyy' }}</time>
+          </p>
+        </header>
+        <p class="card-body">{{ post.body }}</p>
+        <footer class="card-footer">
+          <p class="address">{{ post.location.street }} - {{ post.location.city }}-{{ post.location.state }} - {{ post.location.zipCode }}</p>
+          <a class="phone-link" [href]="'tel:' + post.phone">{{ post.phone }}</a>
+        </footer>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============== -->
+  <!-- OFFERS SECTION -->
+  <!-- ============== -->
+  <section class="app-card">
+    <div class="app-card-header">
+      <i class="fas fa-tags app-card-icon"></i>
+      <h2 class="app-card-title">{{ offersSectionTitle }}</h2>
+      <div *ngIf="userRole === roles.Partner" class="create-post-container">
+        <button class="app-button create-post-button" (click)="isOfferModalOpen = true">
+          <i class="fas fa-plus create-post-icon"></i>
+          Criar nova oferta
+        </button>
+      </div>
+    </div>
+
+    <app-preloader *ngIf="loadingOffers" type="skeleton-cards" [count]="3" [size]="'medium'" [visible]="true"></app-preloader>
+
+    <div class="cards-grid-medium cards-grid-overflow-medium">
+      <article class="card offer" *ngFor="let offer of offers">
+        <header class="card-header">
+          <h3 class="card-title">
+            <span class="offer-partner-name">{{ offer.partnerName }}</span>: {{ offer.title }}
+          </h3>
+        </header>
+        <p class="card-body">{{ offer.body }}</p>
+        <footer class="card-footer">
+          <p class="offer-discount">{{ offer.discountPercentage }}% de desconto</p>
+          <time class="offer-valid-until">Válido até: {{ offer.validUntil | date: 'dd/MM/yyyy' }}</time>
+        </footer>
+      </article>
+    </div>
+  </section>
+
+  <!-- ========================= -->
+  <!-- NEARBY BLOODBANKS SECTION -->
+  <!-- ========================= -->
+  <section class="app-card">
+    <div class="app-card-header">
+      <i class="fas fa-location-dot app-card-icon"></i>
+      <h2 class="app-card-title">{{ nearbyBloodbanksSectionTitle }}</h2>
+    </div>
+    <!-- VISIBLE ONLY TO LOGGED-IN USERS WITH ROLE 'USER' -->
+    <ng-container *ngIf="isLoggedIn; else loginPrompt">
+      <ng-container *ngIf="userRole === roles.User; else restrictedRolePrompt">
+
+        <app-preloader *ngIf="loadingBloodbanks" type="skeleton-cards" [count]="3" [size]="'medium'" [visible]="true"></app-preloader>
+
+        <div class="cards-grid-medium cards-grid-overflow-medium">
+          <article class="card bloodbank" *ngFor="let bloodbank of nearbyBloodbanks">
+            <header class="card-header">
+              <h3 class="card-title">{{ bloodbank.name }}</h3>
+              <p class="card-title">{{ getReadableBloodbankDistance(bloodbank.distance) }} de distância</p>
+              <p class="address">{{ bloodbank.address.street }} - {{ bloodbank.address.city }}-{{ bloodbank.address.state }} - {{ bloodbank.address.zipCode }}</p>
+            </header>
+            <footer class="card-footer">
+              <a class="phone-link" [href]="'tel:' + bloodbank.phone">{{ bloodbank.phone }}</a>
+            </footer>
+          </article>
+        </div>
+      </ng-container>
+    </ng-container>
+  </section>
+
+  <!-- ================== -->
+  <!-- STATISTICS SECTION -->
+  <!-- ================== -->
+  <section class="app-card">
+    <div class="app-card-header">
+      <i class="fas fa-chart-simple app-card-icon"></i>
+      <h2 class="app-card-title">{{ statsSectionTitle }}</h2>
+    </div>
+    <!-- VISIBLE ONLY TO LOGGED-IN USERS WITH ROLE 'USER' -->
+    <ng-container *ngIf="isLoggedIn; else loginPrompt">
+      <ng-container *ngIf="userRole === roles.User; else restrictedRolePrompt">
+
+        <app-preloader *ngIf="loadingStatsAndAchievements" type="skeleton-cards" [count]="6" [size]="'small'" [visible]="true"></app-preloader>
+
+        <div class="cards-grid-small" *ngIf="!loadingStatsAndAchievements">
+          <div class="stat-card" *ngFor="let stat of [
+            { icon: 'fa-hand-holding-heart', label: 'Doações', value: userStats.timesDonated },
+            { icon: 'fa-heartbeat', label: 'Vidas salvas', value: userStats.potentialLivesSaved },
+            { icon: 'fa-heart', label: 'Você doou', value: totalLitersDonated},
+            { icon: 'fa-tint', label: 'Tipo sanguíneo', value: userStats.bloodType },
+            { icon: 'fa-clock', label: 'Próxima doação', value: userStats.timeUntilNextDonation },
+            { icon: 'fa-calendar-check', label: 'Última doação', value: (userStats.lastDonationDate | date: 'dd/MM/yyyy') },
+            { icon: 'custom', label: 'Total de pontos', value: userStats.totalPoints }
+          ]">
+            <ng-container *ngIf="stat.icon !== 'custom'; else customIcon">
+              <i class="fas {{ stat.icon }} stat-icon"></i>
+            </ng-container>
+            <ng-template #customIcon>
+              <img src="assets/icon.png" style="height: 29px; width: 31px;">
+            </ng-template>
+            <p class="stat-label">{{ stat.label }}</p>
+            <p class="stat-value">{{ stat.value }}</p>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </section>
+
+  <!-- ==================== -->
+  <!-- ACHIEVEMENTS SECTION -->
+  <!-- ==================== -->
+  <section class="app-card">
+    <div class="app-card-header">
+      <i class="fas fa-trophy app-card-icon"></i>
+      <h2 class="app-card-title">{{ achievementsSectionTitle }}</h2>
+    </div>
+    <!-- VISIBLE ONLY TO LOGGED-IN USERS WITH ROLE 'USER' -->
+    <ng-container *ngIf="isLoggedIn; else loginPrompt">
+      <ng-container *ngIf="userRole === roles.User; else restrictedRolePrompt">
+
+        <app-preloader *ngIf="loadingStatsAndAchievements" type="spinner" [visible]="true"></app-preloader>
+
+        <div class="achievements-grid" *ngIf="!loadingStatsAndAchievements">
+          <div
+            *ngFor="let achievement of userStats.achievements"
+            class="achievement-square-card tooltip-container"
+            [ngClass]="achievement.rarity.toLowerCase()"
+          >
+            <i class="fas achievement-icon" [ngClass]="achievement.imageUrl"></i>
+            <div class="achievement-info">
+              <span class="achievement-title">{{ achievement.title }}</span>
+              <span class="achievement-points">+{{ achievement.points }} pts</span>
+            </div>
+            <div class="tooltip">{{ achievement.description }}</div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </section>
+
+  <!-- ==================== -->
+  <!-- LEADERBOARDS SECTION -->
+  <!-- ==================== -->
+  <app-leaderboards></app-leaderboards>
+
+  <!-- ======================= -->
+  <!-- LOGIN REQUIRED TEMPLATE -->
+  <!-- ======================= -->
+  <ng-template #loginPrompt>
+    <div class="card">
+      <p class="card-title">{{ loginRequiredMessage }}</p>
+      <button routerLink="/login" class="app-button">Fazer Login</button>
+    </div>
+  </ng-template>
+
+  <!-- ======================== -->
+  <!-- RESTRICTED ROLE TEMPLATE -->
+  <!-- ======================== -->
+  <ng-template #restrictedRolePrompt>
+    <div class="card">
+      <p class="card-title">
+        Esta seção é exclusiva para doadores.
+      </p>
+    </div>
+  </ng-template>
+
+  <!-- ====================== -->
+  <!-- CREATE NEW OFFER MODAL -->
+  <!-- ====================== -->
+  <app-modal
+    [title]="'Criar nova oferta'"
+    [visible]="isOfferModalOpen"
+    (close)="isOfferModalOpen = false"
+  >
+    <app-form-create-item
+      [type]="'offer'"
+      (submitForm)="createNewOffer($event)">
+    </app-form-create-item>
+  </app-modal>
+
+</div>

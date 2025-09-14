@@ -1,0 +1,14 @@
+<div class="preloader-container" *ngIf="visible">
+  <ng-container [ngSwitch]="type">
+    <!-- Spinner preloader -->
+    <div *ngSwitchCase="'spinner'" class="spinner"></div>
+
+    <!-- Skeleton cards preloader -->
+    <div *ngSwitchCase="'skeleton-cards'" class="skeleton-cards">
+      <div [ngClass]="size" class="skeleton-card" *ngFor="let _ of createArray(count)"></div>
+    </div>
+
+    <!-- Default fallback -->
+    <div *ngSwitchDefault>Carregando...</div>
+  </ng-container>
+</div>

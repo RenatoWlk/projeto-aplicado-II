@@ -1,0 +1,117 @@
+# ============================
+# GLOBAL
+# ============================
+HELP.md
+*.log
+*.env
+.env.local
+.DS_Store
+Thumbs.db
+
+# ============================
+# BACKEND - Java / Spring Boot
+# ============================
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Gradle
+.gradle/
+build/
+gradlew
+gradlew.bat
+
+# Java Binaries
+bin
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Spring Tool Suite (STS)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ============================
+# FRONTEND - Angular
+# ============================
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.angular/cache/
+/frontend/.angular/config.json
+/frontend/.env
+/frontend/.env.*.local
+/frontend/yarn.lock
+/frontend/package-lock.json
+yarn.lock
+package-lock.json
+
+# npm / yarn logs
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+
+# Angular build artifacts
+/frontend/.output/
+
+# VS Code
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typingss
+
+# System files
+.DS_Store
+Thumbs.db

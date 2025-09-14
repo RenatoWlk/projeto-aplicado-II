@@ -1,0 +1,66 @@
+<!-- ==================== -->
+<!-- LEADERBOARDS SECTION -->
+<!-- ==================== -->
+<section class="app-card">
+    <div class="app-card-header">
+        <i class="fas fa-award app-card-icon"></i>
+        <h2 class="app-card-title">Rankings</h2>
+    </div>
+
+    <div class="tabs">
+        <button 
+            class="tab-button" 
+            [class.active]="activeTab === 'donors'" 
+            (click)="activeTab = 'donors'">
+            Top 50 Doadores
+        </button>
+        <button 
+            class="tab-button" 
+            [class.active]="activeTab === 'points'" 
+            (click)="activeTab = 'points'">
+            Top 50 Pontuação
+        </button>
+    </div>
+
+    <div class="tab-content">
+        <app-preloader *ngIf="isLoadingLeaderboards" type="spinner" [visible]="true"></app-preloader>
+
+        <!-- Top 50 Donors -->
+        <ul *ngIf="activeTab === 'donors' && !isLoadingLeaderboards" class="ranking-list">
+            <li *ngFor="let donor of topDonors; let i = index">
+                <span class="position">
+                    <span class="position">
+                        <ng-container [ngSwitch]="i">
+                            <span class="first-place" *ngSwitchCase="0"> 1º</span>
+                            <span class="second-place" *ngSwitchCase="1"> 2º</span>
+                            <span class="third-place" *ngSwitchCase="2"> 3º</span>
+                            <span *ngSwitchDefault>{{ i + 1 }}º</span>
+                        </ng-container>
+                    </span>
+                </span>
+                <span class="name">{{ donor.name }}</span>
+                <span class="bloodtype">{{ donor.bloodtype }}</span>
+                <span class="value">{{ donor.totalDonations }} doações</span>
+            </li>
+        </ul>
+
+        <!-- Top 50 by Points -->
+        <ul *ngIf="activeTab === 'points' && !isLoadingLeaderboards" class="ranking-list">
+            <li *ngFor="let user of topPoints; let i = index">
+                <span class="position">
+                    <span class="position">
+                        <ng-container [ngSwitch]="i">
+                            <span class="first-place" *ngSwitchCase="0"> 1º</span>
+                            <span class="second-place" *ngSwitchCase="1"> 2º</span>
+                            <span class="third-place" *ngSwitchCase="2"> 3º</span>
+                            <span *ngSwitchDefault>{{ i + 1 }}º</span>
+                        </ng-container>
+                    </span>
+                </span>
+                <span class="name">{{ user.name }}</span>
+                <span class="bloodtype">{{ user.bloodtype }}</span>
+                <span class="value">{{ user.points }} pontos</span>
+            </li>
+        </ul>
+    </div>
+</section>

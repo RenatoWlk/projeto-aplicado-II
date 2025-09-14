@@ -1,0 +1,16 @@
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin: 1rem;
+    border-radius: 12px;
+  }
+}

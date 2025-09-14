@@ -1,0 +1,369 @@
+.calendar-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    gap: 20px;
+}
+
+.stats-section {
+  flex: 1;
+  max-width: 600px;
+}
+
+.calendar-wrapper {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex: 1;
+}
+
+.calendar {
+    font-family: 'Poppins', sans-serif;
+    padding: 60px;
+}
+
+.mat-calendar {
+    width: 400px;
+    border-radius: 15px;
+    background-color: white !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mat-calendar-table-header {
+    margin-top: 5px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+}
+
+.mat-calendar-body-label {
+    font-family: 'Poppins', sans-serif;
+}
+
+.mat-mdc-card {
+    justify-content: space-evenly;
+}
+
+.mat-calendar-body-today {
+    border: none !important;
+    background-color: none !important;
+}
+
+.selected-date {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    border-left: 4px solid #c62828;
+    background-color: #ffecec;
+    border-radius: 0.5rem;
+    width: 450px;
+}
+
+.mat-calendar-body-selected {
+    border-color: #c62828 !important;
+    background-color: #c62828 !important;
+    color:white;
+}
+
+.calendar-layout .app-card .app-card-header {
+    justify-content: center;
+}
+
+.calendar-stats .stats-grid .card {
+    margin: 16px;
+    justify-content: center;
+}
+
+.calendar-stats .calendar-stats-grid .card {
+    justify-items: center;
+    margin: 12px;
+}
+
+.calendar-stat-value {
+    font-weight: 600;
+}
+
+.calendar-layout .app-card {
+    max-height: 800px;
+    max-width: 600px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.date-wrapper {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 1rem;
+}
+
+.schedule-btn {
+    width: 14srem;
+    height: 3.2rem;
+    font-size: large;
+    padding: 0.5rem 1rem;
+    background-color: #c62828;
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.schedule-btn:hover {
+  background-color: white;
+  color: #c62828;
+  border:  2px solid #c62828 ;
+}
+
+.mat-calendar-table-header th {
+    padding: 10px 0px 0px 0px !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.mat-calendar-body-cell-content {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600 !important;
+}
+
+.schedule-card {
+    height: 680px;
+    width: 600px;
+}
+
+.form-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.schedule-button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.full-width {
+    width: 30rem;
+    gap: 2rem;
+}
+
+.mat-mdc-option {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.mat-mdc-option .mdc-list-item__primary-text {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+mat-label {
+    font-size: large;
+}
+
+mat-label,
+.mat-mdc-select-min-line,
+.mat-mdc-form-field-infix,
+.mdc-list-item,
+.mat-date-range-input-inner,
+.mat-timepicker-input {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.mat-mdc-select-panel {
+    background-color: white !important;
+}
+
+.mat-start-date, .mat-end-date {
+    font-size: 14px !important;
+}
+
+.mat-timepicker-panel {
+    background-color: white !important;
+}
+
+.calendar-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    gap: 20px;
+}
+
+.schedule-card {
+    height: 680px;
+    width: 600px;
+}
+
+.form-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.schedule-button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.full-width {
+    width: 30rem;
+    gap: 2rem;
+}
+
+mat-label {
+    font-size: large;
+}
+
+mat-label,
+.mat-mdc-select-min-line,
+.mat-mdc-form-field-infix,
+.mdc-list-item {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.mat-mdc-select-panel {
+    background-color: white !important;
+}
+
+.stats-section {
+  flex: 1;
+  max-width: 600px;
+}
+
+.calendar-wrapper {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex: 1;
+}
+
+.calendar {
+    font-family: 'Poppins', sans-serif;
+    padding: 60px;
+}
+
+.mat-calendar {
+    width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mat-calendar-table-header {
+    margin-top: 5px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+}
+
+.mat-calendar-body-label {
+    font-family: 'Poppins', sans-serif;
+}
+
+.mat-mdc-card {
+    justify-content: space-evenly;
+}
+
+.mat-calendar-body-today {
+    border: none !important;
+    background-color: none !important;
+}
+
+.selected-date {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    border-left: 4px solid #c62828;
+    background-color: #ffecec;
+    border-radius: 0.5rem;
+    width: 450px;
+}
+
+.mat-calendar-body-selected {
+    border-color: #c62828 !important;
+    background-color: #c62828 !important;
+    color:white;
+}
+
+.calendar-layout .app-card .app-card-header {
+    justify-content: center;
+}
+
+.calendar-stats .stats-grid .card {
+    margin: 16px;
+    justify-content: center;
+}
+
+.calendar-stats .calendar-stats-grid .card {
+    justify-items: center;
+    margin: 12px;
+}
+
+.calendar-stat-value {
+    font-weight: 600;
+}
+
+.calendar-layout .app-card {
+    max-height: 800px;
+    max-width: 600px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.date-wrapper {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 1rem;
+}
+
+.schedule-btn {
+    width: 14srem;
+    height: 3.2rem;
+    font-size: large;
+    padding: 0.5rem 1rem;
+    background-color: #c62828;
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.schedule-btn:hover {
+  background-color: white;
+  color: #c62828;
+  border:  2px solid #c62828 ;
+}
+
+.mat-calendar-table-header th {
+    padding: 10px 0px 0px 0px !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.mat-calendar-body-cell-content {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600 !important;
+}
+
+.mat-calendar-content {
+    font-family: 'Poppins', sans-serif;
+    background-color: white;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius:  15px;
+}

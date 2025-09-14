@@ -1,0 +1,72 @@
+<div class="calendar-layout">
+    <div class="app-card schedule-card">
+        <div class="app-card-header">
+            <i class="fa-solid fa-calendar-days app-card-icon"></i>
+            <h2 class="app-card-title">Disponibilize datas para doação!</h2>
+        </div>
+
+        <form [formGroup]="rangeForm" style="margin-top: 50px;">
+            <div class="form-body">
+                <!-- Date range -->
+                <mat-form-field appearance="outline" class="custom-form-field full-width">
+                    <mat-label>Insira um intervalo de datas</mat-label>
+                    <mat-date-range-input [rangePicker]="picker">
+                        <input matStartDate formControlName="startDate" placeholder="Data inicial">
+                        <input matEndDate formControlName="endDate" placeholder="Data final">
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker [calendarHeaderComponent]="customHeader"></mat-date-range-picker>
+                </mat-form-field>
+
+                <!-- Start time -->
+                <mat-form-field appearance="outline" class="custom-form-field full-width">
+                    <mat-label>Horário inicial</mat-label>
+                    <input matInput [matTimepicker]="startTime" formControlName="startTime">
+                    <mat-timepicker-toggle matIconSuffix [for]="startTime"></mat-timepicker-toggle>
+                    <mat-timepicker #startTime></mat-timepicker>
+                </mat-form-field>
+
+                <!-- End time -->
+                <mat-form-field appearance="outline" class="custom-form-field full-width">
+                    <mat-label>Horário final</mat-label>
+                    <input matInput [matTimepicker]="endTime" formControlName="endTime">
+                    <mat-timepicker-toggle matIconSuffix [for]="endTime"></mat-timepicker-toggle>
+                    <mat-timepicker #endTime></mat-timepicker>
+                </mat-form-field>
+            </div>
+
+            <div class="schedule-button-container">
+                <button type="button" class="schedule-btn" (click)="addAvailableSlots()">Disponibilizar datas para doação</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- <div class="app-card">
+        <div class="app-card-header">
+        <i class="fa-solid fa-bell app-card-icon"></i>
+        <h2 class="app-card-title">Datas de doação</h2>
+        </div>
+        <div class="calendar-stats">
+            <div class="calendar-stats-grid">
+                <div class='card'>
+                    <i class="fa-solid fa-calendar-week app-card-icon"></i>
+                    <div class="app-card-header">
+                        <p>Ultima doação</p>
+                    </div>
+                </div>
+                <div class='card'>
+                    <i class="fa-solid fa-calendar-week app-card-icon"></i>
+                    <div class="app-card-header">
+                        <p class="calendar-stat-label">Próxima doação</p>
+                    </div>
+                </div>
+                <div class='card'>
+                    <i class="fa-solid fa-clock app-card-icon"></i>
+                    <div class="app-card-header">
+                        <p>Dias para a próxima doação</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+</div>

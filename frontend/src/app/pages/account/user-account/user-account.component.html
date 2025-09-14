@@ -1,0 +1,625 @@
+<div *ngIf="isLoading" class="loading-spinner">
+  <i class="fa-solid fa-spinner fa-spin"></i>
+  Carregando...
+</div>
+
+<div *ngIf="error" class="error-message">
+  <i class="fa-solid fa-exclamation-triangle"></i>
+  {{ error }}
+</div>
+
+<div *ngIf="successMessage" class="success-message">
+  <i class="fa-solid fa-check-circle"></i>
+  {{ successMessage }}
+</div>
+
+<!-- Modo Visualização Principal -->
+<ng-container *ngIf="!editProfileMode && !changePasswordMode && !showAchievements && !showQuestionnaires">
+  
+  <!-- Card do Perfil -->
+  <div class="app-card">
+    <div class="app-card-header">
+      <i class="fa-solid fa-user app-card-icon"></i>
+      <h2 class="app-card-title">Meu Perfil</h2>
+    </div>
+    
+    <div class="account-header">
+      <div class="profile-photo-wrapper">
+        <img [src]="user?.photoUrl || 'assets/profile2.png'" 
+              alt="Foto de Perfil" 
+              class="profile-photo" />
+        <input #fileInput 
+                type="file" 
+                (change)="onPhotoSelected($event)" 
+                accept="image/*" 
+                hidden>
+        <button type="button" 
+                class="profile-photo-edit-btn" 
+                (click)="fileInput.click()"
+                [disabled]="isLoading">
+          <i class="fa-solid fa-camera"></i>
+          Trocar Foto
+        </button>
+      </div>
+      
+      <div class="account-info">
+        <p><strong>Nome:</strong> {{ user?.name }}</p>
+        <p><strong>Email:</strong> {{ user?.email }}</p>
+        <p><strong>Tipo Sanguíneo:</strong> 
+          <span class="blood-type">{{ user?.bloodType }}</span>
+        </p>
+        <p *ngIf="user?.address"><strong>Endereço:</strong> {{ user?.address?.street }} - {{ user?.address?.city }}-{{ user?.address?.state}}</p>
+        <p *ngIf="user?.phone"><strong>Telefone:</strong> {{ user?.phone }}</p>
+        <p *ngIf="user?.cpf"><strong>CPF:</strong> {{ user?.cpf }}</p>
+        <p *ngIf="user?.gender"><strong>Gênero:</strong> {{ user?.gender }}</p>
+        
+        <div class="profile-actions">
+          <button type="button" 
+                  (click)="onEditProfile()" 
+                  [disabled]="isLoading">
+            <i class="fa-solid fa-edit"></i>
+            Editar Perfil
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card de Doações -->
+  <div class="app-card">
+    <div class="app-card-header">
+      <i class="fa-solid fa-heart app-card-icon"></i>
+      <h2 class="app-card-title">Status de Doação</h2>
+    </div>
+    
+    <div class="donation-status">
+      <div class="donation-info">
+        <div class="donation-item">
+          <i class="fa-solid fa-calendar-check"></i>
+          <div>
+            <strong>Última doação:</strong>
+            <span>{{ user?.lastDonation ? (user?.lastDonation | date:'dd/MM/yyyy') : 'Nenhuma doação registrada' }}</span>
+            <small *ngIf="calculateDaysSinceLastDonation()">
+              ({{ calculateDaysSinceLastDonation() }} dias atrás)
+            </small>
+          </div>
+        </div>
+        
+        <div class="donation-item">
+          <i class="fa-solid fa-calendar-plus"></i>
+          <div>
+            <strong>Próxima doação possível:</strong>
+            <span>{{ user?.nextEligibleDonation ? (user?.nextEligibleDonation | date:'dd/MM/yyyy') : 'Consulte um profissional' }}</span>
+            <small *ngIf="calculateDaysUntilNextDonation() !== null">
+              <span *ngIf="canDonateNow()" class="can-donate">Você já pode doar!</span>
+              <span *ngIf="!canDonateNow()" class="wait-time">
+                (em {{ calculateDaysUntilNextDonation() }} dias)
+              </span>
+            </small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="donation-cta" *ngIf="canDonateNow()">
+        <i class="fa-solid fa-heart-pulse"></i>
+        <p>Você está apto para doar sangue!</p>
+        <button type="button" class="cta-button">
+          <i class="fa-solid fa-map-marker-alt"></i>
+          Encontrar Banco de Sangue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card de Ações -->
+  <div class="app-card">
+    <div class="app-card-header">
+      <i class="fa-solid fa-star app-card-icon"></i>
+      <h2 class="app-card-title">Minha Jornada</h2>
+    </div>
+    
+    <div class="account-actions">
+      <button type="button"
+              class="account-action-btn achievements"
+              (click)="showAchievementsView()"
+              [disabled]="isLoading">
+        <i class="fa-solid fa-trophy"></i>
+        <span>Ver Conquistas</span>
+        <small *ngIf="hasAchievements">
+          {{ achievementsCount }} conquista(s)
+        </small>
+      </button>
+      
+      <button type="button"
+              class="account-action-btn questionnaires"
+              (click)="showQuestionnairesView()"
+              [disabled]="isLoading">
+        <i class="fa-solid fa-clipboard-list"></i>
+        <span>Ver Questionários</span>
+        <small>Histórico de elegibilidade</small>
+      </button>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Formulário de Edição do Perfil -->
+<div *ngIf="editProfileMode" class="app-card">
+  <div class="app-card-header">
+    <i class="fa-solid fa-user-edit app-card-icon"></i>
+    <h2 class="app-card-title">Editar Perfil</h2>
+  </div>
+
+  <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+    <label>
+      <span>Nome Completo</span>
+      <input type="text" 
+              formControlName="name"
+              placeholder="Seu nome completo"
+              [class.invalid]="isFieldInvalid(profileForm, 'name')" />
+      <div *ngIf="getFieldError(profileForm, 'name')" class="error-text">
+        {{ getFieldError(profileForm, 'name') }}
+      </div>
+    </label>
+    
+    <label>
+      <span>Email</span>
+      <input type="email" 
+              formControlName="email"
+              placeholder="seu@email.com"
+              [class.invalid]="isFieldInvalid(profileForm, 'email')" />
+      <div *ngIf="getFieldError(profileForm, 'email')" class="error-text">
+        {{ getFieldError(profileForm, 'email') }}
+      </div>
+    </label>
+    
+    <label>
+      <span>Endereço</span>
+      <input type="text" 
+              formControlName="address"
+              placeholder="Endereço completo"
+              [class.invalid]="isFieldInvalid(profileForm, 'address')" />
+      <div *ngIf="getFieldError(profileForm, 'address')" class="error-text">
+        {{ getFieldError(profileForm, 'address') }}
+      </div>
+    </label>
+    
+    <label>
+      <span>Telefone</span>
+      <input type="tel" 
+              formControlName="phone"
+              placeholder="(11) 99999-9999"
+              [class.invalid]="isFieldInvalid(profileForm, 'phone')" />
+      <div *ngIf="getFieldError(profileForm, 'phone')" class="error-text">
+        {{ getFieldError(profileForm, 'phone') }}
+      </div>
+    </label>
+    
+    <label>
+      <span>CPF</span>
+      <input type="text" 
+              formControlName="cpf"
+              placeholder="000.000.000-00"
+              [class.invalid]="isFieldInvalid(profileForm, 'cpf')" />
+      <div *ngIf="getFieldError(profileForm, 'cpf')" class="error-text">
+        {{ getFieldError(profileForm, 'cpf') }}
+      </div>
+    </label>
+
+    <label>
+      <span>Gênero</span>
+      <select formControlName="gender" [class.invalid]="isFieldInvalid(profileForm, 'gender')">
+        <option value="">Selecione...</option>
+        <option *ngFor="let option of genderOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+      <div *ngIf="getFieldError(profileForm, 'gender')" class="error-text">
+        {{ getFieldError(profileForm, 'gender') }}
+      </div>
+    </label>
+
+    <div class="form-actions">
+      <button type="submit" 
+              class="primary"
+              [disabled]="isLoading || profileForm.invalid">
+        <i class="fa-solid fa-save"></i>
+        Salvar Alterações
+      </button>
+      <button type="button" 
+              class="secondary" 
+              (click)="cancelEdit()"
+              [disabled]="isLoading">
+        <i class="fa-solid fa-times"></i>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Formulário de Alteração de Senha -->
+<div *ngIf="changePasswordMode" class="app-card">
+  <div class="app-card-header">
+    <i class="fa-solid fa-key app-card-icon"></i>
+    <h2 class="app-card-title">Alterar Senha</h2>
+  </div>
+
+  <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+    <label>
+      <span>Senha Atual</span>
+      <input type="password" 
+              formControlName="currentPassword"
+              placeholder="Digite sua senha atual"
+              [class.invalid]="isFieldInvalid(passwordForm, 'currentPassword')" />
+      <div *ngIf="getFieldError(passwordForm, 'currentPassword')" class="error-text">
+        {{ getFieldError(passwordForm, 'currentPassword') }}
+      </div>
+    </label>
+    
+    <label>
+      <span>Nova Senha</span>
+      <input type="password" 
+              formControlName="newPassword"
+              placeholder="Digite a nova senha (mín. 6 caracteres)"
+              [class.invalid]="isFieldInvalid(passwordForm, 'newPassword')" />
+      <div *ngIf="getFieldError(passwordForm, 'newPassword')" class="error-text">
+        {{ getFieldError(passwordForm, 'newPassword') }}
+      </div>
+    </label>
+    
+    <label>
+      <span>Confirmar Nova Senha</span>
+      <input type="password" 
+              formControlName="confirmPassword"
+              placeholder="Digite novamente a nova senha"
+              [class.invalid]="isFieldInvalid(passwordForm, 'confirmPassword')" />
+      <div *ngIf="getFieldError(passwordForm, 'confirmPassword')" class="error-text">
+        {{ getFieldError(passwordForm, 'confirmPassword') }}
+      </div>
+    </label>
+
+    <div class="form-actions">
+      <button type="submit" 
+              class="primary"
+              [disabled]="isLoading || passwordForm.invalid">
+        <i class="fa-solid fa-save"></i>
+        Alterar Senha
+      </button>
+      <button type="button" 
+              class="secondary" 
+              (click)="cancelPassword()"
+              [disabled]="isLoading">
+        <i class="fa-solid fa-times"></i>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Página de Conquistas -->
+<div *ngIf="showAchievements" class="app-card achievements-page">
+  <div *ngIf = "hasAchievements; else noAchievements">  
+  <div class="app-card-header">
+    <i class="fa-solid fa-trophy app-card-icon"></i>
+    <h2 class="app-card-title">Minhas Conquistas</h2>
+  </div>
+  
+  <div class="badges-list">
+    <div class="achievements-grid" *ngIf="!loadingStatsAndAchievements">
+      <div
+        *ngFor="let achievement of userStats.achievements"
+        class="achievement-square-card tooltip-container"
+        [ngClass]="achievement.rarity.toLowerCase()"
+      >
+        <i class="fas achievement-icon" [ngClass]="achievement.imageUrl"></i>
+        <div class="achievement-info">
+          <span class="achievement-title">{{ achievement.title }}</span>
+          <span class="achievement-points">+{{ achievement.points }} pts</span>
+        </div>
+        <div class="tooltip">{{ achievement.description }}</div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <ng-template #noAchievements>
+    <div class="empty-state">
+      <i class="fa-solid fa-medal" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+      <p>Nenhuma conquista ainda</p>
+      <p style="color: #666; font-size: 0.9rem;">Continue doando para desbloquear conquistas incríveis!</p>
+    </div>
+  </ng-template>
+  
+  <button type="button" class="secondary" (click)="hideViews()">
+    <i class="fa-solid fa-arrow-left"></i>
+    Voltar
+  </button>
+</div>
+
+
+<!-- Página de Questionários Melhorada -->
+<div *ngIf="showQuestionnaires" class="app-card questionnaires-page">
+  <div class="app-card-header">
+    <i class="fa-solid fa-clipboard-list app-card-icon"></i>
+    <h2 class="app-card-title">Questionários de Doação</h2>
+  </div>
+  
+  <div *ngIf="lastQuestionnaire; else noQuestionnaires" class="questionnaire-content">
+    <!-- Status de Elegibilidade -->
+    <div class="eligibility-banner" 
+         [ngClass]="lastQuestionnaire.isEligible ? 'eligible' : 'not-eligible'">
+      <div class="banner-content">
+        <i class="fa-solid" 
+           [ngClass]="lastQuestionnaire.isEligible ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+        <div class="banner-text">
+          <h3>{{ lastQuestionnaire.isEligible ? 'APTO PARA DOAÇÃO' : 'NÃO APTO PARA DOAÇÃO' }}</h3>
+          <p>{{ lastQuestionnaire.resultMessage }}</p>
+        </div>
+      </div>
+      <!--<div class="banner-date">
+        <small>Avaliado em {{ lastQuestionnaire.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
+      </div>-->
+    </div>
+
+    <!-- Informações Básicas -->
+    <div class="questionnaire-section">
+      <h4><i class="fa-solid fa-user"></i> Informações Básicas</h4>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Gênero:</span>
+          <span class="value">{{ lastQuestionnaire.gender }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questões de Saúde Geral -->
+    <div class="questionnaire-section">
+      <h4><i class="fa-solid fa-heart-pulse"></i> Saúde Geral</h4>
+      <div class="questions-list">
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.healthy)">
+          <div class="question-text">Está se sentindo bem de saúde?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.healthy)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.healthy) }}
+          </div>
+        </div>
+
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.symptoms, true)">
+          <div class="question-text">Apresenta sintomas como febre, gripe, resfriado?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.symptoms, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.symptoms) }}
+          </div>
+        </div>
+
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.diseases, true)">
+          <div class="question-text">Possui doenças cardíacas, diabetes, ou outras condições crônicas?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.diseases, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.diseases) }}
+          </div>
+        </div>
+
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.medications, true)">
+          <div class="question-text">Está tomando medicamentos?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.medications, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.medications) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questões Específicas para Mulheres -->
+    <div *ngIf="lastQuestionnaire.gender === 'Feminino'" class="questionnaire-section">
+      <h4><i class="fa-solid fa-venus"></i> Questões Específicas - Mulheres</h4>
+      <div class="questions-list">
+        <div *ngIf="lastQuestionnaire.pregnant" 
+             class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.pregnant, true)">
+          <div class="question-text">Está grávida?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.pregnant, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.pregnant) }}
+          </div>
+        </div>
+
+        <div *ngIf="lastQuestionnaire.recentChildbirth" 
+             class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.recentChildbirth, true)">
+          <div class="question-text">Teve parto ou aborto nos últimos 12 meses?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.recentChildbirth, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.recentChildbirth) }}
+          </div>
+        </div>
+
+        <div *ngIf="lastQuestionnaire.lastDonationFemale" 
+             class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.lastDonationFemale, true)">
+          <div class="question-text">Última doação foi há menos de 90 dias?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.lastDonationFemale, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.lastDonationFemale) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questões Específicas para Homens -->
+    <div *ngIf="lastQuestionnaire.gender === 'Masculino'" class="questionnaire-section">
+      <h4><i class="fa-solid fa-mars"></i> Questões Específicas - Homens</h4>
+      <div class="questions-list">
+        <div *ngIf="lastQuestionnaire.lastDonationMale" 
+             class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.lastDonationMale, true)">
+          <div class="question-text">Última doação foi há menos de 60 dias?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.lastDonationMale, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.lastDonationMale) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questões sobre Comportamento de Risco -->
+    <div class="questionnaire-section">
+      <h4><i class="fa-solid fa-shield-halved"></i> Comportamento de Risco</h4>
+      <div class="questions-list">
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.drugs, true)">
+          <div class="question-text">Fez uso de drogas injetáveis?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.drugs, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.drugs) }}
+          </div>
+        </div>
+
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.partners, true)">
+          <div class="question-text">Teve múltiplos parceiros sexuais ou relações de risco?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.partners, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.partners) }}
+          </div>
+        </div>
+
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.tattooOrPiercing, true)">
+          <div class="question-text">Fez tatuagem, piercing ou acupuntura nos últimos 12 meses?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.tattooOrPiercing, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.tattooOrPiercing) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questões sobre Procedimentos e Vacinas -->
+    <div class="questionnaire-section">
+      <h4><i class="fa-solid fa-syringe"></i> Procedimentos e Vacinas</h4>
+      <div class="questions-list">
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.procedures, true)">
+          <div class="question-text">Realizou cirurgias ou procedimentos médicos recentes?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.procedures, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.procedures) }}
+          </div>
+        </div>
+
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.covidVaccine, true)">
+          <div class="question-text">Tomou vacina COVID-19 nas últimas 48h?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.covidVaccine, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.covidVaccine) }}
+          </div>
+        </div>
+
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.yellowFeverVaccine, true)">
+          <div class="question-text">Tomou vacina da febre amarela nos últimos 30 dias?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.yellowFeverVaccine, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.yellowFeverVaccine) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questões sobre Viagem -->
+    <div class="questionnaire-section">
+      <h4><i class="fa-solid fa-plane"></i> Viagens</h4>
+      <div class="questions-list">
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.travelRiskArea, true)">
+          <div class="question-text">Viajou para áreas de risco (malária, febre amarela) recentemente?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.travelRiskArea, true)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.travelRiskArea) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Histórico de Doações -->
+    <div class="questionnaire-section">
+      <h4><i class="fa-solid fa-history"></i> Histórico de Doações</h4>
+      <div class="questions-list">
+        <div class="question-item" 
+             [ngClass]="getAnswerClass(lastQuestionnaire.donationBefore60, false, 'donationBefore60')">
+          <div class="question-text">Já doou sangue antes dos 60 anos?</div>
+          <div class="answer-badge">
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.donationBefore60, false, 'donationBefore60')"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.donationBefore60, 'donationBefore60') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações Baseadas na Elegibilidade -->
+    <div class="eligibility-actions">
+      <div *ngIf="lastQuestionnaire.isEligible" class="eligible-actions">
+        <div class="action-card eligible-card">
+          <i class="fa-solid fa-heart-pulse"></i>
+          <h4>Parabéns! Você está apto para doar!</h4>
+          <p>{{ getFormattedResultMessage(lastQuestionnaire) }}</p>
+          <button class="action-button primary" (click)="onFindBloodBank()">
+            <i class="fa-solid fa-map-marker-alt"></i>
+            Encontrar Banco de Sangue
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!lastQuestionnaire.isEligible" class="not-eligible-actions">
+        <div class="action-card not-eligible-card">
+          <i class="fa-solid fa-exclamation-circle"></i>
+          <h4>Você não está apto para doar no momento</h4>
+          <p>{{ getFormattedResultMessage(lastQuestionnaire) }}</p>
+          <div class="recommendation" *ngIf="getRecommendations(lastQuestionnaire).length > 0">
+            <h5>Recomendações específicas:</h5>
+            <ul>
+              <li *ngFor="let recommendation of getRecommendations(lastQuestionnaire)">
+                {{ recommendation }}
+              </li>
+            </ul>
+          </div>
+          <div class="action-buttons">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informações Adicionais -->
+    <div class="questionnaire-footer">    
+      <div class="validity-notice">
+        <i class="fa-solid fa-info-circle"></i>
+        <p>
+          <strong>Importante:</strong> Este questionário tem validade limitada. 
+          Para uma nova doação, será necessário responder um novo questionário de elegibilidade.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noQuestionnaires>
+    <div class="empty-state">
+      <i class="fa-solid fa-clipboard-question" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+      <p>Nenhum questionário encontrado</p>
+      <p style="color: #666; font-size: 0.9rem;">Seus questionários de elegibilidade aparecerão aqui</p>
+      <button class="action-button primary" style="margin-top: 1rem;">
+        <i class="fa-solid fa-plus"></i>
+        Fazer Primeiro Questionário
+      </button>
+    </div>
+  </ng-template>
+  
+  <button type="button" class="secondary back-button" (click)="hideViews()">
+    <i class="fa-solid fa-arrow-left"></i>
+    Voltar
+  </button>
+</div>

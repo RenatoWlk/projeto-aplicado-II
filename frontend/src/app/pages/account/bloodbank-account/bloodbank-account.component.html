@@ -1,0 +1,159 @@
+<!-- Loading e mensagens -->
+<div *ngIf="isLoading" class="loading-spinner">
+  <i class="fa-solid fa-spinner fa-spin"></i>
+  Carregando...
+</div>
+
+<div *ngIf="error" class="error-message">
+  <i class="fa-solid fa-exclamation-triangle"></i>
+  {{ error }}
+</div>
+
+<div *ngIf="successMessage" class="success-message">
+  <i class="fa-solid fa-check-circle"></i>
+  {{ successMessage }}
+</div>
+
+<!-- Modo Visualização -->
+<div *ngIf="!editProfileMode">
+  <!-- Card do Perfil -->
+  <div class="app-card">
+    <div class="app-card-header">
+      <i class="fa-solid fa-hospital app-card-icon"></i>
+      <h2 class="app-card-title">Perfil do Banco de Sangue</h2>
+    </div>
+
+    <div class="account-header">
+      <div class="profile-photo-wrapper">
+        <img [src]="bloodBank?.photoUrl || 'assets/bloodbank.png'"
+             alt="Foto do Banco"
+             class="profile-photo" />
+        <input #fileInput 
+               type="file"
+               (change)="onPhotoSelected($event)"
+               accept="image/*"
+               hidden>
+        <button type="button"
+                class="profile-photo-edit-btn"
+                (click)="fileInput.click()"
+                [disabled]="isLoading">
+          <i class="fa-solid fa-camera"></i>
+          Trocar Foto
+        </button>
+      </div>
+
+      <div class="account-info">
+        <p><strong>Nome:</strong> {{ bloodBank?.name }}</p>
+        <p><strong>Email:</strong> {{ bloodBank?.email }}</p>
+        <p><strong>Endereço:</strong> {{ bloodBank?.address?.street }} - {{ bloodBank?.address?.city }}-{{ bloodBank?.address?.state }}</p>
+        <p><strong>Telefone:</strong> {{ bloodBank?.phone }}</p>
+        <p><strong>CNPJ:</strong> {{ bloodBank?.cnpj }}</p>
+        <p *ngIf="bloodBank?.description"><strong>Descrição:</strong> {{ bloodBank?.description }}</p>
+        <p *ngIf="bloodBank?.website"><strong>Website:</strong> {{ bloodBank?.website }}</p>
+        <button type="button"
+                (click)="onEditProfile()"
+                [disabled]="isLoading">
+          <i class="fa-solid fa-edit"></i>
+          Editar Perfil
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Formulário de Edição do Perfil usando ReactiveFormsModule -->
+<div *ngIf="editProfileMode" class="app-card">
+  <div class="app-card-header">
+    <i class="fa-solid fa-user-edit app-card-icon"></i>
+    <h2 class="app-card-title">Editar Perfil</h2>
+  </div>
+
+  <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+    <label>
+      <span>Nome do Banco</span>
+      <input type="text"
+             formControlName="name"
+             placeholder="Nome completo do banco de sangue"
+             [class.invalid]="isFieldInvalid(profileForm, 'name')" />
+      <div *ngIf="getFieldError(profileForm, 'name')" class="error-text">
+        {{ getFieldError(profileForm, 'name') }}
+      </div>
+    </label>
+
+    <label>
+      <span>Email</span>
+      <input type="email"
+             formControlName="email"
+             placeholder="email@exemplo.com"
+             [class.invalid]="isFieldInvalid(profileForm, 'email')" />
+      <div *ngIf="getFieldError(profileForm, 'email')" class="error-text">
+        {{ getFieldError(profileForm, 'email') }}
+      </div>
+    </label>
+
+    <label>
+      <span>Endereço</span>
+      <input type="text"
+             formControlName="address"
+             placeholder="Endereço completo"
+             [class.invalid]="isFieldInvalid(profileForm, 'address')" />
+      <div *ngIf="getFieldError(profileForm, 'address')" class="error-text">
+        {{ getFieldError(profileForm, 'address') }}
+      </div>
+    </label>
+
+    <label>
+      <span>Telefone</span>
+      <input type="tel"
+             formControlName="phone"
+             placeholder="(11) 99999-9999"
+             [class.invalid]="isFieldInvalid(profileForm, 'phone')" />
+      <div *ngIf="getFieldError(profileForm, 'phone')" class="error-text">
+        {{ getFieldError(profileForm, 'phone') }}
+      </div>
+    </label>
+
+    <label>
+      <span>CNPJ</span>
+      <input type="text"
+             formControlName="cnpj"
+             placeholder="00.000.000/0000-00"
+             [class.invalid]="isFieldInvalid(profileForm, 'cnpj')" />
+      <div *ngIf="getFieldError(profileForm, 'cnpj')" class="error-text">
+        {{ getFieldError(profileForm, 'cnpj') }}
+      </div>
+    </label>
+
+    <label>
+      <span>Descrição (Opcional)</span>
+      <textarea formControlName="description"
+                placeholder="Descreva o banco de sangue..."
+                rows="3"></textarea>
+    </label>
+
+    <label>
+      <span>Website (Opcional)</span>
+      <input type="url"
+             formControlName="website"
+             placeholder="https://exemplo.com" />
+    </label>
+
+    <div class="form-actions">
+      <button type="submit"
+              class="primary"
+              [disabled]="isLoading || profileForm.invalid">
+        <i class="fa-solid fa-save"></i>
+        Salvar Alterações
+      </button>
+      <button type="button"
+              class="secondary"
+              (click)="cancelEdit()"
+              [disabled]="isLoading">
+        <i class="fa-solid fa-times"></i>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
+
+

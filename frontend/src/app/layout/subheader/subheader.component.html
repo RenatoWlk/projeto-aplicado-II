@@ -1,0 +1,71 @@
+<div class="subheader" [ngClass]="userRole">
+    <ul class="links">
+
+        <!----------------- DONOR SUBHEADER------------>
+        <ng-container *ngIf="userRole === roles.User">
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/dashboard">
+                    <i class="fas fa-home subheader-icon"></i>
+                    <span class="subheader-text">Home</span>
+                </a>
+            </li>
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/calendar">
+                    <i class="fas fa-calendar-days subheader-icon"></i>
+                    <span class="subheader-text">Calendário</span>
+                </a>
+            </li>
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/map">
+                    <i class="fas fa-map-location-dot subheader-icon"></i>
+                    <span class="subheader-text">Mapa</span>
+                </a>
+            </li>
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/questionnaire">
+                    <i class="fas fa-clipboard-list subheader-icon"></i>
+                    <span class="subheader-text">Questionário</span>
+                </a>
+            </li>
+        </ng-container>
+
+        <!-------------- BLOODBANK SUBHEADER ---------------------->
+        <ng-container *ngIf="userRole === roles.Bloodbank">
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/dashboard">
+                    <i class="fas fa-home subheader-icon"></i>
+                    <span class="subheader-text">Home</span>
+                </a>
+            </li>
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/calendar">
+                    <i class="fas fa-calendar-days subheader-icon"></i>
+                    <span class="subheader-text">Calendário</span>
+                </a>
+            </li>
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/map">
+                    <i class="fas fa-map-location-dot subheader-icon"></i>
+                    <span class="subheader-text">Mapa</span>
+                </a>
+            </li>
+        </ng-container>
+
+        <!-------------- PARTNER SUBHEADER ---------------------->
+        <ng-container *ngIf="userRole === roles.Partner">
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/dashboard">
+                    <i class="fas fa-home subheader-icon"></i>
+                    <span class="subheader-text">Home</span>
+                </a>
+            </li>
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a routerLink="/map">
+                    <i class="fas fa-map-location-dot subheader-icon"></i>
+                    <span class="subheader-text">Mapa</span>
+                </a>
+            </li>
+        </ng-container>
+        
+    </ul>
+</div>

@@ -1,0 +1,170 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&family=Ubuntu:wght@300;400;500;700&display=swap');
+
+html, body {
+  height: auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #F5F5F5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #232a31;
+}
+
+/* ------------------------ APP CARD ------------------------ */
+.app-card {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-card-header {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.app-card-icon {
+  font-size: 32px;
+  color: #e53935;
+  margin-bottom: 8px;
+  margin-left: 4px;
+}
+
+.app-card-title {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #232a31;
+}
+
+/* -------------------- CARD GRID (inside app-card) -------------------- */
+.cards-grid-large {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: 1.5rem;
+}
+
+.cards-grid-medium {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 1.5rem;
+}
+
+.cards-grid-small {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.cards-grid-overflow-large {
+  max-height: 330px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.cards-grid-overflow-medium {
+  max-height: 280px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* --------------------- CARD (inside card-grid) --------------------- */
+.card {
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card-header {
+  margin-bottom: 0.5rem;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.card-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.card-body {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+
+.card-footer {
+  font-size: 0.9rem;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --------------------- PHONE LINK --------------------- */
+.phone-link {
+  text-decoration: none;
+  font-weight: 500;
+  color: #007bff;
+}
+
+.phone-link:hover {
+  text-decoration: underline;
+}
+
+/* --------------------- APP BUTTON --------------------- */
+.app-button {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  background-color: #c62828;
+  color: white;
+  padding: 10px 20px;
+  border: 2px solid #c62828;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.app-button:hover {
+  background-color: white;
+  color: #c62828;
+  border: 2px solid #c62828;
+}
+
+/* --------------------- NOTIFICATION BANNER --------------------- */
+.banner {
+  position: fixed;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
+  max-width: 90%;
+  z-index: 1000;
+}
+
+html, body { height: 100%; }

@@ -1,0 +1,58 @@
+<div class="map-container">
+
+  <section class="app-card map-card">
+    <header class="app-card-header">
+      <i class="fa fa-map-marker-alt app-card-icon" aria-hidden="true"></i>
+      <h2 class="app-card-title">Bancos de sangue na região</h2>
+    </header>
+
+    <ng-container *ngIf="isLoadingLocations">
+      <app-preloader type="spinner" [visible]="true"></app-preloader>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoadingLocations">
+      <nav class="tabs-container">
+        <div
+          class="tab"
+          *ngIf="userLocation != null"
+          (click)="selectLocation(userLocation)"
+          [class.active]="selectedLocation === userLocation"
+        >
+          Centralizar
+        </div>
+        <div
+          class="tab"
+          *ngFor="let loc of locations"
+          (click)="selectLocation(loc)"
+          [class.active]="selectedLocation === loc"
+        >
+          {{ loc.name }}
+        </div>
+      </nav>
+
+      <div *ngIf="selectedLocation" class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ selectedLocation.name }}</h3>
+        </div>
+        <div class="card-body">
+          <p><i class="fa fa-map-marker-alt info-icon"></i>{{ selectedLocation.address.street }} - {{ selectedLocation.address.city}}-{{ selectedLocation.address.state }} - {{ selectedLocation.address.zipCode }}</p>
+          <a class="phone-link" style="cursor: pointer;" [href]="'tel:' + selectedLocation.phone"><i class="fa fa-phone info-icon"></i>{{ selectedLocation.phone }}</a>
+        </div>
+      </div>
+    </ng-container>
+  </section>
+
+  <section class="app-card map-card">
+    <header class="app-card-header">
+      <i class="fa fa-map app-card-icon" aria-hidden="true"></i>
+      <h2 class="app-card-title">Mapa de Hemocentros</h2>
+    </header>
+
+    <ng-container *ngIf="isLoadingLocations">
+      <app-preloader type="spinner" [visible]="true"></app-preloader>
+    </ng-container>
+
+    <div id="map"></div>
+  </section>
+
+</div>

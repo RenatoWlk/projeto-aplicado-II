@@ -1,0 +1,52 @@
+.subheader {
+  height: 40px;
+  background-color: #7bc2f5;
+
+  .links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 1rem;
+    margin: 0;
+    gap: 50px;
+    list-style: none;
+    font-family: 'Poppins', sans-serif;
+
+    li {
+      text-align: center;
+      transition: all 0.2s ease-in-out;
+
+      a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: large;
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 6px;
+
+        .subheader-icon {
+          font-size: 24px;
+          color: white;
+        }
+
+        span {
+          line-height: 1;
+        }
+      }
+
+      &:hover {
+        color: rgb(255, 239, 239);
+        transform: translateY(-3px);
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+      }
+
+      &.active a .subheader-icon,
+      &.active a .subheader-text {
+        color: #d9534f;
+      }
+    }
+  }
+}

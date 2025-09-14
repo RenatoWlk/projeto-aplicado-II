@@ -1,0 +1,106 @@
+$primary-color: #3bacff;
+$primary-hover: #1a5ed9;
+$error-color: red;
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: $primary-color;
+  height: 100vh;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: $primary-color;
+
+  .login-box {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 100%;
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #333;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+        color: #444;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        transition: border 0.3s;
+
+        &:focus {
+          border-color: $primary-color;
+          outline: none;
+        }
+      }
+
+      .error {
+        color: $error-color;
+        font-size: 13px;
+        margin-top: 4px;
+      }
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+
+      .forgot {
+        font-weight: 500;
+        color: #c62828;
+        font-size: 14px;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .divider {
+      border-top: 1px solid #ddd;
+      margin: 20px 0;
+    }
+
+    .register {
+      font-family: 'Poppins', sans-serif;
+      width: 100%;
+      background-color: #fff;
+      color: #c62828;
+      padding: 10px;
+      border: 2px solid #c62828;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        background-color: #c62828;
+        color: white;
+        border: 2px solid #c62828 ;
+      }
+    }
+  }
+}

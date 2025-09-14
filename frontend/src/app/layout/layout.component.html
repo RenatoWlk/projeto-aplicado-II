@@ -1,0 +1,20 @@
+<div class="app-container">
+    <app-header></app-header>
+    @if(userRole === roles.User) {
+        <app-subheader [userRole]=roles.User></app-subheader>
+    }
+    @if(userRole === roles.Bloodbank) {
+        <app-subheader [userRole]=roles.Bloodbank></app-subheader>
+    }
+    @if(userRole === roles.Partner) {
+        <app-subheader [userRole]=roles.Partner></app-subheader>
+    }
+    <div class="content-wrapper">
+    <main>
+        <router-outlet></router-outlet>
+    </main>
+    <footer>
+        <app-footer></app-footer>
+    </footer>
+    </div>
+</div>

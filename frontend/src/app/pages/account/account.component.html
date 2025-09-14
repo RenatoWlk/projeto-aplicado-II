@@ -1,0 +1,7 @@
+<div class="container">
+  <app-user-account *ngIf="userRole === roles.User"></app-user-account>
+
+  <app-bloodbank-account *ngIf="userRole === roles.Bloodbank"></app-bloodbank-account>
+
+  <app-partner-account *ngIf="userRole === roles.Partner"></app-partner-account>
+</div>

@@ -1,0 +1,9 @@
+<div class="modal-overlay" *ngIf="visible">
+  <div class="modal-content">
+    <h2>{{ title }}</h2>
+    <ng-content></ng-content>
+    <div class="modal-footer">
+      <button class="app-button cancel" (click)="onClose()">Fechar</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,137 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: self-end;
+  padding: 4px 10px;
+  background: #3bacff;  
+  color: white;
+  width: 100%;
+  position: relative;
+
+  .logo-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mat-icon {
+    display: contents;
+    font-size: 40px;
+  }
+
+  .slogan {
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffffdd;
+    font-style: italic;
+    white-space: nowrap;
+  }
+
+  .right {
+    padding-left: 5rem;
+  }
+
+  .center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 12px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .left {
+    padding-right: 8rem;
+  }
+}
+
+.header-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 32px;
+  width: 54px;
+  height: 54px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-left: 0.5rem;
+}
+
+.header-btn:hover {
+  color: rgb(255, 239, 239);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  transform: translateY(-2px);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 60px;
+  right: 70px;
+  background-color: white;
+  color: #333;
+  font-weight: 500;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  padding: 10px 0;
+  min-width: 120px;
+}
+
+.dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-menu ul li {
+  padding: 8px 16px;
+}
+
+.dropdown-menu ul li:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-menu ul li a {
+  color: #333;
+  text-decoration: none;
+  display: block;
+}
+
+.logged-in-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.menu-name {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  margin-top: 3px;
+  margin-bottom: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  font-weight: 500;
+  color: #333;
+}
+
+.menu-email {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  margin-top: 3px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  font-style: italic;
+  color: #666;
+}
+
+.list-button:hover {
+  cursor: pointer;
+}

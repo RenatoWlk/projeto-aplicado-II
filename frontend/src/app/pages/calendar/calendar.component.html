@@ -1,0 +1,4 @@
+<div class="container">
+    <app-donator-calendar *ngIf="userRole === roles.User"></app-donator-calendar>
+    <app-bloodbank-calendar *ngIf="userRole === roles.Bloodbank"></app-bloodbank-calendar>
+</div>

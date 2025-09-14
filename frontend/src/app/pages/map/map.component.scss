@@ -1,0 +1,68 @@
+.map-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  padding: 2rem;
+  height: 80vh;
+  box-sizing: border-box;
+}
+
+.map-card {
+  height: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-card:first-child {
+  width: 25%;
+}
+
+.map-card:last-child {
+  width: 65%;
+}
+
+.map-card-header {
+  margin-bottom: 1rem;
+}
+
+.info-icon {
+  font-size: 20px;
+  color: #d9534f;
+  margin-right: 0.5rem;
+}
+
+#map {
+  width: 100%;
+  flex-grow: 1;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.tab {
+  padding: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.tab:last-child {
+  border-bottom: none;
+}
+
+.tab:hover {
+  background-color: #ececec;
+}
+
+.tab.active {
+  background-color: #d9534f;
+  color: white;
+  font-weight: bold;
+}

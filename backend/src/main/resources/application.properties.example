@@ -1,0 +1,4 @@
+spring.application.name=backend
+jwt.secret=3f91a8d4a9c84f40aab142e9327c3c09
+spring.data.mongodb.uri=mongodb+srv://<user>:<senha>@4vid4s.aemyffl.mongodb.net/
+spring.data.mongodb.database=4Vidas

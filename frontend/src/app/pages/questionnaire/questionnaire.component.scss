@@ -1,0 +1,167 @@
+.container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #c62828;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+
+      select {
+        margin-top: 0.5rem;
+        padding: 0.6rem;
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+
+        &:focus {
+          outline: none;
+          border-color: #c62828;
+          box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
+        }
+      }
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.8rem;
+      background-color: #c62828;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #b71c1c;
+      }
+    }
+  }
+
+  .resultado {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-left: 4px solid #c62828;
+    background-color: #ffecec;
+    border-radius: 0.5rem;
+
+    p {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    ul {
+      margin-left: 1rem;
+      list-style: disc;
+
+      li {
+        margin: 0.3rem 0;
+      }
+    }
+  }
+}
+
+select.erro {
+  border: 2px solid #c62828;
+  background: #fff6f6;
+}
+
+.mensagem-erro {
+  color: #c62828;
+  font-size: 0.95em;
+  margin-top: 0.2em;
+  margin-left: 0.1em;
+}
+
+.tooltip {
+  display: inline-flex;
+  border-bottom: 1px dotted #c62828;
+  cursor: help;
+  position: relative;
+  white-space: nowrap; 
+
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 0;
+    bottom: 120%;
+    background: #333;
+    color: #fff;
+    padding: 0.5em 0.8em;
+    border-radius: 0.4em;
+    font-size: 0.95em;
+    white-space: pre-line;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    width: max-content;
+    max-width: 250px;
+    z-index: 10;
+  }
+
+  &:hover::after,
+  &:focus::after {
+    opacity: 1;
+  }
+}
+
+.alerta-sucesso {
+  background: #e8f5e9;
+  color: #256029;
+  border: 1px solid #43a047;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.btn-refazer {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.2rem;
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-refazer:hover {
+  background-color: #125ea2;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  form label {
+    font-size: 0.95rem;
+  }
+
+  form select,
+  form button {
+    font-size: 0.95rem;
+  }
+}
