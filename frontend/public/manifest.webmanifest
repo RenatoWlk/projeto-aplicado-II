@@ -1,0 +1,15 @@
+{
+  "name": "frontend",
+  "short_name": "frontend",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}
