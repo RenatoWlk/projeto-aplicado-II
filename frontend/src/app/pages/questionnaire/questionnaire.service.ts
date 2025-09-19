@@ -25,20 +25,17 @@ export interface QuestionnaireData {
   yellowFeverVaccine: string;
   travelRiskArea: string;
   isEligible: boolean;
-  resultMessage: string;
 }
-
-
 
 @Injectable({
   providedIn: 'root',
 })
 export class QuestionnaireService {
-  private apiUrl = '/api/questionnaire'; // ajuste conforme necessário
+  private apiUrl = '/api/questionnaire';
 
   constructor(private http: HttpClient,private authService: AuthService) {}
 
-    submitQuestionnaire(data: QuestionnaireData): Observable<any> {
+  submitQuestionnaire(data: QuestionnaireData): Observable<any> {
     const id = this.authService.getCurrentUserId();
     data.userId = id;
     return this.http.post(`${this.apiUrl}`, data);

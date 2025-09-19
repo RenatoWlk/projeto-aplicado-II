@@ -31,5 +31,4 @@ public class EligibilityQuestionnaire {
     private String yellowFeverVaccine;
     private String travelRiskArea;
     private boolean isEligible;
-    private String resultMessage;
 }

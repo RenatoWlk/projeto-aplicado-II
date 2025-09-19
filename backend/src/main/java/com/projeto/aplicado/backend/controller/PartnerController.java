@@ -27,16 +27,6 @@ public class PartnerController {
     }
 
     /**
-     * Gets all partners.
-     * 
-     * @return a list of partner response DTOs
-     */
-    @GetMapping
-    public ResponseEntity<List<PartnerResponseDTO>> getAll() {
-        return ResponseEntity.ok(partnerService.findAll());
-    }
-
-    /**
      * Get an existing partner.
      * 
      * @param id the ID of the partner to get
@@ -47,10 +37,15 @@ public class PartnerController {
         return ResponseEntity.ok(partnerService.findById(id));
     }
 
+    /**
+     * Updates a partner account by ID.
+     *
+     * @param id the ID of the partner to be updated.
+     * @param dto the response DTO with the data to update the partner.
+     * @return the partner response DTO with the partner updated data.
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<PartnerResponseDTO> updatePartner(
-            @PathVariable String id,
-            @RequestBody PartnerRequestDTO dto) {
+    public ResponseEntity<PartnerResponseDTO> updatePartner(@PathVariable String id, @RequestBody PartnerRequestDTO dto) {
         return ResponseEntity.ok(partnerService.update(id, dto));
     }
 }

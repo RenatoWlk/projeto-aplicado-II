@@ -151,7 +151,8 @@ export class DonatorCalendarComponent implements OnInit{
       error: (err) => {
         this.visible = true;
         this.notificationService.show('"Erro ao realizar agendamento!"', 'error', 3000);
-        console.error(err);}
+        console.error(err);
+      }
     });
 
   }

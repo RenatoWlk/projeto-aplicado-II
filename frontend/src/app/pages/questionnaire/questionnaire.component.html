@@ -1,7 +1,7 @@
 <div class="container">
   <h1>Questionário de Elegibilidade para Doação de Sangue</h1>
 
-  <form *ngIf="!sucessoPreenchimento" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <form *ngIf="!success" [formGroup]="form" (ngSubmit)="onSubmit()">
     <label>
       Você tem entre 16 e 69 anos?
       <select formControlName="age" [ngClass]="{'erro': form.get('age')?.invalid && submitted}">
@@ -199,11 +199,9 @@
     <button type="submit">Verificar Elegibilidade</button>
   </form>
 
-  <div *ngIf="sucessoPreenchimento" class="alerta-sucesso">
+  <div *ngIf="success" class="alerta-sucesso">
     <p>Formulário preenchido com sucesso!</p>
-    <div class="resultado" *ngIf="resultado">
-      <p>Vá até a secção em sua conta para checar seu resultado!</p>
-    </div>
-    <button (click)="responderNovamente()" class="btn-refazer">Responder novamente</button>
+    <p>Vá até a secção em sua conta para checar seu resultado!</p>
+    <button (click)="resetForm()" class="btn-refazer">Responder novamente</button>
   </div>
 </div>

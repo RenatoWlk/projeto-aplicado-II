@@ -4,6 +4,7 @@ import com.projeto.aplicado.backend.dto.user.UserLocationDTO;
 import com.projeto.aplicado.backend.dto.user.UserRequestDTO;
 import com.projeto.aplicado.backend.dto.user.UserResponseDTO;
 import com.projeto.aplicado.backend.dto.user.UserStatsDTO;
+import com.projeto.aplicado.backend.service.AchievementService;
 import com.projeto.aplicado.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final AchievementService achievementService;
 
     /**
      * Creates a new user.
@@ -29,25 +31,20 @@ public class UserController {
         return ResponseEntity.ok(userService.create(dto));
     }
 
+    /**
+     * Updates an existing user by ID.
+     *
+     * @param id the ID of the user to update.
+     * @param dto the user request DTO with the data to update.
+     * @return the user response DTO with the data updated.
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(
-            @PathVariable String id,
-            @RequestBody UserRequestDTO dto) {
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable String id, @RequestBody UserRequestDTO dto) {
         return ResponseEntity.ok(userService.update(id, dto));
     }
 
     /**
-     * Gets all users.
-     * 
-     * @return a list of user response DTOs
-     */
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAll() {
-        return ResponseEntity.ok(userService.findAll());
-    }
-
-    /**
-     * Get an existing user.
+     * Get an existing user by ID.
      * 
      * @param id the ID of the user to get
      * @return the user response DTO
@@ -58,10 +55,10 @@ public class UserController {
     }
 
     /**
-     * Gets the statistics of a user.
+     * Gets the statistics of a user by ID.
      * 
-     * @param id the ID of the user to get statistics for
-     * @return the user statistics DTO
+     * @param id the ID of the user to get statistics for.
+     * @return the user statistics DTO.
      */
     @GetMapping("/{id}/stats")
     public ResponseEntity<UserStatsDTO> getStatsById(@PathVariable String id) {
@@ -69,17 +66,24 @@ public class UserController {
     }
 
     /**
-     * Gets the location of a user.
+     * Gets the location of a user by ID.
      *
-     * @param id the ID of the user to get the location
-     * @return the user location DTO
+     * @param id the ID of the user to get the location.
+     * @return the user location DTO.
      */
     @GetMapping("/{id}/location")
     public ResponseEntity<UserLocationDTO> getLocationById(@PathVariable String id) {
+        userService.unlockMapAchievement(id);
         return ResponseEntity.ok(userService.findLocationById(id));
     }
 
-    @PostMapping("/forgot-password")
+    /**
+     * Sends a password recovery email to the user.
+     *
+     * @param body the body of the request with the user's email.
+     * @return a ok response.
+     */
+    @PostMapping("/forgotPassword")
     public ResponseEntity<Void> forgotPassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");
         userService.sendPasswordRecoveryEmail(email);

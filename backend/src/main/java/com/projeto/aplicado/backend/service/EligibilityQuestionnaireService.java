@@ -1,21 +1,23 @@
 package com.projeto.aplicado.backend.service;
 
+import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.EligibilityQuestionnaireDTO;
 import com.projeto.aplicado.backend.model.EligibilityQuestionnaire;
+import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.EligibilityQuestionnaireRepository;
+import com.projeto.aplicado.backend.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class EligibilityQuestionnaireService {
     private final EligibilityQuestionnaireRepository questionnaireRepository;
-
-    @Autowired
-    public EligibilityQuestionnaireService(EligibilityQuestionnaireRepository questionnaireRepository) {
-        this.questionnaireRepository = questionnaireRepository;
-    }
+    private final UserRepository userRepository;
+    private final AchievementService achievementService;
 
     public EligibilityQuestionnaire saveQuestionnaire(EligibilityQuestionnaireDTO dto) {
         EligibilityQuestionnaire questionnaire = questionnaireRepository
@@ -45,18 +47,16 @@ public class EligibilityQuestionnaireService {
         questionnaire.setYellowFeverVaccine(dto.getYellowFeverVaccine());
         questionnaire.setTravelRiskArea(dto.getTravelRiskArea());
         questionnaire.setEligible(dto.isEligible());
-        questionnaire.setResultMessage(dto.getResultMessage());
 
-        System.out.println("DTO recebido: " + dto);
+        if (dto.isEligible()) {
+            User user = userRepository.findUserById(dto.getUserId()).orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+            achievementService.unlockAchievementByType(user, "questionnaire_all_correct");
+        }
 
         return questionnaireRepository.save(questionnaire);
     }
 
     public List<EligibilityQuestionnaire> getAllByUser(String userId) {
-    System.out.println("📥 [Service] Buscando questionários para usuário: " + userId);
-    List<EligibilityQuestionnaire> questionnaires = questionnaireRepository.findByUserId(userId);
-    System.out.println("📊 [Service] Total encontrado: " + questionnaires.size());
-    return questionnaires;
-}
-
+        return questionnaireRepository.findByUserId(userId);
+    }
 }

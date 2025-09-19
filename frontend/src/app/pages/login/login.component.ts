@@ -41,7 +41,6 @@ export class LoginComponent {
       },
       error: (err) => {
         this.errorMessage = 'Email ou senha inválidos.';
-        console.error(err);
       }
     });
 

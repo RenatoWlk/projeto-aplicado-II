@@ -44,7 +44,6 @@ export interface EligibilityQuestionnaireDTO {
   resultMessage: string;
 }
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -68,11 +67,12 @@ export class UserAccountService {
     return this.http.get<EligibilityQuestionnaireDTO[]>(`/api/questionnaire/${userId}`);
   }
 
-
+  // TODO
   changePassword(userId: string, password: string): Observable<any> {
     return new Observable<any>;
   }
 
+  // TODO
   uploadPhoto(file: File): Observable<any> {
     return new Observable<any>;
   }

@@ -52,7 +52,6 @@ export class BloodbankCalendarComponent {
 
   addAvailableSlots() {
     const id = this.authService.getCurrentUserId();
-    console.log(`id: ${id}`);
 
     if (!this.rangeForm.value.startDate || !this.rangeForm.value.endDate ||
       !this.rangeForm.value.startTime || !this.rangeForm.value.endTime) {

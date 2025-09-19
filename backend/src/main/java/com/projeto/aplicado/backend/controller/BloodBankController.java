@@ -9,6 +9,7 @@ import com.projeto.aplicado.backend.dto.bloodbank.BloodBankStatsDTO;
 import com.projeto.aplicado.backend.dto.bloodbank.BloodBankAvailabilityDTO;
 import com.projeto.aplicado.backend.model.AvailabilitySlot;
 import com.projeto.aplicado.backend.model.users.BloodBank;
+import com.projeto.aplicado.backend.service.AchievementService;
 import com.projeto.aplicado.backend.service.BloodBankService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,16 +38,6 @@ public class BloodBankController {
     }
 
     /**
-     * Gets all blood banks.
-     *
-     * @return a list of blood bank response DTOs
-     */
-    @GetMapping
-    public ResponseEntity<List<BloodBankResponseDTO>> getAll() {
-        return ResponseEntity.ok(bloodBankService.findAll());
-    }
-
-    /**
      * Get an existing blood bank by ID.
      *
      * @param id the ID of the blood bank to retrieve
@@ -58,8 +49,7 @@ public class BloodBankController {
     }
 
     /**
-     * Retrieves all blood banks with geolocation (latitude and longitude)
-     * to be displayed on the map.
+     * Retrieves all blood banks with geolocation (latitude and longitude) to be displayed on the map.
      *
      * @return a list of blood banks with location data
      */
@@ -142,9 +132,7 @@ public class BloodBankController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BloodBankResponseDTO> updateBloodBank(
-            @PathVariable String id,
-            @RequestBody BloodBankRequestDTO dto) {
+    public ResponseEntity<BloodBankResponseDTO> updateBloodBank(@PathVariable String id, @RequestBody BloodBankRequestDTO dto) {
         return ResponseEntity.ok(bloodBankService.update(id, dto));
     }
 }

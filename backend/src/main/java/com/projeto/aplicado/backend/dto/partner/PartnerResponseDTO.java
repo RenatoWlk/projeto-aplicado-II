@@ -18,8 +18,4 @@ public class PartnerResponseDTO {
     private Role role;
     private String cnpj;
     private List<Offer> offers;
-
-    public List<Offer> getOffers() {
-        return offers == null ? Collections.emptyList() : offers;
-    }
 }

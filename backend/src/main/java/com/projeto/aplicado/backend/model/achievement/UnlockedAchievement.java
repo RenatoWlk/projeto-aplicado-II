@@ -9,4 +9,3 @@ public class UnlockedAchievement {
     private String achievementId;
     private LocalDateTime unlockedAt;
 }
-

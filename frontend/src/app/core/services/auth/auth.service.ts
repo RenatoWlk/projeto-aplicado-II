@@ -126,7 +126,6 @@ export class AuthService {
     try {
       return jwtDecode<DecodedToken>(token);
     } catch (error) {
-      console.error('Invalid or malformed token:', error);
       return null;
     }
   }

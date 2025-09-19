@@ -59,7 +59,7 @@ public class UserService {
     /**
      * Finds all users in the system.
      * 
-     * @return a list of user response DTOs
+     * @return a list of user response DTOs.
      */
     public List<UserResponseDTO> findAll() {
         return userRepository.findAllUsers().stream()
@@ -70,8 +70,8 @@ public class UserService {
     /**
      * Finds a user by ID.
      * 
-     * @param id the ID of the user to find
-     * @return the user response DTO
+     * @param id the ID of the user to find.
+     * @return the user response DTO.
      */
     public UserResponseDTO findById(String id) {
         return userRepository.findUserById(id)
@@ -80,10 +80,20 @@ public class UserService {
     }
 
     /**
+     * Unlocks the map opened achievement.
+     *
+     * @param id the ID of the user.
+     */
+    public void unlockMapAchievement(String id) {
+        User user = userRepository.findUserById(id).orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+        achievementService.unlockAchievementByType(user, "map_opened");
+    }
+
+    /**
      * Finds user statistics by ID.
      * 
-     * @param id the ID of the user to find statistics for
-     * @return the user statistics DTO
+     * @param id the ID of the user to find statistics for.
+     * @return the user statistics DTO.
      */
     public UserStatsDTO findStatsById(String id) {
         return userRepository.findUserById(id)
@@ -95,7 +105,7 @@ public class UserService {
      * Retrieves all blood banks and attempts to enrich each one with geolocation data. <br>
      * If the address is incomplete or an error occurs, coordinates are set to 0.
      *
-     * @return a list of blood bank DTOs including location information
+     * @return a list of blood bank DTOs including location information.
      */
     public UserLocationDTO findLocationById(String id) {
         return userRepository.findById(id)

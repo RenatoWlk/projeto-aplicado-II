@@ -23,6 +23,7 @@ public class User extends UserBase {
     private String cpf;
     private String gender;
     private BloodType bloodType;
+    private List<DonationAppointment> donations;
     private int timesDonated;
     private int timeUntilNextDonation;
     private LocalDate lastDonationDate;

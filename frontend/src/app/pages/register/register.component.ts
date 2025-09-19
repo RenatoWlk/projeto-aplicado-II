@@ -120,11 +120,9 @@ export class RegisterComponent {
 
       this.registerService.registerDonator(payload).subscribe({
         next: (res) => {
-          console.log('Doador cadastrado com sucesso!', res);
           alert('Cadastro realizado com sucesso!');
         },
         error: (err) => {
-          console.error('Erro ao cadastrar doador', err);
           alert('Erro ao cadastrar doador.');
         }
       });
@@ -150,11 +148,9 @@ export class RegisterComponent {
 
       this.registerService.registerBloodBank(payload).subscribe({
         next: (res) => {
-          console.log('Banco de sangue cadastrado com sucesso!', res);
           alert('Cadastro realizado com sucesso!');
         },
         error: (err) => {
-          console.error('Erro ao cadastrar banco de sangue', err);
           alert('Erro ao cadastrar banco de sangue.');
         }
       });
@@ -180,11 +176,9 @@ export class RegisterComponent {
 
       this.registerService.registerPartner(payload).subscribe({
         next: (res) => {
-          console.log('Parceiro cadastrado com sucesso!', res);
           alert('Cadastro realizado com sucesso!');
         },
         error: (err) => {
-          console.error('Erro ao cadastrar parceiro', err);
           alert('Erro ao cadastrar parceiro.');
         }
       });

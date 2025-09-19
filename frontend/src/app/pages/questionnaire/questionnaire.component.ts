@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { QuestionnaireService, QuestionnaireData } from './questionnaire.service';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { QuestionnaireService, QuestionnaireData } from './questionnaire.service';
 import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
@@ -13,164 +13,157 @@ import { AuthService } from '../../core/services/auth/auth.service';
 })
 export class QuestionnaireComponent {
   form: FormGroup;
-  resultado: string = '';
-  perguntasInvalidas: string[] = [];
+  invalidQuestions: string[] = [];
   submitted = false;
-  sucessoPreenchimento = false;
+  success = false;
 
-  perguntasLabels: { [key: string]: string } = {
-    idade: 'Idade entre 16 e 69 anos',
-    sexo: 'Sexo',
-    doacaoAntesDos60: 'Já doou sangue antes dos 60 anos',
-    peso: 'Pesa mais de 50kg',
-    saudavel: 'Está saudável hoje',
-    gravida: 'Está grávida',
-    partoRecente: 'Teve parto nos últimos 12 meses',
-    sintomas: 'Está com sintomas infecciosos',
-    doencas: 'Teve doenças graves',
-    medicamentos: 'Está tomando medicamentos',
-    procedimentos: 'Fez procedimentos recentes',
-    drogas: 'Usa drogas ilícitas injetáveis',
-    parceiros: 'Teve múltiplos parceiros sexuais',
-    tatuagem: 'Fez tatuagem nos últimos 12 meses',
-    homemUltimaDoacao: 'Homem: doou sangue há menos de 2 meses',
-    mulherUltimaDoacao: 'Mulher: doou sangue há menos de 3 meses',
-    vacinaCovid: 'Tomou vacina COVID-19 nos últimos 7 dias',
-    vacinaFebre: 'Tomou vacina febre amarela nos últimos 30 dias',
-    viagemRisco: 'Viajou para área de risco de malária'
+  questionLabels: Record<string, string> = {
+    age: 'Idade entre 16 e 69 anos',
+    gender: 'Sexo',
+    donationBefore60: 'Já doou sangue antes dos 60 anos',
+    weight: 'Pesa mais de 50kg',
+    healthy: 'Está saudável hoje',
+    pregnant: 'Está grávida',
+    recentChildbirth: 'Teve parto nos últimos 12 meses',
+    symptoms: 'Está com sintomas infecciosos',
+    diseases: 'Teve doenças graves',
+    medications: 'Está tomando medicamentos',
+    procedures: 'Fez procedimentos recentes',
+    drugs: 'Usa drogas ilícitas injetáveis',
+    partners: 'Teve múltiplos parceiros sexuais',
+    tattooOrPiercing: 'Fez tatuagem nos últimos 12 meses',
+    lastDonationMale: 'Homem: doou sangue há menos de 2 meses',
+    lastDonationFemale: 'Mulher: doou sangue há menos de 3 meses',
+    covidVaccine: 'Tomou vacina COVID-19 nos últimos 7 dias',
+    yellowFeverVaccine: 'Tomou vacina febre amarela nos últimos 30 dias',
+    travelRiskArea: 'Viajou para área de risco de malária',
   };
 
-constructor(
-  private fb: FormBuilder,
-  private questionnaireService: QuestionnaireService,
-  private authService: AuthService
-) {
-  this.form = this.fb.group({
-  age: [null, [Validators.required]],
-  gender: [null, Validators.required],
-  donationBefore60: [null, Validators.required],
-  weight: [null, [Validators.required]],
-  healthy: [null, Validators.required],
-  pregnant: [null],
-  recentChildbirth: [null],
-  symptoms: [null, Validators.required],
-  diseases: [null, Validators.required],
-  medications: [null, Validators.required],
-  procedures: [null, Validators.required],
-  drugs: [null, Validators.required],
-  partners: [null, Validators.required],
-  tattooOrPiercing: [null, Validators.required],
-  lastDonationMale: [null],
-  lastDonationFemale: [null],
-  covidVaccine: [null, Validators.required],
-  yellowFeverVaccine: [null, Validators.required],
-  travelRiskArea: [null, Validators.required]
-});
+  private readonly invalidIfYes = [
+    'pregnant', 'recentChildbirth', 'symptoms', 'diseases',
+    'medications', 'procedures', 'drugs', 'partners', 'tattooOrPiercing',
+    'covidVaccine', 'yellowFeverVaccine', 'travelRiskArea',
+    'lastDonationMale', 'lastDonationFemale',
+  ];
 
+  private readonly invalidIfNo = [
+    'age', 'donationBefore60', 'weight', 'healthy',
+  ];
 
-  this.form.get('gender')?.valueChanges.subscribe(gender => {
-    if (gender === 'masculino') {
-      this.form.get('lastDonationMale')?.setValidators(Validators.required);
-      this.form.get('lastDonationFemale')?.clearValidators();
-      this.form.get('pregnant')?.clearValidators();
-      this.form.get('recentChildbirth')?.clearValidators();
-    } else if (gender === 'feminino') {
-      this.form.get('lastDonationFemale')?.setValidators(Validators.required);
-      this.form.get('pregnant')?.setValidators(Validators.required);
-      this.form.get('recentChildbirth')?.setValidators(Validators.required);
-      this.form.get('lastDonationMale')?.clearValidators();
-    } else {
-      this.form.get('lastDonationMale')?.clearValidators();
-      this.form.get('lastDonationFemale')?.clearValidators();
-      this.form.get('pregnant')?.clearValidators();
-      this.form.get('recentChildbirth')?.clearValidators();
-    }
+  constructor(
+    private fb: FormBuilder,
+    private questionnaireService: QuestionnaireService,
+    private authService: AuthService
+  ) {
+    this.form = this.buildForm();
+    this.handleGenderValidation();
+  }
 
-    this.form.get('lastDonationMale')?.updateValueAndValidity();
-    this.form.get('lastDonationFemale')?.updateValueAndValidity();
-    this.form.get('pregnant')?.updateValueAndValidity();
-    this.form.get('recentChildbirth')?.updateValueAndValidity();
-  });
+  private buildForm(): FormGroup {
+    return this.fb.group({
+      age: [null, Validators.required],
+      gender: [null, Validators.required],
+      donationBefore60: [null, Validators.required],
+      weight: [null, Validators.required],
+      healthy: [null, Validators.required],
+      pregnant: [null],
+      recentChildbirth: [null],
+      symptoms: [null, Validators.required],
+      diseases: [null, Validators.required],
+      medications: [null, Validators.required],
+      procedures: [null, Validators.required],
+      drugs: [null, Validators.required],
+      partners: [null, Validators.required],
+      tattooOrPiercing: [null, Validators.required],
+      lastDonationMale: [null],
+      lastDonationFemale: [null],
+      covidVaccine: [null, Validators.required],
+      yellowFeverVaccine: [null, Validators.required],
+      travelRiskArea: [null, Validators.required],
+    });
+  }
 
-}
+  private handleGenderValidation(): void {
+    this.form.get('gender')?.valueChanges.subscribe((gender) => {
+      const maleFields = ['lastDonationMale'];
+      const femaleFields = ['lastDonationFemale', 'pregnant', 'recentChildbirth'];
 
+      maleFields.forEach((f) => this.form.get(f)?.clearValidators());
+      femaleFields.forEach((f) => this.form.get(f)?.clearValidators());
 
-  onSubmit() {
-    this.submitted = true;
-    this.sucessoPreenchimento = false;
-    this.perguntasInvalidas = [];
-    this.resultado = '';
+      if (gender === 'masculino') {
+        this.form.get('lastDonationMale')?.setValidators(Validators.required);
+      } else if (gender === 'feminino') {
+        femaleFields.forEach((f) => this.form.get(f)?.setValidators(Validators.required));
+      }
 
-    const simInvalida = [
-      'pregnant', 'recentChildbirth', 'symptoms', 'diseases',
-      'medications', 'procedures', 'drugs', 'partners', 'tattooOrPiercing',
-      'covidVaccine', 'yellowFeverVaccine', 'travelRiskArea',
-      'lastDonationMale', 'lastDonationFemale'
-    ];
+      [...maleFields, ...femaleFields].forEach((f) => this.form.get(f)?.updateValueAndValidity());
+    });
+  }
 
-    const naoInvalida = [
-      'age', 'donationBefore60', 'weight', 'healthy'
-    ];
-
+  private getRelevantFields(): string[] {
     const gender = this.form.get('gender')?.value;
-    let camposRelevantes = [
+    const baseFields = [
       'age', 'gender', 'donationBefore60', 'weight', 'healthy',
-      'symptoms', 'diseases', 'medications', 'procedures', 'drugs',
-      'partners', 'tattooOrPiercing', 'covidVaccine',
-      'yellowFeverVaccine', 'travelRiskArea'
+      'symptoms', 'diseases', 'medications', 'procedures',
+      'drugs', 'partners', 'tattooOrPiercing',
+      'covidVaccine', 'yellowFeverVaccine', 'travelRiskArea',
     ];
 
-    if (gender === 'masculino') {
-      camposRelevantes.push('lastDonationMale');
-    }
-    if (gender === 'feminino') {
-      camposRelevantes.push('pregnant', 'recentChildbirth', 'lastDonationFemale');
-    }
+    if (gender === 'masculino') return [...baseFields, 'lastDonationMale'];
+    if (gender === 'feminino') return [...baseFields, 'pregnant', 'recentChildbirth', 'lastDonationFemale'];
 
+    return baseFields;
+  }
 
-    const naoRespondidas = camposRelevantes.filter(
-      key => this.form.get(key)?.value === '' || this.form.get(key)?.value === null
+  private validateEligibility(relevantFields: string[]): boolean {
+    this.invalidQuestions = [];
+
+    relevantFields.forEach((field) => {
+      const value = this.form.get(field)?.value;
+      if (
+        (this.invalidIfYes.includes(field) && value === 'Sim') ||
+        (this.invalidIfNo.includes(field) && value === 'Não')
+      ) {
+        this.invalidQuestions.push(field);
+      }
+    });
+
+    return this.invalidQuestions.length === 0;
+  }
+
+  onSubmit(): void {
+    this.submitted = true;
+    this.success = false;
+    this.invalidQuestions = [];
+
+    const relevantFields = this.getRelevantFields();
+    const unanswered = relevantFields.filter(
+      (field) => !this.form.get(field)?.value
     );
 
-    if (naoRespondidas.length > 0) {
-      this.resultado = 'Por favor, responda todas as perguntas antes de enviar o formulário.';
-      this.perguntasInvalidas = naoRespondidas;
+    if (unanswered.length > 0) {
+      this.invalidQuestions = unanswered;
       return;
     }
 
-    this.sucessoPreenchimento = true;
+    const isEligible = this.validateEligibility(relevantFields);
 
-    for (const controlName of camposRelevantes) {
-      const control = this.form.get(controlName);
-      if (
-        (simInvalida.includes(controlName) && control?.value === 'Sim') ||
-        (naoInvalida.includes(controlName) && control?.value === 'Não')
-      ) {
-        this.perguntasInvalidas.push(controlName);
-      }
-    }
+    this.success = true;
 
-    const isEligible = this.perguntasInvalidas.length === 0;
-    this.resultado = isEligible
-      ? 'Parabéns! Você está apto(a) para doar sangue. Procure o hemocentro mais próximo.'
-      : 'Você não está elegível para doar sangue neste momento. Veja abaixo os critérios não atendidos:';
+    const data: QuestionnaireData = {
+      ...this.form.value,
+      isEligible,
+      userId: this.authService.getCurrentUserId(),
+    };
 
-    if (this.sucessoPreenchimento) {
-      const data: QuestionnaireData = this.form.value;
-      console.log('Dados do questionário:', data);
-      console.log('É elegible: ',isEligible);
-      this.questionnaireService.submitQuestionnaire(data).subscribe({
-        next: () => console.log('Respostas enviadas com sucesso.'),
-        error: (err) => console.error('Erro ao enviar respostas:', err)
-      });
-    }
+    this.questionnaireService.submitQuestionnaire(data);
   }
 
-  responderNovamente() {
+  resetForm(): void {
     this.form.reset();
     this.submitted = false;
-    this.sucessoPreenchimento = false;
-    this.perguntasInvalidas = [];
-    this.resultado = '';
+    this.success = false;
+    this.invalidQuestions = [];
   }
 }

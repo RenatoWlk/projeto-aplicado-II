@@ -19,7 +19,7 @@ public class EligibilityQuestionnaireDTO {
     private String medications;
     private String procedures;
     private String drugs;
-    private String Partners;
+    private String partners;
     private String tattooOrPiercing;
     private String lastDonationMale;
     private String lastDonationFemale;
@@ -27,5 +27,4 @@ public class EligibilityQuestionnaireDTO {
     private String yellowFeverVaccine;
     private String travelRiskArea;
     private boolean isEligible;
-    private String resultMessage;
 }

@@ -22,7 +22,6 @@ export class ForgotPasswordComponent {
   onSubmit() {
     if (this.forgotForm.valid) {
       const email = this.forgotForm.value.email;
-      console.log('Enviar e-mail de recuperação para:', email);
       // TODO servico para mandar email
     }
   }
