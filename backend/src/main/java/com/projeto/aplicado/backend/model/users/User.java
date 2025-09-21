@@ -1,6 +1,5 @@
 package com.projeto.aplicado.backend.model.users;
 
-import com.projeto.aplicado.backend.model.DonationAppointment;
 import com.projeto.aplicado.backend.model.ScheduledDonation;
 import com.projeto.aplicado.backend.model.achievement.UnlockedAchievement;
 import com.projeto.aplicado.backend.model.enums.BloodType;
@@ -23,7 +22,6 @@ public class User extends UserBase {
     private String cpf;
     private String gender;
     private BloodType bloodType;
-    private List<DonationAppointment> donations;
     private int timesDonated;
     private int timeUntilNextDonation;
     private LocalDate lastDonationDate;

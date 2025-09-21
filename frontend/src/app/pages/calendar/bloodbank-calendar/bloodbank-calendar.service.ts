@@ -3,11 +3,8 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 
 export interface DonationSlots {
-    id: string;
-    startDate: Date;
-    endDate: Date;
-    startTime: string;
-    endTime: string;
+    id: string,
+    availabilitySlots: { date: string,slots: { time: string, availableSpots: number, }[], } [],
 }
 
 @Injectable({
@@ -19,6 +16,7 @@ export class BloodbankService {
     ) {}
 
     addAvailableSlots(slot : DonationSlots): Observable<any> {
+        console.log('slot', slot);
         return this.http.post<DonationSlots>(`/api/bloodbanks/availability`, slot);
     }
 }

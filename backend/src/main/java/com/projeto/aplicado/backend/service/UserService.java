@@ -30,12 +30,13 @@ public class UserService {
 
     /**
      * Creates a new user in the system.
-     * 
+     *
      * @param dto the user request DTO containing user details
      * @return the created user response DTO
      */
     public UserResponseDTO create(UserRequestDTO dto) {
         User user = new User();
+        System.out.println(dto);
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -53,13 +54,14 @@ public class UserService {
         user.setTotalPoints(0);
 
         user = userRepository.save(user);
+        System.out.println(user);
         return toResponseDTO(user);
     }
 
     /**
      * Finds all users in the system.
-     * 
-     * @return a list of user response DTOs.
+     *
+     * @return a list of user response DTOs
      */
     public List<UserResponseDTO> findAll() {
         return userRepository.findAllUsers().stream()
@@ -69,9 +71,9 @@ public class UserService {
 
     /**
      * Finds a user by ID.
-     * 
-     * @param id the ID of the user to find.
-     * @return the user response DTO.
+     *
+     * @param id the ID of the user to find
+     * @return the user response DTO
      */
     public UserResponseDTO findById(String id) {
         return userRepository.findUserById(id)
@@ -80,20 +82,10 @@ public class UserService {
     }
 
     /**
-     * Unlocks the map opened achievement.
-     *
-     * @param id the ID of the user.
-     */
-    public void unlockMapAchievement(String id) {
-        User user = userRepository.findUserById(id).orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
-        achievementService.unlockAchievementByType(user, "map_opened");
-    }
-
-    /**
      * Finds user statistics by ID.
-     * 
-     * @param id the ID of the user to find statistics for.
-     * @return the user statistics DTO.
+     *
+     * @param id the ID of the user to find statistics for
+     * @return the user statistics DTO
      */
     public UserStatsDTO findStatsById(String id) {
         return userRepository.findUserById(id)
@@ -105,35 +97,35 @@ public class UserService {
      * Retrieves all blood banks and attempts to enrich each one with geolocation data. <br>
      * If the address is incomplete or an error occurs, coordinates are set to 0.
      *
-     * @return a list of blood bank DTOs including location information.
+     * @return a list of blood bank DTOs including location information
      */
     public UserLocationDTO findLocationById(String id) {
         return userRepository.findById(id)
-            .map(user -> {
-                UserLocationDTO dto = toLocationDTO(user);
+                .map(user -> {
+                    UserLocationDTO dto = toLocationDTO(user);
 
-                if (user.getAddress() == null ||
-                        user.getAddress().getStreet() == null ||
-                        user.getAddress().getCity() == null ||
-                        user.getAddress().getState() == null ||
-                        user.getAddress().getZipCode() == null) {
+                    if (user.getAddress() == null ||
+                            user.getAddress().getStreet() == null ||
+                            user.getAddress().getCity() == null ||
+                            user.getAddress().getState() == null ||
+                            user.getAddress().getZipCode() == null) {
+                        return dto;
+                    }
+
+                    try {
+                        String address = removeAccents(user.getAddress().getStreet().toLowerCase());
+                        double[] coordinates = geolocationService.getCoordinatesFromAddress(address);
+                        dto.setLatitude(coordinates[0]);
+                        dto.setLongitude(coordinates[1]);
+                    } catch (Exception e) {
+                        System.err.println("Error trying to get the coords: " + e.getMessage());
+                        dto.setLatitude(0.0);
+                        dto.setLongitude(0.0);
+                    }
+
                     return dto;
-                }
-
-                try {
-                    String address = removeAccents(user.getAddress().getStreet().toLowerCase());
-                    double[] coordinates = geolocationService.getCoordinatesFromAddress(address);
-                    dto.setLatitude(coordinates[0]);
-                    dto.setLongitude(coordinates[1]);
-                } catch (Exception e) {
-                    System.err.println("Error trying to get the coords: " + e.getMessage());
-                    dto.setLatitude(0.0);
-                    dto.setLongitude(0.0);
-                }
-
-                return dto;
-            })
-            .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+                })
+                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
     }
 
     private UserResponseDTO toResponseDTO(User user) {
@@ -187,8 +179,8 @@ public class UserService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             String message = "Olá " + user.getName() + ",\n\n" +
-                             "Seu login é: " + user.getEmail() + "\n\n" +
-                             "Sua senha é: " + user.getPassword() + "\n\n";
+                    "Seu login é: " + user.getEmail() + "\n\n" +
+                    "Sua senha é: " + user.getPassword() + "\n\n";
 
             emailService.sendEmail(user.getEmail(), "Recuperação de Dados de Acesso", message);
         }
@@ -201,15 +193,15 @@ public class UserService {
 
     public UserResponseDTO update(String id, UserRequestDTO dto) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         if (!user.getEmail().equals(dto.getEmail()) &&
-            userRepository.existsByEmail(dto.getEmail())) {
+                userRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
-        
+
         mapDtoToEntity(dto,user);
-        
+
         User updatedUser = userRepository.save(user);
         return toResponseDTO(updatedUser);
     }
@@ -223,13 +215,16 @@ public class UserService {
 
     public void changePassword(String id, ChangePasswordDTO dto) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
             throw new RuntimeException("Incorrect password");
         }
-        
+
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public void unlockMapAchievement(String id) {
     }
 }

@@ -1,9 +1,9 @@
 package com.projeto.aplicado.backend.model.users;
 
 import com.projeto.aplicado.backend.model.Campaign;
+import com.projeto.aplicado.backend.model.DailyAvailability;
 import com.projeto.aplicado.backend.model.DonationsOverTime;
 import com.projeto.aplicado.backend.model.enums.BloodType;
-import com.projeto.aplicado.backend.model.AvailabilitySlot;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,5 +26,6 @@ public class BloodBank extends UserBase {
     private Integer scheduledDonations;
     private List<DonationsOverTime> donationsOverTime;
     private Map<BloodType, Integer> bloodTypeBloodBags;
-    private List<AvailabilitySlot> availabilitySlots = new ArrayList<>();
+    private List<DailyAvailability> availabilitySlots;
+
 }

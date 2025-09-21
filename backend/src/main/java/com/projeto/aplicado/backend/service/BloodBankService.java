@@ -5,20 +5,23 @@ import com.projeto.aplicado.backend.dto.CampaignDTO;
 import com.projeto.aplicado.backend.dto.DonationScheduleDTO;
 import com.projeto.aplicado.backend.dto.bloodbank.*;
 import com.projeto.aplicado.backend.model.Campaign;
+import com.projeto.aplicado.backend.model.DailyAvailability;
 import com.projeto.aplicado.backend.model.ScheduledDonation;
+import com.projeto.aplicado.backend.model.Slot;
 import com.projeto.aplicado.backend.model.enums.BloodType;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.BloodBank;
 import com.projeto.aplicado.backend.model.users.User;
-import com.projeto.aplicado.backend.model.AvailabilitySlot;
 import com.projeto.aplicado.backend.repository.BloodBankRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -322,15 +325,20 @@ public class BloodBankService {
         BloodBank bloodBank = bloodBankRepository.findBloodBankById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
 
-        AvailabilitySlot slot = new AvailabilitySlot();
-        slot.setStartDate(dto.getStartDate());
-        slot.setEndDate(dto.getEndDate());
-        slot.setStartTime(dto.getStartTime());
-        slot.setEndTime(dto.getEndTime());
+        if (bloodBank.getAvailabilitySlots() == null) {
+            bloodBank.setAvailabilitySlots(new ArrayList<>());
+        }
 
-        bloodBank.getAvailabilitySlots().add(slot);
+        for (DailyAvailabilityDTO dailyDto: dto.getAvailability()) {
+            LocalDate date = dailyDto.getDate();
+
+            List<Slot> slots = dailyDto.getSlots().stream().map(s -> new Slot(s.getTime(), s.getAvailableSpots())).toList();
+            DailyAvailability daily = new DailyAvailability(date, slots);
+            bloodBank.getAvailabilitySlots().add(daily);
+        }
         bloodBankRepository.save(bloodBank);
     }
+
 
     /**
      * Schedules a donation appointment for a user at a blood bank.
@@ -342,7 +350,7 @@ public class BloodBankService {
     public void scheduleDonation(DonationScheduleDTO dto) {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        
+
         BloodBank bloodBank = bloodBankRepository.findBloodBankById(dto.getBloodBankId())
                 .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
 
@@ -420,5 +428,5 @@ public class BloodBankService {
 
         bloodBank = bloodBankRepository.save(bloodBank);
         return toResponseDTO(bloodBank);
-        }
     }
+}

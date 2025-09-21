@@ -33,7 +33,6 @@ export class BloodbankCalendarComponent {
     lastDonationDate : new Date(),
     nextDonationDate : new Date(),
     daysUntilNextDonation : 0,
-
   }
 
   rangeForm = new FormGroup({
@@ -41,6 +40,7 @@ export class BloodbankCalendarComponent {
     endDate: new FormControl<Date>(new Date(), {nonNullable: true}),
     startTime: new FormControl<string>('08:00', {nonNullable: true}),
     endTime: new FormControl<string>('17:00', {nonNullable: true}),
+    availableSpots: new FormControl<number>(0, {nonNullable: true}),
   });
 
 
@@ -52,23 +52,70 @@ export class BloodbankCalendarComponent {
 
   addAvailableSlots() {
     const id = this.authService.getCurrentUserId();
+    const startDate = this.rangeForm.controls.startDate.value!;
+    const endDate = this.rangeForm.controls.endDate.value!;
+    const startTime = this.rangeForm.controls.startTime.value!;
+    const endTime = this.rangeForm.controls.endTime.value!;
+    const availableSpots = this.rangeForm.controls.availableSpots.value!;
 
-    if (!this.rangeForm.value.startDate || !this.rangeForm.value.endDate ||
-      !this.rangeForm.value.startTime || !this.rangeForm.value.endTime) {
+
+    if (availableSpots <= 0) {
       //banner de erro
+      console.log('erro');
       return;
     }
 
-    const slot: DonationSlots = {
-      id: id,
-      startDate: this.rangeForm.controls.startDate.value,
-      endDate: this.rangeForm.controls.endDate.value,
-      startTime: this.rangeForm.controls.startTime.value?.toString().substring(16, 24),
-      endTime: this.rangeForm.controls.endTime.value?.toString().substring(16, 24)
-    }
+    const slotsByDate = this.generateSlotsByDate(startDate, endDate, startTime, endTime, availableSpots)
+    const payload = {id: id, availabilitySlots: slotsByDate};
 
-    this.bloodbankService.addAvailableSlots(slot).subscribe(() => {
-      console.log("Disponibilidade salva com sucesso");
+    this.bloodbankService.addAvailableSlots(payload).subscribe(() => {
+      console.log('Slots adicionados com sucesso');
     })
+
+  }
+
+  private toTimeString(value: Date | string): string {
+    if (typeof value === 'string') return value;
+    if (value instanceof Date) {
+      const time = value.toTimeString().slice(0, 5);
+      return time;
+    }
+    return '';
+  }
+
+  private generateDailySlots(startTime: string, endTime: string, availableSpots: number) {
+    const slots: {time: string, availableSpots: number}[] = [];
+    const [hStart, mStart] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+
+    let h = hStart;
+    let m = mStart;
+
+    while (h < endH || (h === endH && m <= endM)) {
+      slots.push(
+        {time: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
+         availableSpots});
+      m += 30;
+      if (m >= 60) {
+        m = 0;
+        h += 1;
+      }
+    }
+    return slots;
+  }
+
+  private generateSlotsByDate(startDate: Date, endDate: Date, startTime: string, endTime: string, availableSpots: number) {
+    const result: {date: string, slots: {time: string, availableSpots: number}[] }[] = [];
+
+    let current = new Date(startDate);
+    while (current <= endDate) {
+      const dateStr = current.toISOString().substring(0, 10);
+      const start = this.toTimeString(startTime);
+      const end = this.toTimeString(endTime);
+      const dailySlots = this.generateDailySlots(start, end, availableSpots);
+      result.push({date: dateStr, slots: dailySlots});
+      current.setDate(current.getDate() + 1);
+    }
+    return result;
   }
 }
