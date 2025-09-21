@@ -1,7 +1,9 @@
 package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.dto.CampaignDTO;
+import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.Campaign;
+import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.repository.BloodBankRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,13 @@ public class CampaignService {
     /**
      * Creates a new campaign.
      *
-     * @param dto the campaign DTO containing campaign details
-     * @return the created campaign DTO
+     * @param dto The campaign DTO containing campaign details.
+     * @return The created campaign DTO.
+     * @throws UserNotFoundException In case the blood bank was not found with the email provided.
      */
-    public CampaignDTO create(CampaignDTO dto) {
+    public CampaignDTO create(CampaignDTO dto) throws UserNotFoundException {
         var bb = bloodBankRepository.findByEmail(dto.getBloodbankEmail())
-                .orElseThrow(() -> new RuntimeException("Bloodbank email not found"));
+                .orElseThrow(() -> new UserNotFoundException(Role.BLOODBANK, "Blood bank not found with email provided when creating a campaign"));
 
         Campaign camp = new Campaign();
         camp.setTitle(dto.getTitle());
@@ -39,30 +42,21 @@ public class CampaignService {
         bb.getCampaigns().add(camp);
         bloodBankRepository.save(bb);
 
-        return toDTO(camp);
+        return toCampaignDTO(camp);
     }
 
     /**
      * Fetches all campaigns from the database and converts them to DTOs.
      * 
-     * @return a list of CampaignDTO objects representing all campaigns.
+     * @return A list of CampaignDTO objects representing all campaigns.
      */
     public List<CampaignDTO> getAllCampaigns() {
         return bloodBankRepository.findAllBloodBanks().stream()
                 .flatMap(b -> b.getCampaigns().stream())
-                .map(c -> {
-                    CampaignDTO dto = new CampaignDTO();
-                    dto.setTitle(c.getTitle());
-                    dto.setBody(c.getBody());
-                    dto.setStartDate(c.getStartDate());
-                    dto.setEndDate(c.getEndDate());
-                    dto.setLocation(c.getLocation());
-                    dto.setPhone(c.getPhone());
-                    return dto;
-                }).toList();
+                .map(this::toCampaignDTO).toList();
     }
 
-    private CampaignDTO toDTO(Campaign campaign) {
+    private CampaignDTO toCampaignDTO(Campaign campaign) {
         CampaignDTO dto = new CampaignDTO();
         dto.setTitle(campaign.getTitle());
         dto.setBody(campaign.getBody());

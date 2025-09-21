@@ -1,7 +1,9 @@
 package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.dto.OfferDTO;
+import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.Offer;
+import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.repository.PartnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,13 @@ public class OfferService {
     /**
      * Creates a new offer.
      *
-     * @param dto the offer DTO containing offer details
-     * @return the created offer DTO
+     * @param dto The offer DTO containing offer details.
+     * @return The created offer DTO.
+     * @throws UserNotFoundException In case the partner was not found with the email provided.
      */
-    public OfferDTO create(OfferDTO dto) {
+    public OfferDTO create(OfferDTO dto) throws UserNotFoundException {
         var partner = partnerRepository.findByEmail(dto.getPartnerEmail())
-                .orElseThrow(() -> new RuntimeException("Partner name not found"));
+                .orElseThrow(() -> new UserNotFoundException(Role.PARTNER, "Partner not found with email provided when creating an offer"));
 
         Offer offer = new Offer();
         offer.setTitle(dto.getTitle());
@@ -36,7 +39,7 @@ public class OfferService {
         partner.getOffers().add(offer);
         partnerRepository.save(partner);
 
-        return toDTO(partner.getName(), offer);
+        return toOfferDTO(partner.getName(), offer);
     }
 
     /**
@@ -47,11 +50,11 @@ public class OfferService {
     public List<OfferDTO> getAllOffers() {
         return partnerRepository.findAllPartners().stream()
                 .flatMap(partner -> partner.getOffers().stream()
-                        .map(offer -> toDTO(partner.getName(), offer)))
+                        .map(offer -> toOfferDTO(partner.getName(), offer)))
                 .toList();
     }
 
-    private OfferDTO toDTO(String partnerName, Offer offer) {
+    private OfferDTO toOfferDTO(String partnerName, Offer offer) {
         OfferDTO dto = new OfferDTO();
         dto.setPartnerName(partnerName);
         dto.setTitle(offer.getTitle());

@@ -2,7 +2,9 @@ package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.EligibilityQuestionnaireDTO;
+import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.EligibilityQuestionnaire;
+import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.EligibilityQuestionnaireRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
@@ -19,7 +21,7 @@ public class EligibilityQuestionnaireService {
     private final UserRepository userRepository;
     private final AchievementService achievementService;
 
-    public EligibilityQuestionnaire saveQuestionnaire(EligibilityQuestionnaireDTO dto) {
+    public EligibilityQuestionnaire saveQuestionnaire(EligibilityQuestionnaireDTO dto) throws UserNotFoundException {
         EligibilityQuestionnaire questionnaire = questionnaireRepository
                 .findByUserId(dto.getUserId())
                 .stream()
@@ -49,7 +51,7 @@ public class EligibilityQuestionnaireService {
         questionnaire.setEligible(dto.isEligible());
 
         if (dto.isEligible()) {
-            User user = userRepository.findUserById(dto.getUserId()).orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+            User user = userRepository.findUserById(dto.getUserId()).orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when unlocking achievement when saving questionnaire"));
             achievementService.unlockAchievementByType(user, "questionnaire_all_correct");
         }
 

@@ -3,6 +3,7 @@ package com.projeto.aplicado.backend.service;
 import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.partner.PartnerRequestDTO;
 import com.projeto.aplicado.backend.dto.partner.PartnerResponseDTO;
+import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.users.Partner;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.repository.PartnerRepository;
@@ -42,26 +43,16 @@ public class PartnerService {
     }
 
     /**
-     * Finds all partners.
-     * 
-     * @return a list of partner response DTOs
-     */
-    public List<PartnerResponseDTO> findAll() {
-        return partnerRepository.findAllPartners().stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Finds a partner by ID.
      * 
-     * @param id the ID of the partner to find
-     * @return the partner response DTO
+     * @param id The ID of the partner to find.
+     * @return The partner response DTO.
+     * @throws UserNotFoundException In case the partner was not found with ID provided.
      */
-    public PartnerResponseDTO findById(String id) {
+    public PartnerResponseDTO findById(String id) throws UserNotFoundException {
         return partnerRepository.findPartnerById(id)
                 .map(this::toResponseDTO)
-                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(Role.PARTNER, "Partner not found with ID provided when finding by ID"));
     }
 
     private PartnerResponseDTO toResponseDTO(Partner partner) {
@@ -80,13 +71,14 @@ public class PartnerService {
     /**
      * Updates an existing partner.
      * 
-     * @param id  the ID of the partner to update
-     * @param dto the partner request DTO containing the updated details
-     * @return the updated partner response DTO
+     * @param id The ID of the partner to update.
+     * @param dto The partner request DTO containing the updated details.
+     * @return The updated partner response DTO.
+     * @throws UserNotFoundException In case the partner was not found with ID provided.
      */
-    public PartnerResponseDTO update(String id, PartnerRequestDTO dto) {
+    public PartnerResponseDTO update(String id, PartnerRequestDTO dto) throws UserNotFoundException {
         Partner partner = partnerRepository.findPartnerById(id)
-                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(Role.PARTNER, "Partner not found with ID provided when updating"));
 
         partner.setName(dto.getName());
         partner.setEmail(dto.getEmail());
@@ -94,8 +86,7 @@ public class PartnerService {
         partner.setPhone(dto.getPhone());
         partner.setCnpj(dto.getCnpj());
         partner.setOffers(dto.getOffers());
-       partner = partnerRepository.save(partner);
+        partner = partnerRepository.save(partner);
         return toResponseDTO(partner);
-        }
-
     }
+}

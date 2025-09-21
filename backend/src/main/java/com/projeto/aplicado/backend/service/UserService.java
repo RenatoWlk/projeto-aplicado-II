@@ -6,11 +6,13 @@ import com.projeto.aplicado.backend.dto.user.UserLocationDTO;
 import com.projeto.aplicado.backend.dto.user.UserStatsDTO;
 import com.projeto.aplicado.backend.dto.user.UserRequestDTO;
 import com.projeto.aplicado.backend.dto.user.UserResponseDTO;
+import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.model.Address;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,57 +59,51 @@ public class UserService {
     }
 
     /**
-     * Finds all users in the system.
-     * 
-     * @return a list of user response DTOs.
-     */
-    public List<UserResponseDTO> findAll() {
-        return userRepository.findAllUsers().stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Finds a user by ID.
      * 
      * @param id the ID of the user to find.
      * @return the user response DTO.
+     * @throws UserNotFoundException In case the user was not found with the ID provided.
      */
-    public UserResponseDTO findById(String id) {
+    public UserResponseDTO findById(String id) throws UserNotFoundException {
         return userRepository.findUserById(id)
                 .map(this::toResponseDTO)
-                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when finding by ID"));
     }
 
     /**
      * Unlocks the map opened achievement.
      *
      * @param id the ID of the user.
+     * @throws UserNotFoundException In case the user was not found with the ID provided
      */
-    public void unlockMapAchievement(String id) {
-        User user = userRepository.findUserById(id).orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+    public void unlockMapAchievement(String id) throws UserNotFoundException {
+        User user = userRepository.findUserById(id).orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when unlocking map achievement"));
         achievementService.unlockAchievementByType(user, "map_opened");
     }
 
     /**
      * Finds user statistics by ID.
      * 
-     * @param id the ID of the user to find statistics for.
-     * @return the user statistics DTO.
+     * @param id The ID of the user to find statistics for.
+     * @return The user statistics DTO.
+     * @throws UserNotFoundException In case the user was not found with the ID provided.
      */
-    public UserStatsDTO findStatsById(String id) {
+    public UserStatsDTO findStatsById(String id) throws UserNotFoundException {
         return userRepository.findUserById(id)
                 .map(this::toStatsDTO)
-                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when finding stats by ID"));
     }
 
     /**
      * Retrieves all blood banks and attempts to enrich each one with geolocation data. <br>
      * If the address is incomplete or an error occurs, coordinates are set to 0.
      *
+     * @param id The ID of the user to get the location.
      * @return a list of blood bank DTOs including location information.
+     * @throws UserNotFoundException In case the user was not found with the ID provided.
      */
-    public UserLocationDTO findLocationById(String id) {
+    public UserLocationDTO findLocationById(String id) throws UserNotFoundException {
         return userRepository.findById(id)
             .map(user -> {
                 UserLocationDTO dto = toLocationDTO(user);
@@ -133,7 +129,7 @@ public class UserService {
 
                 return dto;
             })
-            .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
+            .orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when finding location by ID"));
     }
 
     private UserResponseDTO toResponseDTO(User user) {
@@ -199,13 +195,13 @@ public class UserService {
         return normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
 
-    public UserResponseDTO update(String id, UserRequestDTO dto) {
+    public UserResponseDTO update(String id, UserRequestDTO dto) throws UserNotFoundException, BadCredentialsException {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with the ID provided when updating"));
         
         if (!user.getEmail().equals(dto.getEmail()) &&
             userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new BadCredentialsException("Email already exists");
         }
         
         mapDtoToEntity(dto,user);
@@ -214,19 +210,19 @@ public class UserService {
         return toResponseDTO(updatedUser);
     }
 
-    public void delete(String id) {
+    public void delete(String id) throws UserNotFoundException {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException(Role.USER, "User not found with ID provided when deleting");
         }
         userRepository.deleteById(id);
     }
 
-    public void changePassword(String id, ChangePasswordDTO dto) {
+    public void changePassword(String id, ChangePasswordDTO dto) throws UserNotFoundException, BadCredentialsException {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when changing password"));
         
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
-            throw new RuntimeException("Incorrect password");
+            throw new BadCredentialsException("Incorrect password");
         }
         
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));

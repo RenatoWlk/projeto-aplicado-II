@@ -19,6 +19,20 @@ public class GeolocationService {
         this.httpClient = HttpClient.newHttpClient();
     }
 
+    /**
+     * Retrieves geographical coordinates (latitude and longitude) from a given address string
+     * using the Nominatim API (OpenStreetMap).
+     *
+     * <p>The method encodes the provided address, sends an HTTP request to the Nominatim API,
+     * and parses the JSON response to extract the latitude and longitude values.</p>
+     *
+     * <p>If the address is not found or an error occurs during the process, the method returns
+     * a default value of <code>{0.0, 0.0}</code>.</p>
+     *
+     * @param address The address to be converted into geographical coordinates.
+     * @return A double array containing the latitude and longitude, respectively.
+     *         If the lookup fails, returns <code>{0.0, 0.0}</code>.
+     */
     public double[] getCoordinatesFromAddress(String address) {
         try {
             String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
@@ -43,7 +57,6 @@ public class GeolocationService {
             double lon = Double.parseDouble(location.getString("lon"));
 
             return new double[]{lat, lon};
-
         } catch (Exception e) {
             System.err.println("Error trying to get the coords from: " + address);
             System.err.println("Error message: " + e.getMessage());

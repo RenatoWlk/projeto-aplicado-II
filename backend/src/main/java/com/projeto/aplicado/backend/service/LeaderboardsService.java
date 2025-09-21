@@ -17,6 +17,14 @@ import java.util.stream.Collectors;
 public class LeaderboardsService {
     private final UserRepository userRepository;
 
+    /**
+     * Builds leaderboards of users based on donations and points.
+     *
+     * <p>Returns the top 50 donors (by number of donations) and the top 50 users
+     * (by total points), including their name, blood type, and score.</p>
+     *
+     * @return a {@link LeaderboardsDTO} with top donors and top points users.
+     */
     public LeaderboardsDTO getLeaderboards() {
         List<User> users = userRepository.findAllUsers();
 

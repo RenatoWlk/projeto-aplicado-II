@@ -3,6 +3,9 @@ package com.projeto.aplicado.backend.service;
 import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.auth.AuthRequest;
 import com.projeto.aplicado.backend.dto.auth.AuthResponse;
+import com.projeto.aplicado.backend.exception.AuthenticationException;
+import com.projeto.aplicado.backend.exception.UserNotFoundException;
+import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.UserBase;
 import com.projeto.aplicado.backend.repository.UserRepository;
 import com.projeto.aplicado.backend.security.JwtUtil;
@@ -24,31 +27,25 @@ public class AuthService {
     /**
      * Authenticates a user by validating their credentials and generating a JWT token.
      *
-     * @param request The authentication request containing the user's email and password.
-     * @return An AuthResponse containing the generated JWT token.
+     * @param request The {@link AuthRequest} containing the user's email and password.
+     * @return An {@link AuthResponse} containing the generated JWT token.
+     * @throws UserNotFoundException In case the user was not found with the email provided.
+     * @throws BadCredentialsException In case the password provided is wrong.
+     * @throws AuthenticationException In case the operation fails.
      */
-    public AuthResponse authenticate(AuthRequest request) {
+    public AuthResponse authenticate(AuthRequest request) throws UserNotFoundException, BadCredentialsException, AuthenticationException {
         try {
-            UserBase user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> {
-                        System.err.println("User not found with email: " + request.getEmail());
-                        return new UsernameNotFoundException(Messages.USER_NOT_FOUND);
-                    });
+            UserBase user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with the email provided when authenticating"));
 
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                System.err.println("Invalid password for email: " + request.getEmail());
                 throw new BadCredentialsException(Messages.INVALID_CREDENTIALS);
             }
 
             String token = jwtUtil.generateToken(user.getId(), user.getName(), user.getEmail(), user.getRole());
 
             return new AuthResponse(token);
-        } catch (UsernameNotFoundException | BadCredentialsException ex) {
-            System.err.println("Authentication failed: " + ex.getMessage());
-            throw ex;
         } catch (Exception ex) {
-            System.err.println("Unexpected error during authentication" + ex);
-            throw new RuntimeException("Erro interno ao autenticar. Tente novamente mais tarde.");
+            throw new AuthenticationException("Failed to authenticate user");
         }
     }
 }

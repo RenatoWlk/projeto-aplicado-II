@@ -11,7 +11,7 @@
   <section class="app-card card-overflow">
     <div class="app-card-header">
       <i class="fas fa-book-medical app-card-icon"></i>
-      <h2 class="app-card-title">{{ postsSectionTitle }}</h2>
+      <h2 class="app-card-title">{{ POSTS_SECTION_TITLE }}</h2>
     </div>
 
     <app-preloader *ngIf="loadingPosts" type="skeleton-cards" [count]="3" [size]="'large'" [visible]="true"></app-preloader>
@@ -41,7 +41,7 @@
   <section class="app-card">
     <div class="app-card-header">
       <i class="fas fa-tags app-card-icon"></i>
-      <h2 class="app-card-title">{{ offersSectionTitle }}</h2>
+      <h2 class="app-card-title">{{ OFFERS_SECTION_TITLE }}</h2>
       <div *ngIf="userRole === roles.Partner" class="create-post-container">
         <button class="app-button create-post-button" (click)="isOfferModalOpen = true">
           <i class="fas fa-plus create-post-icon"></i>
@@ -74,7 +74,7 @@
   <section class="app-card">
     <div class="app-card-header">
       <i class="fas fa-location-dot app-card-icon"></i>
-      <h2 class="app-card-title">{{ nearbyBloodbanksSectionTitle }}</h2>
+      <h2 class="app-card-title">{{ NEARBY_BLOODBANKS_SECTION_TITLE }}</h2>
     </div>
     <!-- VISIBLE ONLY TO LOGGED-IN USERS WITH ROLE 'USER' -->
     <ng-container *ngIf="isLoggedIn; else loginPrompt">
@@ -104,7 +104,7 @@
   <section class="app-card">
     <div class="app-card-header">
       <i class="fas fa-chart-simple app-card-icon"></i>
-      <h2 class="app-card-title">{{ statsSectionTitle }}</h2>
+      <h2 class="app-card-title">{{ STATS_SECTION_TITLE }}</h2>
     </div>
     <!-- VISIBLE ONLY TO LOGGED-IN USERS WITH ROLE 'USER' -->
     <ng-container *ngIf="isLoggedIn; else loginPrompt">
@@ -142,7 +142,7 @@
   <section class="app-card">
     <div class="app-card-header">
       <i class="fas fa-trophy app-card-icon"></i>
-      <h2 class="app-card-title">{{ achievementsSectionTitle }}</h2>
+      <h2 class="app-card-title">{{ ACHIEVEMENTS_SECTION_TITLE }}</h2>
     </div>
     <!-- VISIBLE ONLY TO LOGGED-IN USERS WITH ROLE 'USER' -->
     <ng-container *ngIf="isLoggedIn; else loginPrompt">
@@ -178,7 +178,7 @@
   <!-- ======================= -->
   <ng-template #loginPrompt>
     <div class="card">
-      <p class="card-title">{{ loginRequiredMessage }}</p>
+      <p class="card-title">{{ LOGIN_REQUIRED_MESSAGE }}</p>
       <button routerLink="/login" class="app-button">Fazer Login</button>
     </div>
   </ng-template>

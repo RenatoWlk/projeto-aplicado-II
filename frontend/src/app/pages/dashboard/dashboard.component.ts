@@ -20,12 +20,13 @@ import { PreloaderComponent } from "../../shared/preloader/preloader.component";
 })
 export class DashboardComponent implements OnInit {
   // Constants
-  postsSectionTitle: string = DashboardConstants.POSTS_SECTION_TITLE;
-  offersSectionTitle: string = DashboardConstants.OFFERS_SECTION_TITLE;
-  nearbyBloodbanksSectionTitle: string = DashboardConstants.NEARBY_BLOODBANKS_SECTION_TITLE;
-  statsSectionTitle: string = DashboardConstants.STATS_SECTION_TITLE;
-  achievementsSectionTitle: string = DashboardConstants.ACHIEVEMENTS_SECTION_TITLE;
-  loginRequiredMessage: string = DashboardConstants.LOGIN_REQUIRED_MESSAGE;
+  public readonly POSTS_SECTION_TITLE: string = DashboardConstants.POSTS_SECTION_TITLE;
+  public readonly OFFERS_SECTION_TITLE: string = DashboardConstants.OFFERS_SECTION_TITLE;
+  public readonly NEARBY_BLOODBANKS_SECTION_TITLE: string = DashboardConstants.NEARBY_BLOODBANKS_SECTION_TITLE;
+  public readonly STATS_SECTION_TITLE: string = DashboardConstants.STATS_SECTION_TITLE;
+  public readonly ACHIEVEMENTS_SECTION_TITLE: string = DashboardConstants.ACHIEVEMENTS_SECTION_TITLE;
+  public readonly LOGIN_REQUIRED_MESSAGE: string = DashboardConstants.LOGIN_REQUIRED_MESSAGE;
+  private readonly LITERS_PER_DONATION: number = 0.45;
 
   // User data
   readonly roles = UserRole;
@@ -135,7 +136,7 @@ export class DashboardComponent implements OnInit {
   /**
    * Returns a human-readable string for the time until the next donation.
    * 
-   * @param secondsString - The time in seconds until the next donation.
+   * @param secondsString The time in seconds until the next donation.
    * @returns A string representing the time in a human-readable format.
    */
   getReadableTimeUntilNextDonation(secondsString: string): string {
@@ -155,7 +156,7 @@ export class DashboardComponent implements OnInit {
   /**
    * Calculates how many lives were potentially saved.
    * 
-   * @param donations - The number of donations made.
+   * @param donations The number of donations made.
    * @returns The number of potential lives saved (total donations * 4).
    */
   private calculatePotentialLivesSaved(donations: number): number {
@@ -165,7 +166,7 @@ export class DashboardComponent implements OnInit {
   /**
    * Sorts achievements by rarity (comum → raro → épico → lendário → mítico).
    * 
-   * @param achievements - The list of achievements to sort.
+   * @param achievements The list of achievements to sort.
    * @returns The sorted list of achievements.
    */
   private sortAchievementsByRarity(achievements: any[]): any[] {
@@ -181,10 +182,8 @@ export class DashboardComponent implements OnInit {
   }
 
   calculateLitersDonated(donations: number): string {
-    const LITERS_PER_DONATION = 0.45;
-    return +(donations * LITERS_PER_DONATION).toFixed(2).toString() + " Litros";
+    return (donations * this.LITERS_PER_DONATION).toFixed(2).toString() + " Litros";
   }
-
 
   createNewOffer(data: any): void {
     this.isOfferModalOpen = false;
