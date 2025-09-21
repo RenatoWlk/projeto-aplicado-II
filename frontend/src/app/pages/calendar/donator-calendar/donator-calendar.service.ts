@@ -13,7 +13,7 @@ export interface BloodBank {
 
 export interface DonationDate {
     userId: string;
-    bloodBankId: string | null;
+    bloodBankId: string;
     date: string;
     hour: string; 
 }

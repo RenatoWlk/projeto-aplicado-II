@@ -61,7 +61,7 @@ export class BloodbankCalendarComponent {
 
     if (availableSpots <= 0) {
       //banner de erro
-      console.log('erro');
+      alert('Erro');
       return;
     }
 
@@ -69,7 +69,7 @@ export class BloodbankCalendarComponent {
     const payload = {id: id, availabilitySlots: slotsByDate};
 
     this.bloodbankService.addAvailableSlots(payload).subscribe(() => {
-      console.log('Slots adicionados com sucesso');
+      alert('Vagas disponibilizadas com sucesso');
     })
 
   }

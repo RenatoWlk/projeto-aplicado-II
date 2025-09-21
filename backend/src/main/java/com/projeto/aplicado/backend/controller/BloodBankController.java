@@ -165,6 +165,7 @@ public class BloodBankController {
 
     @PostMapping("/schedule")
     public ResponseEntity<Void> scheduleDonation(@RequestBody DonationScheduleDTO scheduleDTO) {
+        System.out.println(scheduleDTO);
         bloodBankService.scheduleDonation(scheduleDTO);
         return ResponseEntity.ok().build();
     }
