@@ -12,6 +12,6 @@ import java.time.LocalTime;
 public class ScheduledDonation {
     private String bloodBankId;
     private LocalDate date;
-    private LocalTime hour;
+    private String hour;
     private Integer availableSpot;
 }
