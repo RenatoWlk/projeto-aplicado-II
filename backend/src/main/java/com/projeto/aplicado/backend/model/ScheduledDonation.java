@@ -1,5 +1,6 @@
 package com.projeto.aplicado.backend.model;
 
+import com.projeto.aplicado.backend.model.users.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,5 +13,7 @@ import java.time.LocalTime;
 public class ScheduledDonation {
     private String bloodBankId;
     private LocalDate date;
-    private LocalTime hour;
+    private String hour;
+    private Integer availableSpot;
+    private String userId;
 }
