@@ -4,23 +4,24 @@ import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.CampaignDTO;
 import com.projeto.aplicado.backend.dto.DonationScheduleDTO;
 import com.projeto.aplicado.backend.dto.bloodbank.*;
-import com.projeto.aplicado.backend.exception.LocationException;
-import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.Campaign;
+import com.projeto.aplicado.backend.model.DailyAvailability;
 import com.projeto.aplicado.backend.model.ScheduledDonation;
+import com.projeto.aplicado.backend.model.Slot;
 import com.projeto.aplicado.backend.model.enums.BloodType;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.BloodBank;
 import com.projeto.aplicado.backend.model.users.User;
-import com.projeto.aplicado.backend.model.AvailabilitySlot;
 import com.projeto.aplicado.backend.repository.BloodBankRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,8 +32,6 @@ public class BloodBankService {
     private final UserRepository userRepository;
     private final GeolocationService geolocationService;
     private final PasswordEncoder passwordEncoder;
-
-    private final double MAX_DISTANCE_KM = 80.0;
 
     /**
      * Creates a new blood bank with default values and saves it to the database.
@@ -66,16 +65,27 @@ public class BloodBankService {
     }
 
     /**
+     * Retrieves all blood banks from the database.
+     *
+     * @return a list of blood bank response DTOs
+     */
+    public List<BloodBankResponseDTO> findAll() {
+        return bloodBankRepository.findAllBloodBanks().stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Finds a blood bank by its ID.
      *
      * @param id the ID of the blood bank
      * @return the blood bank as a response DTO
-     * @throws UserNotFoundException if no blood bank is found with the given ID
+     * @throws RuntimeException if no blood bank is found with the given ID
      */
-    public BloodBankResponseDTO findById(String id) throws UserNotFoundException {
+    public BloodBankResponseDTO findById(String id) {
         return bloodBankRepository.findBloodBankById(id)
                 .map(this::toResponseDTO)
-                .orElseThrow(() -> new UserNotFoundException(Role.BLOODBANK, "Blood bank not found with the ID provided when finding by ID"));
+                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
     }
 
     /**
@@ -84,10 +94,10 @@ public class BloodBankService {
      * @param id the ID of the blood bank
      * @return a DTO containing blood donation statistics
      */
-    public BloodBankStatsDTO findStatsById(String id) throws UserNotFoundException {
+    public BloodBankStatsDTO findStatsById(String id) {
         return bloodBankRepository.findBloodBankById(id)
                 .map(this::toStatsDTO)
-                .orElseThrow(() -> new UserNotFoundException(Role.BLOODBANK, "Blood bank not found when finding the stats by ID"));
+                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
     }
 
     /**
@@ -96,10 +106,10 @@ public class BloodBankService {
      * @param id the ID of the blood bank
      * @return a list containing all the campaigns from the blood bank
      */
-    public List<CampaignDTO> findCampaignsById(String id) throws UserNotFoundException {
+    public List<CampaignDTO> findCampaignsById(String id) {
         return bloodBankRepository.findBloodBankById(id)
                 .map(this::toCampaignsDTO)
-                .orElseThrow(() -> new UserNotFoundException(Role.BLOODBANK, "Blood bank not found when finding the campaigns by ID"));
+                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
     }
 
     /**
@@ -142,25 +152,25 @@ public class BloodBankService {
      *
      * @param userId the user ID to calculate the distance of the blood banks from
      * @return a list of blood bank DTOs including location information
-     * @throws UserNotFoundException In case the user was not found with the ID provided.
-     * @throws LocationException In case the address provided in incomplete.
      */
-    public List<BloodBankNearbyDTO> getNearbyBloodbanksFromUser(String userId) throws UserNotFoundException, LocationException {
+    public List<BloodBankNearbyDTO> getNearbyBloodbanksFromUser(String userId) {
         User user = userRepository.findUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with the ID provided when finding the nearby banks"));
+                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
 
         if (user.getAddress() == null ||
                 user.getAddress().getStreet() == null ||
                 user.getAddress().getCity() == null ||
                 user.getAddress().getState() == null ||
                 user.getAddress().getZipCode() == null) {
-            throw new LocationException(Messages.USER_ADDRESS_INCOMPLETE);
+            throw new RuntimeException(Messages.USER_ADDRESS_INCOMPLETE);
         }
 
         String userAddress = removeAccents(user.getAddress().getStreet().toLowerCase());
         double[] userCoordinates = geolocationService.getCoordinatesFromAddress(userAddress);
         double userLat = userCoordinates[0];
         double userLon = userCoordinates[1];
+
+        final double MAX_DISTANCE_KM = 80.0;
 
         return bloodBankRepository.findAllBloodBanks().stream().map(bloodBank -> {
             BloodBankNearbyDTO dto = toNearbyDTO(bloodBank);
@@ -184,7 +194,7 @@ public class BloodBankService {
                     }
                 }
             } catch (Exception e) {
-                System.err.println("\nError trying to get the coords");
+                System.err.println("\n\n\n\nError trying to get the coords");
                 System.err.println("Error message: " + e.getMessage());
             }
 
@@ -202,6 +212,8 @@ public class BloodBankService {
      * @return the distance in kilometers
      */
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int EARTH_RADIUS_KM = 6371;
+
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
 
@@ -210,7 +222,6 @@ public class BloodBankService {
                         Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        final int EARTH_RADIUS_KM = 6371;
         return EARTH_RADIUS_KM * c;
     }
 
@@ -314,15 +325,20 @@ public class BloodBankService {
         BloodBank bloodBank = bloodBankRepository.findBloodBankById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
 
-        AvailabilitySlot slot = new AvailabilitySlot();
-        slot.setStartDate(dto.getStartDate());
-        slot.setEndDate(dto.getEndDate());
-        slot.setStartTime(dto.getStartTime());
-        slot.setEndTime(dto.getEndTime());
+        if (bloodBank.getAvailabilitySlots() == null) {
+            bloodBank.setAvailabilitySlots(new ArrayList<>());
+        }
 
-        bloodBank.getAvailabilitySlots().add(slot);
+        for (DailyAvailabilityDTO dailyDto: dto.getAvailability()) {
+            LocalDate date = dailyDto.getDate();
+
+            List<Slot> slots = dailyDto.getSlots().stream().map(s -> new Slot(s.getTime(), s.getAvailableSpots())).toList();
+            DailyAvailability daily = new DailyAvailability(date, slots);
+            bloodBank.getAvailabilitySlots().add(daily);
+        }
         bloodBankRepository.save(bloodBank);
     }
+
 
     /**
      * Schedules a donation appointment for a user at a blood bank.
@@ -334,7 +350,7 @@ public class BloodBankService {
     public void scheduleDonation(DonationScheduleDTO dto) {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        
+
         BloodBank bloodBank = bloodBankRepository.findBloodBankById(dto.getBloodBankId())
                 .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
 
@@ -399,11 +415,10 @@ public class BloodBankService {
      * @param id  the ID of the blood bank to update
      * @param dto the DTO containing the updated information
      * @return the updated blood bank response DTO
-     * @throws UserNotFoundException In case the blood bank was not found with ID provided.
      */
-    public BloodBankResponseDTO update(String id, BloodBankRequestDTO dto) throws UserNotFoundException {
+    public BloodBankResponseDTO update(String id, BloodBankRequestDTO dto) {
         BloodBank bloodBank = bloodBankRepository.findBloodBankById(id)
-                .orElseThrow(() -> new UserNotFoundException(Role.BLOODBANK, "BloodBank not found when updating"));
+                .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
 
         bloodBank.setName(dto.getName());
         bloodBank.setEmail(dto.getEmail());

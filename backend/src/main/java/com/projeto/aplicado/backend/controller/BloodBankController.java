@@ -2,19 +2,20 @@ package com.projeto.aplicado.backend.controller;
 
 import com.projeto.aplicado.backend.dto.CampaignDTO;
 import com.projeto.aplicado.backend.dto.DonationScheduleDTO;
-import com.projeto.aplicado.backend.dto.bloodbank.BloodBankMapDTO;
-import com.projeto.aplicado.backend.dto.bloodbank.BloodBankRequestDTO;
-import com.projeto.aplicado.backend.dto.bloodbank.BloodBankResponseDTO;
-import com.projeto.aplicado.backend.dto.bloodbank.BloodBankStatsDTO;
-import com.projeto.aplicado.backend.dto.bloodbank.BloodBankAvailabilityDTO;
-import com.projeto.aplicado.backend.model.AvailabilitySlot;
+import com.projeto.aplicado.backend.dto.bloodbank.*;
+import com.projeto.aplicado.backend.model.BloodBankAvailability;
+import com.projeto.aplicado.backend.model.DailyAvailability;
+import com.projeto.aplicado.backend.model.Slot;
 import com.projeto.aplicado.backend.model.users.BloodBank;
-import com.projeto.aplicado.backend.service.AchievementService;
 import com.projeto.aplicado.backend.service.BloodBankService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,16 @@ public class BloodBankController {
     }
 
     /**
+     * Gets all blood banks.
+     *
+     * @return a list of blood bank response DTOs
+     */
+    @GetMapping
+    public ResponseEntity<List<BloodBankResponseDTO>> getAll() {
+        return ResponseEntity.ok(bloodBankService.findAll());
+    }
+
+    /**
      * Get an existing blood bank by ID.
      *
      * @param id the ID of the blood bank to retrieve
@@ -49,7 +60,8 @@ public class BloodBankController {
     }
 
     /**
-     * Retrieves all blood banks with geolocation (latitude and longitude) to be displayed on the map.
+     * Retrieves all blood banks with geolocation (latitude and longitude)
+     * to be displayed on the map.
      *
      * @return a list of blood banks with location data
      */
@@ -83,9 +95,9 @@ public class BloodBankController {
     @PostMapping("/availability")
     public ResponseEntity<Void> addAvailabilitySlots(@RequestBody BloodBankAvailabilityDTO slotsDTO) {
         bloodBankService.addAvailabilitySlots(slotsDTO);
+        System.out.println(slotsDTO);
         return ResponseEntity.ok().build();
     }
-
     @GetMapping("/available-slots")
     public ResponseEntity<List<BloodBank>> getBloodBanksWithAvailableSpots() {
         List<BloodBank> bloodBanks = bloodBankService.findBloodBanksWithAvailableSlots();
@@ -93,46 +105,75 @@ public class BloodBankController {
     }
 
     @GetMapping("/available-dates")
-    public List<Map<String, Object>> getBloodAvailableDates(@RequestParam("bloodBankId") String bloodBankId) {
-        BloodBank bank = bloodBankService.findEntityById(bloodBankId);
+    public List<Map<String, Object>> getBloodbankAvailableDates(@RequestParam String bloodbankId) {
+        BloodBank bank = bloodBankService.findEntityById(bloodbankId);
         //List<BloodBank> banks = bloodBankService.findAvailableDates();
         List<Map<String, Object>> slots = new ArrayList<>();
 
         if (bank != null) {
-            for (AvailabilitySlot slot: bank.getAvailabilitySlots()) {
+            for (DailyAvailability slot: bank.getAvailabilitySlots()) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("startDate", slot.getStartDate());
-                map.put("endDate", slot.getEndDate());
+                map.put("date", slot.getDate());
                 slots.add(map);
+                System.out.println(map);
             }
         }
         return slots;
     }
 
     @GetMapping("/available-hours")
-    public List<Map<String, Object>> getBloodAvailableHours() {
-        List<BloodBank> banks = bloodBankService.findAvailableHours();
+    public List<Map<String, Object>> getBloodbankAvailableHours(
+            @RequestParam("bloodbankId") String bloodbankId,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        BloodBank bank = bloodBankService.findEntityById(bloodbankId);
         List<Map<String, Object>> slots = new ArrayList<>();
 
-        for (BloodBank bank : banks) {
-            for (AvailabilitySlot slot: bank.getAvailabilitySlots()) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("startTime", slot.getStartTime());
-                map.put("endTime", slot.getEndTime());
-                slots.add(map);
+        if (bank != null) {
+            for (DailyAvailability daily: bank.getAvailabilitySlots()) {
+                if (daily.getDate().isEqual(date)) {
+                    for (Slot s: daily.getSlots()) {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("time", s.getTime());
+                        map.put("availableSpots", s.getAvailableSpots());
+                        slots.add(map);
+                    }
+                }
             }
         }
         return slots;
     }
 
+    @GetMapping("/{id}/availability")
+    public ResponseEntity<Map<String, List<SlotDTO>>> getAvailability(@PathVariable String id) {
+        BloodBank bank = bloodBankService.findEntityById(id);
+        if (bank == null) return ResponseEntity.notFound().build();
+
+        Map<String, List<SlotDTO>> result = new HashMap<>();
+        for (DailyAvailability daily : bank.getAvailabilitySlots()) {
+            for (Slot s: daily.getSlots()) {
+                SlotDTO dto = new SlotDTO();
+                dto.setTime(s.getTime());
+                dto.setAvailableSpots(s.getAvailableSpots());
+
+                result.computeIfAbsent(daily.getDate().toString(), k -> new ArrayList<>())
+                        .add(dto);
+            }
+        }
+        return ResponseEntity.ok(result);
+    }
+
     @PostMapping("/schedule")
     public ResponseEntity<Void> scheduleDonation(@RequestBody DonationScheduleDTO scheduleDTO) {
+        System.out.println(scheduleDTO);
         bloodBankService.scheduleDonation(scheduleDTO);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BloodBankResponseDTO> updateBloodBank(@PathVariable String id, @RequestBody BloodBankRequestDTO dto) {
+    public ResponseEntity<BloodBankResponseDTO> updateBloodBank(
+            @PathVariable String id,
+            @RequestBody BloodBankRequestDTO dto) {
         return ResponseEntity.ok(bloodBankService.update(id, dto));
     }
 }

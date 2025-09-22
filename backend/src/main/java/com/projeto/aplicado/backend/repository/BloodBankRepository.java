@@ -34,5 +34,4 @@ public interface BloodBankRepository extends MongoRepository<BloodBank, String> 
             "{ '$project': { 'availabilitySlots.startTime': 1, 'availabilitySlots.endTime': 1 } }"
     })
     List<BloodBank> findAvailableHoursOnly();
-
 }
