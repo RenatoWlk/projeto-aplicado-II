@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { BloodBankDashboardService } from "../../dashboard/bloodbank-dashboard/bloodbank-dashboard.service";
@@ -13,7 +13,7 @@ export interface BloodBank {
 
 export interface DonationDate {
     userId: string;
-    bloodBankId: string | null;
+    bloodBankId: string;
     date: string;
     hour: string; 
 }
@@ -27,26 +27,29 @@ export class DonationService {
     
     constructor(private http: HttpClient) {}
 
+    // Pega os bancos de sangue que disponbilizaram datas de doação
     getBloodBanksWithAvailableSlots(): Observable<BloodBank[]> {
         return this.http.get<BloodBank[]>(`${this.API}/available-slots`);
     }
 
-    scheduleDonation(appointment: DonationDate): Observable<any> {
-        return this.http.post(`${this.API}/schedule`, appointment);
+    // Pega as datas disponibilizidas para doação, a partir do id do banco de sangue
+    getAvailableDonationDates(bloodbankId: string): Observable<{date: string}[]> {
+        return this.http.get<{date: string}[]>(
+            `${this.API}/available-dates`,
+            { params: {bloodbankId} }
+        );
     }
 
-    getSlotsByBloodBankId(): Observable<DonationSlots[]> {
-        return this.http.get<DonationSlots[]>(`${this.API}/available-dates`);
-    }
-
-    getAvailableDonationDates(bloodBankId: string): Observable<{ startDate: string; endDate: string }[]> {
-    return this.http.get<{ startDate: string; endDate: string }[]>(`${this.API}/available-dates`, {
-        params: { bloodBankId }
+    // Pega os horários e número de vagas disponiveis para doação, a partir do id do banco de sangue e a data escolhida pelo usuário
+    getAvailableDonationHours(bloodbankId: string, date: string): Observable<{ time: string; availableSpots: number }[]> {
+        return this.http.get<{ time: string; availableSpots: number }[]>(`${this.API}/available-hours`, {
+            params: {bloodbankId, date}
         });
     }
 
-    getAvailableDonationHours(): Observable<{ startTime: string; endTime: string }[]> {
-        return this.http.get<{ startTime: string; endTime: string }[]>(`${this.API}/available-hours`);
+    // Envia o agendamento escolhido pelo usuário
+    scheduleDonation(appointment: DonationDate): Observable<any> {
+        return this.http.post(`${this.API}/schedule`, appointment);
     }
 
 }

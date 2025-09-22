@@ -33,6 +33,13 @@
                     <mat-timepicker-toggle matIconSuffix [for]="endTime"></mat-timepicker-toggle>
                     <mat-timepicker #endTime></mat-timepicker>
                 </mat-form-field>
+
+                
+                <!-- Slots quantity -->
+                <mat-form-field appearance="outline" class="custom-form-field full-width">
+                    <mat-label>Quantidade de vagas</mat-label>
+                    <input matInput formControlName="availableSpots">
+                </mat-form-field>
             </div>
 
             <div class="schedule-button-container">
@@ -40,33 +47,4 @@
             </div>
         </form>
     </div>
-
-    <!-- <div class="app-card">
-        <div class="app-card-header">
-        <i class="fa-solid fa-bell app-card-icon"></i>
-        <h2 class="app-card-title">Datas de doação</h2>
-        </div>
-        <div class="calendar-stats">
-            <div class="calendar-stats-grid">
-                <div class='card'>
-                    <i class="fa-solid fa-calendar-week app-card-icon"></i>
-                    <div class="app-card-header">
-                        <p>Ultima doação</p>
-                    </div>
-                </div>
-                <div class='card'>
-                    <i class="fa-solid fa-calendar-week app-card-icon"></i>
-                    <div class="app-card-header">
-                        <p class="calendar-stat-label">Próxima doação</p>
-                    </div>
-                </div>
-                <div class='card'>
-                    <i class="fa-solid fa-clock app-card-icon"></i>
-                    <div class="app-card-header">
-                        <p>Dias para a próxima doação</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
 </div>
