@@ -1,0 +1,55 @@
+services:
+  java-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8080:8080"
+    networks:
+      - appnet
+    depends_on:
+      - mongo-db
+    # Add environment variables here if needed
+
+  typescript-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    ports:
+      - "2000:80"
+    networks:
+      - appnet
+    depends_on:
+      - java-backend
+    # Add environment variables here if needed
+
+  mongo-db:
+    image: mongo:latest
+    restart: unless-stopped
+    ports:
+      - "27017:27017"  # Default MongoDB port
+    networks:
+      - appnet
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Uncomment below to persist MongoDB data
+    # volumes:
+    #   - mongo-data:/data/db
+    # env_file: ./.env  # Uncomment if .env file exists in ./mongo-db
+    # Add environment variables here if needed
+
+networks:
+  appnet:
+    driver: bridge
+
+# Uncomment below to persist MongoDB data
+#volumes:
+#  mongo-data:
+#    driver: local

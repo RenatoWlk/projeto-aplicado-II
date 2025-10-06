@@ -1,0 +1,77 @@
+# Version control
+.git/
+.gitignore
+.svn/
+.hg/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node.js
+frontend/node_modules/
+frontend/npm-debug.log
+frontend/yarn-debug.log
+
+# Java build outputs
+backend/build/
+backend/build.gradle
+backend/settings.gradle
+backend/.gradle/
+backend/gradle/
+backend/gradlew.bat
+
+# Angular build outputs
+frontend/dist/
+frontend/.angular/
+
+# Test and coverage artifacts
+**/test/
+**/tests/
+**/*.spec.ts
+**/*.test.js
+**/*.test.ts
+**/*.test.java
+**/*.test.go
+**/.pytest_cache/
+**/.coverage
+
+# Temporary and cache files
+**/tmp/
+**/temp/
+**/*.tmp
+**/.cache/
+**/.tsbuildinfo
+**/debug/
+**/*.log
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+.local/
+local/
+
+# Documentation and project files
+docs/
+*.md
+README*
+
+# Docker files
+Dockerfile*
+docker-compose*
+
+# Miscellaneous
+*.properties
+*.editorconfig
+
+# Exclude lock files and gradle wrappers (do NOT ignore these)
+# (Intentionally not ignoring *.lock, gradlew, gradlew.bat, .gradle, gradle/)
+
+# End of .dockerignore
