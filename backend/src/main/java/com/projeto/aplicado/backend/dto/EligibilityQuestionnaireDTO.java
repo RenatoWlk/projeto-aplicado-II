@@ -1,5 +1,7 @@
 package com.projeto.aplicado.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -8,23 +10,24 @@ import lombok.ToString;
 public class EligibilityQuestionnaireDTO {
     private String userId;
     private String gender;
-    private String age;
-    private String donationBefore60;
-    private String weight;
-    private String healthy;
-    private String pregnant;
-    private String recentChildbirth;
-    private String symptoms;
-    private String diseases;
-    private String medications;
-    private String procedures;
-    private String drugs;
-    private String partners;
-    private String tattooOrPiercing;
-    private String lastDonationMale;
-    private String lastDonationFemale;
-    private String covidVaccine;
-    private String yellowFeverVaccine;
-    private String travelRiskArea;
-    private boolean isEligible;
+    private boolean age;
+    private boolean donationBefore60;
+    private boolean weight;
+    private boolean healthy;
+    private boolean pregnant;
+    private boolean recentChildbirth;
+    private boolean symptoms;
+    private boolean diseases;
+    private boolean medications;
+    private boolean procedures;
+    private boolean drugs;
+    private boolean partners;
+    private boolean tattooOrPiercing;
+    private boolean lastDonationMale;
+    private boolean lastDonationFemale;
+    private boolean covidVaccine;
+    private boolean yellowFeverVaccine;
+    private boolean travelRiskArea;
+     @JsonProperty("isEligible")
+    private boolean eligible;
 }

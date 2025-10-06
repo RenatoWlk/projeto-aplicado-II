@@ -122,8 +122,8 @@ export class QuestionnaireComponent {
     relevantFields.forEach((field) => {
       const value = this.form.get(field)?.value;
       if (
-        (this.invalidIfYes.includes(field) && value === 'Sim') ||
-        (this.invalidIfNo.includes(field) && value === 'Não')
+        (this.invalidIfYes.includes(field) && value === true) ||
+        (this.invalidIfNo.includes(field) && value === false)
       ) {
         this.invalidQuestions.push(field);
       }
@@ -139,7 +139,7 @@ export class QuestionnaireComponent {
 
     const relevantFields = this.getRelevantFields();
     const unanswered = relevantFields.filter(
-      (field) => !this.form.get(field)?.value
+      (field) => this.form.get(field)?.value === null || this.form.get(field)?.value === undefined
     );
 
     if (unanswered.length > 0) {
@@ -153,11 +153,19 @@ export class QuestionnaireComponent {
 
     const data: QuestionnaireData = {
       ...this.form.value,
-      isEligible,
+      eligible: isEligible,
       userId: this.authService.getCurrentUserId(),
     };
 
-    this.questionnaireService.submitQuestionnaire(data);
+    console.log('Dados enviados para o backend:', data);
+
+    this.questionnaireService.submitQuestionnaire(data)
+    .subscribe({
+        next: response => console.log('Resposta do backend:', response),
+        error: err => console.error('Erro ao enviar questionário:', err),
+        complete: () => console.log('Requisição finalizada')
+    });
+
   }
 
   resetForm(): void {

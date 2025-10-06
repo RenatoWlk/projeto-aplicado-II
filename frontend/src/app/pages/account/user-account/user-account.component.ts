@@ -304,106 +304,22 @@ export class UserAccountComponent implements OnInit {
     return eligibilityFields.includes(fieldName);
   }
 
-  getAnswerClass(answer: string, isInverted: boolean = false, fieldName: string = ''): string {
-    if (!answer) return 'neutral';
-    
-    const normalizedAnswer = answer.toLowerCase().trim();
-    
-    if (this.isEligibilityField(fieldName)) {
-      switch (normalizedAnswer) {
-        case 'sim':
-        case 'apto':
-          return 'positive';
-        case 'não':
-        case 'não apto':
-          return 'negative';
-        default:
-          return 'neutral';
-      }
-    }
-    
-    if (isInverted) {
-      switch (normalizedAnswer) {
-        case 'sim':
-          return 'negative';
-        case 'não':
-          return 'positive';
-        default:
-          return 'neutral';
-      }
-    } else {
-      switch (normalizedAnswer) {
-        case 'sim':
-          return 'positive';
-        case 'não':
-          return 'negative';
-        default:
-          return 'neutral';
-      }
-    }
-  }
+  getAnswerClass(answer: boolean | null): string {
+  if (answer === null) return 'neutral';
+  return answer ? 'yes' : 'no';
+}
+  getAnswerIcon(answer: boolean | null): string {
+  if (answer === null) return 'fa-question';
+  return answer ? 'fa-check' : 'fa-xmark';
+}
 
-  getAnswerIcon(answer: string, isInverted: boolean = false, fieldName: string = ''): string {
-    if (!answer) return 'fa-question';
-    
-    const normalizedAnswer = answer.toLowerCase().trim();
-    
-    // Para campos de aptidão (idade, peso, etc.)
-    if (this.isEligibilityField(fieldName)) {
-      switch (normalizedAnswer) {
-        case 'sim':
-        case 'apto':
-          return 'fa-check';
-        case 'não':
-        case 'não apto':
-          return 'fa-times';
-        default:
-          return 'fa-question';
-      }
-    }
-    
-    if (isInverted) {
-      switch (normalizedAnswer) {
-        case 'sim':
-          return 'fa-times';
-        case 'não':
-          return 'fa-check';
-        default:
-          return 'fa-question';
-      }
-    } else {
-      switch (normalizedAnswer) {
-        case 'sim':
-          return 'fa-check';
-        case 'não':
-          return 'fa-times';
-        default:
-          return 'fa-question';
-      }
-    }
-  }
-
-  getFormattedAnswer(answer: string, fieldName: string = ''): string {
-    if (!answer) return 'N/A';
-    
-    const normalizedAnswer = answer.toLowerCase().trim();
-    
-    if (this.isEligibilityField(fieldName)) {
-      switch (normalizedAnswer) {
-        case 'sim':
-          return 'Apto';
-        case 'não':
-          return 'Não Apto';
-        default:
-          return answer;
-      }
-    }
-    
-    return answer;
-  }
+  getFormattedAnswer(answer: boolean | null): string {
+  if (answer === null) return '-';
+  return answer ? 'Sim' : 'Não';
+}
 
   getFormattedResultMessage(questionnaire: EligibilityQuestionnaireDTO): string {
-    if (questionnaire.isEligible) {
+    if (questionnaire.eligible) {
       return 'Baseado nas suas respostas, você está apto para realizar a doação de sangue. Procure um banco de sangue mais próximo.';
     } else {
       return questionnaire.resultMessage || 'Algumas das suas respostas indicam que você não está apto para doação no momento. Consulte um profissional de saúde para mais informações.';
@@ -413,48 +329,48 @@ export class UserAccountComponent implements OnInit {
   getRecommendations(questionnaire: EligibilityQuestionnaireDTO): string[] {
     const recommendations: string[] = [];
     
-    if (!questionnaire.isEligible) {
-      if (questionnaire.symptoms === 'Sim') {
+    if (!questionnaire.eligible) {
+      if (questionnaire.symptoms === true) {
         recommendations.push('Aguarde até estar completamente recuperado dos sintomas');
       }
       
-      if (questionnaire.medications === 'Sim') {
+      if (questionnaire.medications === true) {
         recommendations.push('Consulte sobre a compatibilidade dos seus medicamentos com a doação');
       }
       
-      if (questionnaire.procedures === 'Sim') {
+      if (questionnaire.procedures === true) {
         recommendations.push('Aguarde o período de recuperação recomendado após procedimentos médicos');
       }
       
-      if (questionnaire.tattooOrPiercing === 'Sim') {
+      if (questionnaire.tattooOrPiercing === true) {
         recommendations.push('Aguarde 12 meses após tatuagem, piercing ou acupuntura');
       }
       
-      if (questionnaire.covidVaccine === 'Sim') {
+      if (questionnaire.covidVaccine === true) {
         recommendations.push('Aguarde 48 horas após a vacinação contra COVID-19');
       }
       
-      if (questionnaire.yellowFeverVaccine === 'Sim') {
+      if (questionnaire.yellowFeverVaccine === true) {
         recommendations.push('Aguarde 30 dias após a vacinação contra febre amarela');
       }
       
-      if (questionnaire.drugs === 'Sim') {
+      if (questionnaire.drugs === true) {
         recommendations.push('Procure orientação médica especializada sobre uso de substâncias');
       }
       
       if (questionnaire.gender === 'Feminino') {
-        if (questionnaire.pregnant === 'Sim') {
+        if (questionnaire.pregnant === true) {
           recommendations.push('Gestantes não podem doar sangue por questões de segurança');
         }
-        if (questionnaire.recentChildbirth === 'Sim') {
+        if (questionnaire.recentChildbirth === true) {
           recommendations.push('Aguarde 12 meses após parto ou aborto');
         }
-        if (questionnaire.lastDonationFemale === 'Sim') {
+        if (questionnaire.lastDonationFemale === true) {
           recommendations.push('Mulheres devem aguardar 90 dias entre doações');
         }
       }
       
-      if (questionnaire.gender === 'Masculino' && questionnaire.lastDonationMale === 'Sim') {
+      if (questionnaire.gender === 'Masculino' && questionnaire.lastDonationMale === true) {
         recommendations.push('Homens devem aguardar 60 dias entre doações');
       }
       
@@ -512,7 +428,7 @@ export class UserAccountComponent implements OnInit {
     icon: string; 
     message: string 
   } {
-    if (questionnaire.isEligible) {
+    if (questionnaire.eligible) {
       return {
         status: 'Apto',
         color: '#4caf50',
@@ -552,17 +468,11 @@ export class UserAccountComponent implements OnInit {
     return questionMap[field] || field;
   }
 
-  /**
-   * Navega para fazer um novo questionário
-   */
   onNewQuestionnaire(): void {
     // TODO Implementar navegação para página de questionário
     // this.router.navigate(['/questionnaire']);
   }
 
-  /**
-   * Navega para encontrar bancos de sangue
-   */
   onFindBloodBank(): void {
     // TODO Implementar navegação para página de bancos de sangue
     // this.router.navigate(['/blood-banks']);
