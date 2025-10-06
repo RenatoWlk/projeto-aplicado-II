@@ -7,6 +7,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Achievement, DashboardService, UserStats } from '../../dashboard/dashboard.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { RouterModule } from '@angular/router';
+import { QuestionnairePdfService } from './questionnaire-pdf.service';
 
 @Component({
   selector: 'app-user-account',
@@ -48,7 +49,8 @@ export class UserAccountComponent implements OnInit {
     private userService: UserAccountService,
     private fb: FormBuilder,
     private authService: AuthService,
-    private dashboardService: DashboardService  
+    private dashboardService: DashboardService,
+    private pdfService: QuestionnairePdfService
   ) {}
 
   ngOnInit(): void {
@@ -469,12 +471,17 @@ export class UserAccountComponent implements OnInit {
   }
 
   onNewQuestionnaire(): void {
-    // TODO Implementar navegação para página de questionário
     // this.router.navigate(['/questionnaire']);
   }
 
+
   onFindBloodBank(): void {
-    // TODO Implementar navegação para página de bancos de sangue
     // this.router.navigate(['/blood-banks']);
+  }
+
+  downloadQuestionnairePDF(): void {
+    if (this.lastQuestionnaire && this.user) {
+      this.pdfService.generatePDF(this.lastQuestionnaire, this.user.name);
+    }
   }
 }
