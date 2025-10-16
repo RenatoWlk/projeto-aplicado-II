@@ -30,24 +30,24 @@ public class EligibilityQuestionnaireService {
 
         questionnaire.setUserId(dto.getUserId());
         questionnaire.setGender(dto.getGender());
-        questionnaire.setAge(dto.getAge());
-        questionnaire.setDonationBefore60(dto.getDonationBefore60());
-        questionnaire.setWeight(dto.getWeight());
-        questionnaire.setHealthy(dto.getHealthy());
-        questionnaire.setPregnant(dto.getPregnant());
-        questionnaire.setRecentChildbirth(dto.getRecentChildbirth());
-        questionnaire.setSymptoms(dto.getSymptoms());
-        questionnaire.setDiseases(dto.getDiseases());
-        questionnaire.setMedications(dto.getMedications());
-        questionnaire.setProcedures(dto.getProcedures());
-        questionnaire.setDrugs(dto.getDrugs());
-        questionnaire.setPartners(dto.getPartners());
-        questionnaire.setTattooOrPiercing(dto.getTattooOrPiercing());
-        questionnaire.setLastDonationMale(dto.getLastDonationMale());
-        questionnaire.setLastDonationFemale(dto.getLastDonationFemale());
-        questionnaire.setCovidVaccine(dto.getCovidVaccine());
-        questionnaire.setYellowFeverVaccine(dto.getYellowFeverVaccine());
-        questionnaire.setTravelRiskArea(dto.getTravelRiskArea());
+        questionnaire.setAge(dto.isAge());
+        questionnaire.setDonationBefore60(dto.isDonationBefore60());
+        questionnaire.setWeight(dto.isWeight());
+        questionnaire.setHealthy(dto.isHealthy());
+        questionnaire.setPregnant(dto.isPregnant());
+        questionnaire.setRecentChildbirth(dto.isRecentChildbirth());
+        questionnaire.setSymptoms(dto.isSymptoms());
+        questionnaire.setDiseases(dto.isDiseases());
+        questionnaire.setMedications(dto.isMedications());
+        questionnaire.setProcedures(dto.isProcedures());
+        questionnaire.setDrugs(dto.isDrugs());
+        questionnaire.setPartners(dto.isPartners());
+        questionnaire.setTattooOrPiercing(dto.isTattooOrPiercing());
+        questionnaire.setLastDonationMale(dto.isLastDonationMale());
+        questionnaire.setLastDonationFemale(dto.isLastDonationFemale());
+        questionnaire.setCovidVaccine(dto.isCovidVaccine());
+        questionnaire.setYellowFeverVaccine(dto.isYellowFeverVaccine());
+        questionnaire.setTravelRiskArea(dto.isTravelRiskArea());
         questionnaire.setEligible(dto.isEligible());
 
         if (dto.isEligible()) {

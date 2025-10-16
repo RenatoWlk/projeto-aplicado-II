@@ -22,25 +22,25 @@ export interface User {
 export interface EligibilityQuestionnaireDTO {
   userId: string;
   gender: string;
-  age: string;
-  donationBefore60: string;
-  weight: string;
-  healthy: string;
-  pregnant?: string;
-  recentChildbirth?: string;
-  symptoms: string;
-  diseases: string;
-  medications: string;
-  procedures: string;
-  drugs: string;
-  partner: string;
-  tattooOrPiercing: string;
-  lastDonationMale?: string;
-  lastDonationFemale?: string;
-  covidVaccine: string;
-  yellowFeverVaccine: string;
-  travelRiskArea: string;
-  isEligible: boolean;
+  age: boolean;
+  donationBefore60: boolean;
+  weight: boolean;
+  healthy: boolean;
+  pregnant?: boolean;
+  recentChildbirth?: boolean;
+  symptoms: boolean;
+  diseases: boolean;
+  medications: boolean;
+  procedures: boolean;
+  drugs: boolean;
+  partners: boolean;
+  tattooOrPiercing: boolean;
+  lastDonationMale?: boolean;
+  lastDonationFemale?: boolean;
+  covidVaccine: boolean;
+  yellowFeverVaccine: boolean;
+  travelRiskArea: boolean;
+  eligible: boolean;
   resultMessage: string;
 }
 

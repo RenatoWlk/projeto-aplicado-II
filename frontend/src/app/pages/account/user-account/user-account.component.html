@@ -346,18 +346,26 @@
   <div *ngIf="lastQuestionnaire; else noQuestionnaires" class="questionnaire-content">
     <!-- Status de Elegibilidade -->
     <div class="eligibility-banner" 
-         [ngClass]="lastQuestionnaire.isEligible ? 'eligible' : 'not-eligible'">
+         [ngClass]="lastQuestionnaire.eligible ? 'eligible' : 'not-eligible'">
       <div class="banner-content">
         <i class="fa-solid" 
-           [ngClass]="lastQuestionnaire.isEligible ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+           [ngClass]="lastQuestionnaire.eligible ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
         <div class="banner-text">
-          <h3>{{ lastQuestionnaire.isEligible ? 'APTO PARA DOAÇÃO' : 'NÃO APTO PARA DOAÇÃO' }}</h3>
+          <h3>{{ lastQuestionnaire.eligible ? 'APTO PARA DOAÇÃO' : 'NÃO APTO PARA DOAÇÃO' }}</h3>
           <p>{{ lastQuestionnaire.resultMessage }}</p>
         </div>
       </div>
       <!--<div class="banner-date">
         <small>Avaliado em {{ lastQuestionnaire.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
       </div>-->
+    </div>
+
+    <!-- Botão de Download PDF -->
+    <div class="pdf-download-section">
+      <button class="pdf-download-button" (click)="downloadQuestionnairePDF()">
+        <i class="fa-solid fa-file-pdf"></i>
+        Baixar Questionário em PDF
+      </button>
     </div>
 
     <!-- Informações Básicas -->
@@ -385,28 +393,28 @@
         </div>
 
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.symptoms, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.symptoms)">
           <div class="question-text">Apresenta sintomas como febre, gripe, resfriado?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.symptoms, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.symptoms)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.symptoms) }}
           </div>
         </div>
 
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.diseases, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.diseases)">
           <div class="question-text">Possui doenças cardíacas, diabetes, ou outras condições crônicas?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.diseases, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.diseases)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.diseases) }}
           </div>
         </div>
 
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.medications, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.medications)">
           <div class="question-text">Está tomando medicamentos?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.medications, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.medications)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.medications) }}
           </div>
         </div>
@@ -417,32 +425,32 @@
     <div *ngIf="lastQuestionnaire.gender === 'Feminino'" class="questionnaire-section">
       <h4><i class="fa-solid fa-venus"></i> Questões Específicas - Mulheres</h4>
       <div class="questions-list">
-        <div *ngIf="lastQuestionnaire.pregnant" 
+        <div *ngIf="lastQuestionnaire.pregnant !== null && lastQuestionnaire.pregnant !== undefined" 
              class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.pregnant, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.pregnant)">
           <div class="question-text">Está grávida?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.pregnant, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.pregnant)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.pregnant) }}
           </div>
         </div>
 
-        <div *ngIf="lastQuestionnaire.recentChildbirth" 
+        <div *ngIf="lastQuestionnaire.recentChildbirth !== null && lastQuestionnaire.recentChildbirth !== undefined" 
              class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.recentChildbirth, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.recentChildbirth)">
           <div class="question-text">Teve parto ou aborto nos últimos 12 meses?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.recentChildbirth, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.recentChildbirth)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.recentChildbirth) }}
           </div>
         </div>
 
-        <div *ngIf="lastQuestionnaire.lastDonationFemale" 
+        <div *ngIf="lastQuestionnaire.lastDonationFemale !== null && lastQuestionnaire.lastDonationFemale !== undefined" 
              class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.lastDonationFemale, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.lastDonationFemale)">
           <div class="question-text">Última doação foi há menos de 90 dias?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.lastDonationFemale, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.lastDonationFemale)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.lastDonationFemale) }}
           </div>
         </div>
@@ -453,12 +461,12 @@
     <div *ngIf="lastQuestionnaire.gender === 'Masculino'" class="questionnaire-section">
       <h4><i class="fa-solid fa-mars"></i> Questões Específicas - Homens</h4>
       <div class="questions-list">
-        <div *ngIf="lastQuestionnaire.lastDonationMale" 
+        <div *ngIf="lastQuestionnaire.lastDonationMale !== null && lastQuestionnaire.lastDonationMale !== undefined" 
              class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.lastDonationMale, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.lastDonationMale)">
           <div class="question-text">Última doação foi há menos de 60 dias?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.lastDonationMale, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.lastDonationMale)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.lastDonationMale) }}
           </div>
         </div>
@@ -470,28 +478,28 @@
       <h4><i class="fa-solid fa-shield-halved"></i> Comportamento de Risco</h4>
       <div class="questions-list">
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.drugs, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.drugs)">
           <div class="question-text">Fez uso de drogas injetáveis?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.drugs, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.drugs)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.drugs) }}
           </div>
         </div>
 
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.partners, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.partners)">
           <div class="question-text">Teve múltiplos parceiros sexuais ou relações de risco?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.partners, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.partners)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.partners) }}
           </div>
         </div>
 
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.tattooOrPiercing, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.tattooOrPiercing)">
           <div class="question-text">Fez tatuagem, piercing ou acupuntura nos últimos 12 meses?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.tattooOrPiercing, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.tattooOrPiercing)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.tattooOrPiercing) }}
           </div>
         </div>
@@ -503,28 +511,28 @@
       <h4><i class="fa-solid fa-syringe"></i> Procedimentos e Vacinas</h4>
       <div class="questions-list">
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.procedures, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.procedures)">
           <div class="question-text">Realizou cirurgias ou procedimentos médicos recentes?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.procedures, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.procedures)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.procedures) }}
           </div>
         </div>
 
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.covidVaccine, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.covidVaccine)">
           <div class="question-text">Tomou vacina COVID-19 nas últimas 48h?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.covidVaccine, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.covidVaccine)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.covidVaccine) }}
           </div>
         </div>
 
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.yellowFeverVaccine, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.yellowFeverVaccine)">
           <div class="question-text">Tomou vacina da febre amarela nos últimos 30 dias?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.yellowFeverVaccine, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.yellowFeverVaccine)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.yellowFeverVaccine) }}
           </div>
         </div>
@@ -536,10 +544,10 @@
       <h4><i class="fa-solid fa-plane"></i> Viagens</h4>
       <div class="questions-list">
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.travelRiskArea, true)">
+             [ngClass]="getAnswerClass(lastQuestionnaire.travelRiskArea)">
           <div class="question-text">Viajou para áreas de risco (malária, febre amarela) recentemente?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.travelRiskArea, true)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.travelRiskArea)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.travelRiskArea) }}
           </div>
         </div>
@@ -551,11 +559,11 @@
       <h4><i class="fa-solid fa-history"></i> Histórico de Doações</h4>
       <div class="questions-list">
         <div class="question-item" 
-             [ngClass]="getAnswerClass(lastQuestionnaire.donationBefore60, false, 'donationBefore60')">
+             [ngClass]="getAnswerClass(lastQuestionnaire.donationBefore60)">
           <div class="question-text">Já doou sangue antes dos 60 anos?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.donationBefore60, false, 'donationBefore60')"></i>
-            {{ getFormattedAnswer(lastQuestionnaire.donationBefore60, 'donationBefore60') }}
+            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.donationBefore60)"></i>
+            {{ getFormattedAnswer(lastQuestionnaire.donationBefore60) }}
           </div>
         </div>
       </div>
@@ -563,7 +571,7 @@
 
     <!-- Ações Baseadas na Elegibilidade -->
     <div class="eligibility-actions">
-      <div *ngIf="lastQuestionnaire.isEligible" class="eligible-actions">
+      <div *ngIf="lastQuestionnaire.eligible" class="eligible-actions">
         <div class="action-card eligible-card">
           <i class="fa-solid fa-heart-pulse"></i>
           <h4>Parabéns! Você está apto para doar!</h4>
@@ -575,7 +583,7 @@
         </div>
       </div>
 
-      <div *ngIf="!lastQuestionnaire.isEligible" class="not-eligible-actions">
+      <div *ngIf="!lastQuestionnaire.eligible" class="not-eligible-actions">
         <div class="action-card not-eligible-card">
           <i class="fa-solid fa-exclamation-circle"></i>
           <h4>Você não está apto para doar no momento</h4>
