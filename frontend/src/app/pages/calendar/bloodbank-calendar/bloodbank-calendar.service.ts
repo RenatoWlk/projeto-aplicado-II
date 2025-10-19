@@ -16,7 +16,6 @@ export class BloodbankService {
     ) {}
 
     addAvailableSlots(slot : DonationSlots): Observable<any> {
-        console.log('slot', slot);
         return this.http.post<DonationSlots>(`/api/bloodbanks/availability`, slot);
     }
 }
