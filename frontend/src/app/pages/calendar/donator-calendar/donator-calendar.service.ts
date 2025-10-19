@@ -16,7 +16,23 @@ export interface DonationDate {
     bloodBankId: string;
     date: string;
     hour: string; 
+    slot: number;
 }
+
+export interface BloodBankAvailability {
+    id: string,
+    availability: DailyAvailability[];
+}
+
+export interface DailyAvailability {
+    date: string,
+    slots: Slot[];
+}
+
+export interface Slot {
+    time: string,
+    availableSpots: number;
+} 
 
 @Injectable({
     providedIn: 'root'
@@ -32,19 +48,12 @@ export class DonationService {
         return this.http.get<BloodBank[]>(`${this.API}/available-slots`);
     }
 
-    // Pega as datas disponibilizidas para doação, a partir do id do banco de sangue
-    getAvailableDonationDates(bloodbankId: string): Observable<{date: string}[]> {
-        return this.http.get<{date: string}[]>(
+    // Complete donation data.
+    getAvailableDonationDates(bloodbankId: string): Observable<DailyAvailability[]> {
+        return this.http.get<DailyAvailability[]>(
             `${this.API}/available-dates`,
-            { params: {bloodbankId} }
+            { params: {bloodbankId}}
         );
-    }
-
-    // Pega os horários e número de vagas disponiveis para doação, a partir do id do banco de sangue e a data escolhida pelo usuário
-    getAvailableDonationHours(bloodbankId: string, date: string): Observable<{ time: string; availableSpots: number }[]> {
-        return this.http.get<{ time: string; availableSpots: number }[]>(`${this.API}/available-hours`, {
-            params: {bloodbankId, date}
-        });
     }
 
     // Envia o agendamento escolhido pelo usuário

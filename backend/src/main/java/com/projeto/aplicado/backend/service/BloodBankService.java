@@ -4,10 +4,7 @@ import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.CampaignDTO;
 import com.projeto.aplicado.backend.dto.DonationScheduleDTO;
 import com.projeto.aplicado.backend.dto.bloodbank.*;
-import com.projeto.aplicado.backend.model.Campaign;
-import com.projeto.aplicado.backend.model.DailyAvailability;
-import com.projeto.aplicado.backend.model.ScheduledDonation;
-import com.projeto.aplicado.backend.model.Slot;
+import com.projeto.aplicado.backend.model.*;
 import com.projeto.aplicado.backend.model.enums.BloodType;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.BloodBank;
@@ -22,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -348,6 +346,7 @@ public class BloodBankService {
      */
     @Transactional
     public void scheduleDonation(DonationScheduleDTO dto) {
+        System.out.println(dto);
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
@@ -368,6 +367,7 @@ public class BloodBankService {
         scheduledDonation.setBloodBankId(bloodBank.getId());
         scheduledDonation.setDate(dto.getDate());
         scheduledDonation.setHour(dto.getHour());
+        scheduledDonation.setSlot(dto.getSlot());
 
         user.getScheduledDonations().add(scheduledDonation);
         user.setLastDonationDate(dto.getDate());
@@ -376,6 +376,27 @@ public class BloodBankService {
         int current = bloodBank.getScheduledDonations() != null ? bloodBank.getScheduledDonations() : 0;
         bloodBank.setScheduledDonations(current + 1);
         bloodBankRepository.save(bloodBank);
+
+        BloodBank availability = bloodBankRepository.findBloodBankById(dto.getBloodBankId())
+                .orElseThrow(() -> new RuntimeException("Disponibilidade de banco nao encontrada"));
+
+        DailyAvailability daily = availability.getAvailabilitySlots().stream()
+                .filter(d -> d.getDate().equals(dto.getDate()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Data não encontrada na disponiblidade"));
+
+        LocalTime time = LocalTime.parse(dto.getHour());
+        Slot slot = daily.getSlots().stream()
+                .filter(s -> s.getTime().equals(time))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Sem vagas disponíveis para esse horário."));
+
+        if (slot.getAvailableSpots() <= 0) {
+            throw new RuntimeException("Sem vagas disponíveis para esse horário");
+        }
+
+        slot.setAvailableSpots(slot.getAvailableSpots() - 1);
+        bloodBankRepository.save(availability);
     }
 
     /**
@@ -428,5 +449,38 @@ public class BloodBankService {
 
         bloodBank = bloodBankRepository.save(bloodBank);
         return toResponseDTO(bloodBank);
+    }
+/*
+    public List<DailyAvailabilityDTO> getAvailableDonationDatesWithSpots(String bloodbankId) {
+        return bloodBankRepository.findAvailableDatesByBloodBankId(bloodbankId);
+    }
+*/
+
+    public List<DailyAvailabilityDTO> getAvailableDonationDatesWithSpots(String bloodbankId) {
+        BloodBank bloodBank = bloodBankRepository.findBloodBankById(bloodbankId)
+                .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
+
+        if (bloodBank.getAvailabilitySlots() == null || bloodBank.getAvailabilitySlots().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return bloodBank.getAvailabilitySlots().stream()
+                .map(dailyAvailability -> {
+                    DailyAvailabilityDTO dto = new DailyAvailabilityDTO();
+                    dto.setDate(dailyAvailability.getDate());
+
+                    List<SlotDTO> slotDTOs = dailyAvailability.getSlots().stream()
+                            .map(slot -> {
+                                SlotDTO slotDTO = new SlotDTO();
+                                slotDTO.setTime(slot.getTime());
+                                slotDTO.setAvailableSpots(slot.getAvailableSpots());
+                                return slotDTO;
+                            })
+                            .collect(Collectors.toList());
+
+                    dto.setSlots(slotDTOs);
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }

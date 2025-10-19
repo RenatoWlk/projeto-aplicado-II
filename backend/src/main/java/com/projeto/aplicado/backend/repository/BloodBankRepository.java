@@ -1,5 +1,6 @@
 package com.projeto.aplicado.backend.repository;
 
+import com.projeto.aplicado.backend.dto.bloodbank.DailyAvailabilityDTO;
 import com.projeto.aplicado.backend.model.users.BloodBank;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -34,4 +35,22 @@ public interface BloodBankRepository extends MongoRepository<BloodBank, String> 
             "{ '$project': { 'availabilitySlots.startTime': 1, 'availabilitySlots.endTime': 1 } }"
     })
     List<BloodBank> findAvailableHoursOnly();
+
+    @Aggregation(pipeline = {
+            "{ '$match': { '_id': ?0 } }",
+            "{ '$unwind': '$availabilitySlots' }",
+            "{ '$unwind': '$availabilitySlots.slots' }",
+            "{ '$match': { 'availabilitySlots.slots.availableSpots': { '$gt': 0 } } }",
+            "{ '$group': { " +
+                    "'_id': '$availabilitySlots.date', " +
+                    "'availableSlots': { '$sum': '$availabilitySlots.slots.availableSpots' } " +
+                    "} }",
+            "{ '$project': { " +
+                    "'_id': 0, " +
+                    "'date': '$_id', " +
+                    "'availableSlots': 1 " +
+                    "} }",
+            "{ '$sort': { 'date': 1 } }"
+    })
+    List<DailyAvailabilityDTO> findAvailableDatesByBloodBankId(String id);
 }
