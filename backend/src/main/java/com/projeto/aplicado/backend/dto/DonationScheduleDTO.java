@@ -14,4 +14,5 @@ public class DonationScheduleDTO {
     private String bloodBankId;
     private LocalDate date;
     private String hour;
+    private Integer slot;
 }

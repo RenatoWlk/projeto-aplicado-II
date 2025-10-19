@@ -61,7 +61,7 @@ export class BloodbankCalendarComponent {
 
     if (availableSpots <= 0) {
       //banner de erro
-      console.log('erro');
+
       return;
     }
 
