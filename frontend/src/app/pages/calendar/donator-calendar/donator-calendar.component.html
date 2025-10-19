@@ -37,8 +37,8 @@
                 <mat-form-field *ngIf="availableDonationHours" appearence="outline"  class="custom-form-field full-width">
                     <mat-label>Horário disponível: </mat-label>
                     <mat-select formControlName="donationTime"  class="custom-form-field full-width">
-                        <mat-option *ngFor="let hour of availableDonationHours" [value]="hour">
-                        {{ hour }}
+                        <mat-option *ngFor="let slot of availableDonationHours" [value]="slot.time">
+                        {{ slot.time }} - {{ slot.availableSpots }} vaga(s)
                         </mat-option>
                     </mat-select>
                 </mat-form-field>

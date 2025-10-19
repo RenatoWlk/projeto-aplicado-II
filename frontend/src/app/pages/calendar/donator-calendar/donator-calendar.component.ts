@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 import { CommonModule } from '@angular/common';
-import { BloodBank, DonationDate, DonationService } from './donator-calendar.service';
+import { BloodBank, DailyAvailability, DonationDate, DonationService, Slot } from './donator-calendar.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -41,8 +41,9 @@ export class DonatorCalendarComponent implements OnInit {
 
   selectedDate: Date | null = null;
   availableDates: Date[] = [];
-  availableDonationHours: string[] = [];
+  availableDonationHours: Slot[] = [];
   visible: boolean = false;
+  dailyAvailabilityData: DailyAvailability [] = [];
 
   constructor(
     private donationService: DonationService,
@@ -50,7 +51,7 @@ export class DonatorCalendarComponent implements OnInit {
     private notificationService: NotificationBannerService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.loadBloodBanks();
   }
 
@@ -63,10 +64,19 @@ export class DonatorCalendarComponent implements OnInit {
 
   // Filtro do calendário: habilita apenas datas disponíveis
   availableDonationDates = (d: Date | null): boolean => {
-    if (!d || this.availableDates.length === 0) return false;
-    const day = this.normalize(d);
-    return this.availableDates.some(date => this.normalize(date).getTime() === day.getTime());
+    if (!d || this.dailyAvailabilityData.length === 0) return false;
+    const dateString = this.formatDateToString(d);
+    const dayData = this.dailyAvailabilityData.find(data => data.date === dateString);
+
+    return dayData ? dayData.slots.some(slot => slot.availableSpots > 0) : false;
   };
+
+  private formatDateToString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
   private normalize(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -79,29 +89,43 @@ export class DonatorCalendarComponent implements OnInit {
     this.scheduleForm.get('donationTime')?.reset();
     this.selectedDate = null;
     this.availableDates = [];
+    let dailyAvailability: DailyAvailability[] = [];
+    let slot: Slot[] = [];
     this.availableDonationHours = [];
 
-    this.donationService.getAvailableDonationDates(bloodBankId).subscribe({
-      next: dates => {
-        this.availableDates = dates.map(d => new Date(d.date));
-      },
-      error: () => this.availableDates = []
-    });
+    this.donationService.getAvailableDonationDates(bloodBankId)
+      .subscribe({    
+        next: dates => {
+          this.dailyAvailabilityData = dates;
+          this.availableDates = dates
+          .filter(d => d.slots.some(slot => slot.availableSpots > 0))
+          .map(d => new Date(d.date));
+        },
+        error: (err) => {
+          this.availableDates = [];
+          this.notificationService.show('Erro ao carregar as datas disponíveis', 'error', 3000);
+        },
+    })
   }
 
   // Quando o usuário seleciona uma data
   onDateSelected(date: Date | null) {
     if (!date || !this.selectedBloodBankId) return;
+
     this.selectedDate = date;
     this.scheduleForm.get('donationTime')?.reset();
     this.availableDonationHours = [];
 
     const dateString = date.toISOString().split('T')[0]; // 'yyyy-MM-dd'
-    this.donationService.getAvailableDonationHours(this.selectedBloodBankId, dateString)
-      .subscribe({
-        next: slots => this.availableDonationHours = slots.map(s => s.time.substring(0, 5)),
-        error: () => this.availableDonationHours = []
-      });
+
+    const selectDayData = this.dailyAvailabilityData.find(d => d.date === dateString);
+
+    if (selectDayData && selectDayData.slots.length > 0) {
+      this.availableDonationHours = selectDayData.slots
+        .filter(slot => slot.availableSpots > 0)
+    } else {
+      this.notificationService.show('Nenhum horário disponível para essa data!', 'warning', 3000);
+    }
   }
 
   // Agendamento
@@ -122,6 +146,7 @@ export class DonatorCalendarComponent implements OnInit {
       bloodBankId: this.selectedBloodBankId,
       date: appointmentDate.toISOString(),
       hour: appointmentDate.toTimeString().substring(0, 5),
+      slot: 1,
     };
 
     this.donationService.scheduleDonation(appointment).subscribe({

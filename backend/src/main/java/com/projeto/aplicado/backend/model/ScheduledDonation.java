@@ -14,6 +14,6 @@ public class ScheduledDonation {
     private String bloodBankId;
     private LocalDate date;
     private String hour;
-    private Integer availableSpot;
+    private Integer slot;
     private String userId;
 }
