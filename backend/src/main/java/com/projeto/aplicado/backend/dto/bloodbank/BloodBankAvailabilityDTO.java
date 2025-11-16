@@ -1,6 +1,7 @@
 package com.projeto.aplicado.backend.dto.bloodbank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.projeto.aplicado.backend.dto.donation.DailyAvailabilityDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;

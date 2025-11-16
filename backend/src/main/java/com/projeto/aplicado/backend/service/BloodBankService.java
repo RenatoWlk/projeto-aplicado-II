@@ -4,6 +4,8 @@ import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.CampaignDTO;
 import com.projeto.aplicado.backend.dto.DonationScheduleDTO;
 import com.projeto.aplicado.backend.dto.bloodbank.*;
+import com.projeto.aplicado.backend.dto.donation.DailyAvailabilityDTO;
+import com.projeto.aplicado.backend.dto.donation.SlotDTO;
 import com.projeto.aplicado.backend.model.*;
 import com.projeto.aplicado.backend.model.enums.BloodType;
 import com.projeto.aplicado.backend.model.enums.Role;
@@ -12,7 +14,6 @@ import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.BloodBankRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -450,11 +451,6 @@ public class BloodBankService {
         bloodBank = bloodBankRepository.save(bloodBank);
         return toResponseDTO(bloodBank);
     }
-/*
-    public List<DailyAvailabilityDTO> getAvailableDonationDatesWithSpots(String bloodbankId) {
-        return bloodBankRepository.findAvailableDatesByBloodBankId(bloodbankId);
-    }
-*/
 
     public List<DailyAvailabilityDTO> getAvailableDonationDatesWithSpots(String bloodbankId) {
         BloodBank bloodBank = bloodBankRepository.findBloodBankById(bloodbankId)

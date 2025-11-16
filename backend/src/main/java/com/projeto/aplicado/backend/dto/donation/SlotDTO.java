@@ -1,4 +1,4 @@
-package com.projeto.aplicado.backend.dto.bloodbank;
+package com.projeto.aplicado.backend.dto.donation;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

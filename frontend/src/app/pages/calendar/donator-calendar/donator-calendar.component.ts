@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewEncapsulation, OnInit, inject } from '@angular/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -46,10 +46,11 @@ export class DonatorCalendarComponent implements OnInit {
   dailyAvailabilityData: DailyAvailability [] = [];
 
   constructor(
-    private donationService: DonationService,
     private authService: AuthService,
     private notificationService: NotificationBannerService
   ) {}
+
+  donationService = inject(DonationService);
 
   async ngOnInit(): Promise<void> {
     this.loadBloodBanks();

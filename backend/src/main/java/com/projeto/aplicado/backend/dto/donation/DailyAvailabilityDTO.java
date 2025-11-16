@@ -1,6 +1,5 @@
-package com.projeto.aplicado.backend.dto.bloodbank;
+package com.projeto.aplicado.backend.dto.donation;
 
-import com.projeto.aplicado.backend.model.DailyAvailability;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

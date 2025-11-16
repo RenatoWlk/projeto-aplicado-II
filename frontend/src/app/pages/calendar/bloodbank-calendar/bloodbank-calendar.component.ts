@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 import { CalendarStats } from '../calendar.service';
-import { BloodbankService, DonationSlots } from './bloodbank-calendar.service';
+import { BloodbankService } from './bloodbank-calendar.service';
+import { DonationSlots } from '../../donation-info/donation.model';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
