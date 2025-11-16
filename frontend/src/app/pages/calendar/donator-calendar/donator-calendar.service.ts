@@ -121,17 +121,12 @@ export class DonationService {
         );
     }
 
-/**
-     * ATUALIZADO: Envia o agendamento escolhido pelo usuário
-     * Agora usa a nova API de donations
+    /**
+     * Envia o agendamento escolhido pelo usuário
      */
     scheduleDonation(appointment: DonationDate): Observable<DonationResponse> {
         return this.http.post<DonationResponse>(this.DONATION_API, appointment);
     }
-
-    // ========================================
-    // NOVOS MÉTODOS (API de donations)
-    // ========================================
 
     /**
      * Buscar agendamentos de um usuário
@@ -158,25 +153,6 @@ export class DonationService {
 
         return this.http.get<DonationResponse[]>(
             `${this.DONATION_API}/blood-bank/${bloodBankId}`,
-            { params }
-        );
-    }
-
-    /**
-     * Verificar disponibilidade de um horário específico
-     */
-    checkSlotAvailability(
-        bloodBankId: string,
-        date: string,
-        hour: string
-    ): Observable<SlotAvailability> {
-        const params = new HttpParams()
-            .set('bloodBankId', bloodBankId)
-            .set('date', date)
-            .set('hour', hour);
-
-        return this.http.get<SlotAvailability>(
-            `${this.DONATION_API}/availability`, 
             { params }
         );
     }
@@ -259,5 +235,12 @@ export class DonationService {
             `${this.DONATION_API}/blood-bank/${bloodBankId}/stats`,
             { params }
         );
+    }
+
+    /**
+     * Buscar slots disponíveis considerando agendamentos
+     */
+    getAvailableSlots(bloodBankId: string, date: string): Observable<any> {
+        return this.http.get(`${this.BLOODBANK_API}/${bloodBankId}/available-slots/${date}`);
     }
 }

@@ -1,6 +1,26 @@
-<div *ngIf="visible"
-     class="banner"
-     [ngClass]="bannerClass"
-     aria-live="polite">
-  <strong>{{ type | uppercase }}</strong>: {{ message }}
+<!-- Overlay de fundo -->
+<div 
+  *ngIf="visible"
+  class="notification-overlay"
+  [ngClass]="{
+    'overlay-fade-in': visible,
+    'overlay-fade-out': !visible
+  }">
+</div>
+
+<!-- Banner de notificação -->
+<div 
+  *ngIf="visible"
+  class="banner"
+  [ngClass]="bannerClass"
+  aria-live="polite">
+  <i class="fas notification-icon" 
+     [ngClass]="{
+       'fa-check-circle': type === 'success',
+       'fa-exclamation-triangle': type === 'warning',
+       'fa-times-circle': type === 'error'
+     }"></i>
+  <div class="notification-content">
+    <strong>{{ type | uppercase }}</strong>: {{ message }}
+  </div>
 </div>

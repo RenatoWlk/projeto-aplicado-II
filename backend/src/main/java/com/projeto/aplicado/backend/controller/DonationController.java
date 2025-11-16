@@ -73,26 +73,6 @@ public class DonationController {
     }
 
     /**
-     * Check slot availability for a specific time.
-     *
-     * @param bloodBankId the ID of the blood bank
-     * @param date the date in ISO format
-     * @param hour the hour in HH:MM format
-     * @return slot availability information
-     */
-    @GetMapping("/check-availability")
-    public ResponseEntity<SlotAvailabilityDTO> checkAvailability(
-            @RequestParam String bloodBankId,
-            @RequestParam String date,
-            @RequestParam String hour) {
-
-        SlotAvailabilityDTO availability = donationService.checkSlotAvailability(
-                bloodBankId, date, hour);
-
-        return ResponseEntity.ok(availability);
-    }
-
-    /**
      * Get a donation by ID.
      *
      * @param id the donation ID
@@ -182,18 +162,11 @@ public class DonationController {
      * Get donation statistics for a blood bank.
      *
      * @param bloodBankId the blood bank ID
-     * @param startDate start date in ISO format
-     * @param endDate end date in ISO format
      * @return donation statistics
      */
     @GetMapping("/blood-bank/{bloodBankId}/stats")
-    public ResponseEntity<DonationStatsDTO> getStats(
-            @PathVariable String bloodBankId,
-            @RequestParam String startDate,
-            @RequestParam String endDate) {
-
-        DonationStatsDTO stats = donationService.getStats(bloodBankId, startDate, endDate);
-
+    public ResponseEntity<DonationStatsDTO> getStats(@PathVariable String bloodBankId) {
+        DonationStatsDTO stats = donationService.getStats(bloodBankId);
         return ResponseEntity.ok(stats);
     }
 }

@@ -1,12 +1,7 @@
 package com.projeto.aplicado.backend.service;
 
-import com.bloodbank.model.Donation;
-import com.bloodbank.model.Donation.DonationStatus;
-import com.projeto.aplicado.backend.dto.donation.CreateDonationDTO;
-import com.projeto.aplicado.backend.dto.donation.DonationDTO;
-import com.projeto.aplicado.backend.dto.donation.DonationStatsDTO;
-import com.projeto.aplicado.backend.dto.donation.SlotAvailabilityDTO;
-import com.projeto.aplicado.backend.model.enums.BloodType;
+import com.projeto.aplicado.backend.dto.donation.*;
+import com.projeto.aplicado.backend.model.users.Donation;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.DonationRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
@@ -14,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +22,7 @@ public class DonationService {
 
     private final DonationRepository donationRepository;
     private final UserRepository userRepository;
-    private static final int MAX_SLOTS_PER_HOUR = 5;
+
 
     @Transactional
     public DonationDTO createDonation(String userId, CreateDonationDTO request) {
@@ -39,9 +35,9 @@ public class DonationService {
         }
 
         // Verificar se já existe agendamento ativo para este usuário neste dia
-        List<DonationStatus> activeStatuses = Arrays.asList(
-                DonationStatus.PENDING,
-                DonationStatus.CONFIRMED
+        List<Donation.DonationStatus> activeStatuses = Arrays.asList(
+                Donation.DonationStatus.PENDING,
+                Donation.DonationStatus.CONFIRMED
         );
 
         donationRepository.findByUserIdAndDateAndStatusIn(userId, request.getDate(), activeStatuses)
@@ -49,16 +45,8 @@ public class DonationService {
                     throw new RuntimeException("Você já possui um agendamento para este dia");
                 });
 
-        // Verificar disponibilidade de slots
-        SlotAvailabilityDTO availability = checkSlotAvailability(
-                request.getBloodBankId(),
-                request.getDate(),
-                request.getHour()
-        );
-
-        if (!availability.isAvailable()) {
-            throw new RuntimeException("Não há vagas disponíveis para este horário");
-        }
+        // REMOVIDO: Verificação de disponibilidade
+        // O frontend já verifica usando getAvailableSlots antes de permitir agendar
 
         // Criar doação
         Donation donation = new Donation();
@@ -68,7 +56,7 @@ public class DonationService {
         donation.setHour(request.getHour());
         donation.setSlot(request.getSlot());
         donation.setBloodType(user.getBloodType());
-        donation.setStatus(DonationStatus.PENDING);
+        donation.setStatus(Donation.DonationStatus.PENDING);
         donation.setCreatedAt(LocalDateTime.now());
         donation.setUpdatedAt(LocalDateTime.now());
 
@@ -81,9 +69,9 @@ public class DonationService {
         List<Donation> donations;
 
         if (activeOnly) {
-            List<DonationStatus> activeStatuses = Arrays.asList(
-                    DonationStatus.PENDING,
-                    DonationStatus.CONFIRMED
+            List<Donation.DonationStatus> activeStatuses = Arrays.asList(
+                    Donation.DonationStatus.PENDING,
+                    Donation.DonationStatus.CONFIRMED
             );
             donations = donationRepository.findByUserIdAndStatusInOrderByDateDescHourDesc(
                     userId, activeStatuses);
@@ -118,17 +106,17 @@ public class DonationService {
     }
 
     public SlotAvailabilityDTO checkSlotAvailability(
-            String bloodBankId, String date, String hour) {
+            String bloodBankId, String date, String hour, int totalSlotsPublished) {
 
-        List<DonationStatus> activeStatuses = Arrays.asList(
-                DonationStatus.PENDING,
-                DonationStatus.CONFIRMED
+        List<Donation.DonationStatus> activeStatuses = Arrays.asList(
+                Donation.DonationStatus.PENDING,
+                Donation.DonationStatus.CONFIRMED
         );
 
         long slotsUsed = donationRepository.countByBloodBankIdAndDateAndHourAndStatusIn(
                 bloodBankId, date, hour, activeStatuses);
 
-        int slotsRemaining = MAX_SLOTS_PER_HOUR - (int) slotsUsed;
+        int slotsRemaining = totalSlotsPublished - (int) slotsUsed;
         boolean available = slotsRemaining > 0;
 
         return new SlotAvailabilityDTO(available, (int) slotsUsed, slotsRemaining);
@@ -139,11 +127,11 @@ public class DonationService {
         Donation donation = donationRepository.findByIdAndUserId(donationId, userId)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
 
-        if (donation.getStatus() == DonationStatus.COMPLETED) {
+        if (donation.getStatus() == Donation.DonationStatus.COMPLETED) {
             throw new RuntimeException("Não é possível cancelar um agendamento já completado");
         }
 
-        donation.setStatus(DonationStatus.CANCELLED);
+        donation.setStatus(Donation.DonationStatus.CANCELLED);
         donation.setCancellationReason(reason);
         donation.setUpdatedAt(LocalDateTime.now());
 
@@ -157,7 +145,7 @@ public class DonationService {
         Donation donation = donationRepository.findByIdAndBloodBankId(donationId, bloodBankId)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
 
-        donation.setStatus(DonationStatus.CONFIRMED);
+        donation.setStatus(Donation.DonationStatus.CONFIRMED);
         donation.setUpdatedAt(LocalDateTime.now());
 
         donation = donationRepository.save(donation);
@@ -170,7 +158,7 @@ public class DonationService {
         Donation donation = donationRepository.findByIdAndBloodBankId(donationId, bloodBankId)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
 
-        donation.setStatus(DonationStatus.COMPLETED);
+        donation.setStatus(Donation.DonationStatus.COMPLETED);
         if (notes != null && !notes.isEmpty()) {
             donation.setNotes(notes);
         }
@@ -185,9 +173,9 @@ public class DonationService {
         String today = LocalDateTime.now().toLocalDate().toString() + "T00:00:00.000Z";
         String futureDate = LocalDateTime.now().plusDays(days).toLocalDate().toString() + "T00:00:00.000Z";
 
-        List<DonationStatus> activeStatuses = Arrays.asList(
-                DonationStatus.PENDING,
-                DonationStatus.CONFIRMED
+        List<Donation.DonationStatus> activeStatuses = Arrays.asList(
+                Donation.DonationStatus.PENDING,
+                Donation.DonationStatus.CONFIRMED
         );
 
         List<Donation> donations = donationRepository.findUpcomingDonations(
@@ -205,12 +193,10 @@ public class DonationService {
         return mapToResponse(donation);
     }
 
-    public DonationStatsDTO getStats(String bloodBankId, String startDate, String endDate) {
-        // Buscar todas as doações no período
+    public DonationStatsDTO getStats(String bloodBankId) {
+        // Buscar TODAS as doações do banco sem filtro de data
         List<Donation> donations = donationRepository.findAll().stream()
                 .filter(d -> d.getBloodBankId().equals(bloodBankId))
-                .filter(d -> d.getDate().compareTo(startDate) >= 0)
-                .filter(d -> d.getDate().compareTo(endDate) <= 0)
                 .toList();
 
         // Contar por status
@@ -222,7 +208,8 @@ public class DonationService {
 
         // Contar por tipo sanguíneo (apenas completadas)
         Map<String, Integer> byBloodType = donations.stream()
-                .filter(d -> d.getStatus() == DonationStatus.COMPLETED)
+                .filter(d -> d.getStatus() == Donation.DonationStatus.COMPLETED)
+                .filter(d -> d.getBloodType() != null)
                 .collect(Collectors.groupingBy(
                         d -> d.getBloodType().getLabel(),
                         Collectors.summingInt(e -> 1)

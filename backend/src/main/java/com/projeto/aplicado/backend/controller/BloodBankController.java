@@ -3,6 +3,7 @@ package com.projeto.aplicado.backend.controller;
 import com.projeto.aplicado.backend.dto.CampaignDTO;
 import com.projeto.aplicado.backend.dto.DonationScheduleDTO;
 import com.projeto.aplicado.backend.dto.bloodbank.*;
+import com.projeto.aplicado.backend.dto.donation.AvailableSlotsDTO;
 import com.projeto.aplicado.backend.dto.donation.DailyAvailabilityDTO;
 import com.projeto.aplicado.backend.dto.donation.SlotDTO;
 import com.projeto.aplicado.backend.model.DailyAvailability;
@@ -98,6 +99,15 @@ public class BloodBankController {
     public ResponseEntity<List<BloodBank>> getBloodBanksWithAvailableSpots() {
         List<BloodBank> bloodBanks = bloodBankService.findBloodBanksWithAvailableSlots();
         return ResponseEntity.ok(bloodBanks);
+    }
+
+    @GetMapping("/{bloodBankId}/available-slots/{date}")
+    public ResponseEntity<AvailableSlotsDTO> getAvailableSlots(
+            @PathVariable String bloodBankId,
+            @PathVariable String date) {
+
+        AvailableSlotsDTO slots = bloodBankService.getAvailableSlotsForDate(bloodBankId, date);
+        return ResponseEntity.ok(slots);
     }
 
     @GetMapping("/{id}/availability")

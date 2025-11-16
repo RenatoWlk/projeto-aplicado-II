@@ -11,6 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core'
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { RegisterService } from '../../pages/register/register.service';
+import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 @Component({
   selector: 'app-register',
@@ -24,7 +25,7 @@ import { RegisterService } from '../../pages/register/register.service';
 export class RegisterComponent {
   userForm!: FormGroup;
 
-  constructor(private fb: FormBuilder, private registerService: RegisterService) {}
+  constructor(private fb: FormBuilder, private registerService: RegisterService, private notificationService: NotificationBannerService) {}
 
   selectedOption: string = '';
 
@@ -120,10 +121,10 @@ export class RegisterComponent {
 
       this.registerService.registerDonator(payload).subscribe({
         next: (res) => {
-          alert('Cadastro realizado com sucesso!');
+          this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
         },
         error: (err) => {
-          alert('Erro ao cadastrar doador.');
+          this.notificationService.show('Erro ao cadastrador doador', "error", 3000);
         }
       });
 
@@ -148,10 +149,10 @@ export class RegisterComponent {
 
       this.registerService.registerBloodBank(payload).subscribe({
         next: (res) => {
-          alert('Cadastro realizado com sucesso!');
+          this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
         },
         error: (err) => {
-          alert('Erro ao cadastrar banco de sangue.');
+          this.notificationService.show('Erro ao cadastrador banco de sangue', "error", 3000);
         }
       });
 
@@ -176,10 +177,10 @@ export class RegisterComponent {
 
       this.registerService.registerPartner(payload).subscribe({
         next: (res) => {
-          alert('Cadastro realizado com sucesso!');
+          this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
         },
         error: (err) => {
-          alert('Erro ao cadastrar parceiro.');
+          this.notificationService.show('Erro ao cadastrador parceiro', "error", 3000);
         }
       });
     }

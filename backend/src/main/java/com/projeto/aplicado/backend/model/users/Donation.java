@@ -1,4 +1,4 @@
-package com.bloodbank.model;
+package com.projeto.aplicado.backend.model.users;
 
 import com.projeto.aplicado.backend.model.enums.BloodType;
 import lombok.Data;

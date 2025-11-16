@@ -9,11 +9,16 @@ import { MatDatepickerInputEvent, MatDatepickerModule } from '@angular/material/
 import { CustomHeaderComponent } from '../calendar/custom-header/custom-header.component';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { FormsModule } from '@angular/forms';
+import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 interface DashboardStats {
   scheduledDonations: number;
   totalDonations: number;
   monthlyAverage: number;
+  pending: number;
+  confirmed: number;
+  completed: number;
+  cancelled: number;
 }
 
 interface DonationListItem {
@@ -43,7 +48,11 @@ export class DonationInfoComponent implements OnInit {
   stats: DashboardStats = {
     scheduledDonations: 0,
     totalDonations: 0,
-    monthlyAverage: 0
+    monthlyAverage: 0,
+    pending: 0,
+    confirmed: 0,
+    completed: 0,
+    cancelled: 0,
   };
   
   todayDonations: DonationListItem[] = [];
@@ -51,56 +60,41 @@ export class DonationInfoComponent implements OnInit {
   loadingStats = true;
   loadingDonations = true;
 
-  constructor(private donationService: DonationInfoService) {}
+  constructor(private donationService: DonationInfoService, private notificationService: NotificationBannerService) {}
 
   authService = inject(AuthService);
 
   ngOnInit(): void {
     this.bloodBankId = this.authService.getCurrentUserId();
-    // this.bloodBankId = 'BLOODBANK_ID_AQUI';
-    
-    this.loadDashboardStats();
+    this.loadStats();
     this.loadTodayDonations();
   }
 
   /**
    * Carrega as estatísticas do dashboard
    */
-  loadDashboardStats(): void {
-    this.loadingStats = true;
-    
-    // Período: último ano para calcular estatísticas
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setFullYear(endDate.getFullYear() - 1);
-    
-    this.donationService.getStats(
-      this.bloodBankId,
-      startDate.toISOString(),
-      endDate.toISOString()
-    ).subscribe({
-      next: (data: { completedDonations: number; byStatus: { [x: string]: any; }; }) => {
-        console.log('Stats received:', data);
-        
-        // Total de doações completadas
-        this.stats.totalDonations = data.completedDonations || 0;
-        
-        // Doações agendadas (PENDING + CONFIRMED)
-        this.stats.scheduledDonations = 
-          (data.byStatus['PENDING'] || 0) + 
-          (data.byStatus['CONFIRMED'] || 0);
-        
-        // Média mensal (total de doações / 12 meses)
-        this.stats.monthlyAverage = Math.round(this.stats.totalDonations / 12);
-        
-        this.loadingStats = false;
-      },
-      error: (err: any) => {
-        console.error('Erro ao carregar estatísticas:', err);
-        this.loadingStats = false;
-      }
-    });
-  }
+loadStats(): void {
+  this.loadingStats = true;
+  
+  this.donationService.getStats(this.bloodBankId).subscribe({
+    next: (data: any) => {
+      this.stats.totalDonations = data.completedDonations || 0;
+      this.stats.scheduledDonations = 
+        (data.byStatus['PENDING'] || 0) + 
+        (data.byStatus['CONFIRMED'] || 0);
+      this.stats.monthlyAverage = Math.round(this.stats.totalDonations / 12);
+      this.loadingStats = false;
+      this.stats.pending = (data.byStatus['PENDING'] || 0);
+      this.stats.confirmed = (data.byStatus['CONFIRMED'] || 0);
+      this.stats.completed = (data.byStatus['COMPLETED'] || 0);
+      this.stats.cancelled = (data.byStatus['CANCELLED'] || 0);
+    },
+    error: (err: any) => {
+      console.error('Erro:', err);
+      this.loadingStats = false;
+    }
+  });
+}
 
   /**
    * Carrega os agendamentos do dia selecionado
@@ -143,7 +137,6 @@ export class DonationInfoComponent implements OnInit {
     this.selectedDate = event.value;
     // Converte para ISO String para a API
     const isoDate = event.value.toISOString();
-    console.log(isoDate);
     this.loadTodayDonations();
   }
 }
@@ -189,14 +182,12 @@ export class DonationInfoComponent implements OnInit {
   confirmDonation(donationId: string): void {
     this.donationService.confirmDonation(donationId, this.bloodBankId).subscribe({
       next: (response: any) => {
-        console.log('Doação confirmada:', response);
-        // Recarregar lista
+        this.notificationService.show('Doação confirmada!' ,"success", 3000);
         this.loadTodayDonations();
-        this.loadDashboardStats();
+        this.loadStats();
       },
       error: (err: any) => {
-        console.error('Erro ao confirmar doação:', err);
-        alert('Erro ao confirmar doação');
+        this.notificationService.show('Erro ao confirmar doação!', "error", 3000);
       }
     });
   }
@@ -207,14 +198,13 @@ export class DonationInfoComponent implements OnInit {
   completeDonation(donationId: string, notes?: string): void {
     this.donationService.completeDonation(donationId, this.bloodBankId, notes).subscribe({
       next: (response: any) => {
-        console.log('Doação completada:', response);
+        this.notificationService.show('Doação completada!' ,"success", 3000);
         // Recarregar lista e estatísticas
         this.loadTodayDonations();
-        this.loadDashboardStats();
+        this.loadStats();
       },
       error: (err: any) => {
-        console.error('Erro ao completar doação:', err);
-        alert('Erro ao completar doação');
+        this.notificationService.show('Erro ao completar doação!', "error", 3000);
       }
     });
   }
@@ -223,23 +213,18 @@ export class DonationInfoComponent implements OnInit {
    * Cancelar uma doação (pelo banco de sangue)
    */
   cancelDonation(donationId: string, userId: string): void {
-    const reason = prompt('Motivo do cancelamento (opcional):');
-    
-    // Permitir cancelamento mesmo sem motivo
-    if (reason !== null) { // null = usuário clicou em "Cancelar" no prompt
-      this.donationService.cancelDonation(donationId, userId, reason || undefined).subscribe({
+
+      this.donationService.cancelDonation(donationId, userId).subscribe({
         next: (response: any) => {
-          console.log('Doação cancelada:', response);
+        this.notificationService.show('Doação cancelada!' ,"success", 3000);
           // Recarregar lista e estatísticas
           this.loadTodayDonations();
-          this.loadDashboardStats();
+          this.loadStats();
         },
         error: (err: { error: { message: any; }; }) => {
-          console.error('Erro ao cancelar doação:', err);
-          alert('Erro ao cancelar doação: ' + (err.error?.message || 'Erro desconhecido'));
+          this.notificationService.show('Erro ao cancelar doação!' + (err.error?.message || 'Erro desconhecido'), "error", 3000);
         }
       });
-    }
   }
 
   /**

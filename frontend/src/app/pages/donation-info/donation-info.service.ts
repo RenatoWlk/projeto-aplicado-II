@@ -125,14 +125,9 @@ export class DonationInfoService {
   /**
    * Buscar estatísticas de doações
    */
-  getStats(bloodBankId: string, startDate: string, endDate: string): Observable<DonationStats> {
-    const params = new HttpParams()
-      .set('startDate', startDate)
-      .set('endDate', endDate);
-
+  getStats(bloodBankId: string): Observable<DonationStats> {
     return this.http.get<DonationStats>(
       `${this.API_URL}/blood-bank/${bloodBankId}/stats`,
-      { params }
     );
   }
 }

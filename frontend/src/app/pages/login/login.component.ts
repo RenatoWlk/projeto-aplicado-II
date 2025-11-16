@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationBannerService,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -28,7 +30,7 @@ export class LoginComponent {
 
   login() {
     if (this.loginForm.invalid) {
-      this.errorMessage = 'Preencha todos os campos corretamente.';
+      this.notificationService.show('Preencha todos os campos corretamente', 'error', 3000);
       return;
     }
 
@@ -37,10 +39,13 @@ export class LoginComponent {
 
     this.authService.login(email, password).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard']);
+        this.notificationService.show('Login realizado com sucesso!', 'success', 3000);
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 3500);      
       },
       error: (err) => {
-        this.errorMessage = 'Email ou senha inválidos.';
+        this.notificationService.show('Email ou senha inválidos!', 'error', 3000);
       }
     });
 

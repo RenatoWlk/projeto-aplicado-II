@@ -6,15 +6,36 @@
 }
 
 .stat-card {
-    padding: 1.5rem;
-    gap: 1rem;
-    border-left: 5px solid #ccc;
-    background-color: #f9f9f9;
+  padding: 1.5rem;
+  gap: 1rem;
+  border-left: 5px solid #ccc;
+  background-color: #f9f9f9;
+
+  &.stat-pending, &.stat-confirmed, &.stat-completed, &.stat-cancelled {
+    width: 20%;
+  }
+
 }
 
 .stat-icon {
-    font-size: 2.5rem;
-    color: #666;
+  font-size: 2.5rem;
+  color: #666;
+
+  &.icon-pending {
+    color:#856404;
+  }
+
+  &.icon-confirmed {
+    color:#17a2b8;
+  }
+
+  &.icon-completed {
+    color:#28a745;
+  }
+
+  &.icon-cancelled {
+    color:#dc3545;
+  }
 }
 
 .stat-info {
@@ -35,19 +56,19 @@
 }
 
 .stat-scheduled {
-    border-left-color: #3498db;
+  border-left-color: #3498db;
 }
 
 .stat-total {
-    border-left-color: #e74c3c;
+  border-left-color: #e74c3c;
 }
 
 .stat-average {
-    border-left-color: #8e44ad;
+  border-left-color: #8e44ad;
 }
 
 .stat-scheduled .stat-icon {
-    color: #3498db;
+  color: #3498db;
 }
 
 .stat-total .stat-icon {
@@ -68,12 +89,12 @@
 
 .ranking-list li {
   display: grid;
-  grid-template-columns: 60px 200px 100px 80px 130px 250px; /* Tamanhos fixos */
+  // grid-template-columns: 1fr 2fr 1fr 1.5fr 2.5fr;
+  grid-template-columns: 10% 30% 10% 25% 25%;
   gap: 1rem;
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid #eee;
-  justify-content: space-evenly;
 }
 
 .position {
@@ -85,6 +106,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  justify-self: center;
 }
 
 .bloodtype {
@@ -97,6 +119,7 @@
   font-weight: 600;
   color: #555;
   text-align: center;
+  justify-self: center;
 }
 
 .status {
@@ -108,6 +131,7 @@
   font-weight: 500;
   text-align: center;
   white-space: nowrap;
+  justify-self: center;
 }
 
 .actions {
@@ -116,7 +140,7 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: nowrap;
-  justify-content: flex-start;
+  justify-content: space-evenly;
 }
 
 .btn-action {
@@ -126,7 +150,6 @@
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.75rem;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -148,9 +171,18 @@
   color: #856404;
 }
 
+.stat-pending {
+  border-left-color: #856404;
+}
+
+
 .status-confirmed {
   background-color: #17a2b8;
   color: white;
+}
+
+.stat-confirmed {
+  border-left-color: #17a2b8;
 }
 
 .status-completed {
@@ -158,10 +190,19 @@
   color: white;
 }
 
+.stat-completed {
+  border-left-color: #28a745;
+}
+
 .status-cancelled {
   background-color: #dc3545;
   color: white;
 }
+
+.stat-cancelled {
+  border-left-color: #dc3545;
+}
+
 
 .btn-confirm {
   background-color: #17a2b8;
@@ -210,18 +251,6 @@
 
 .stat-card:hover {
   transform: translateY(-4px);
-}
-
-.stat-scheduled .stat-icon {
-  color: #17a2b8;
-}
-
-.stat-total .stat-icon {
-  color: #28a745;
-}
-
-.stat-average .stat-icon {
-  color: #ffc107;
 }
 
 .mat-label {

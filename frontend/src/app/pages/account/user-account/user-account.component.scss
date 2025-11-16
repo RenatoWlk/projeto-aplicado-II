@@ -817,12 +817,31 @@ form {
     }
   }
   }
-
-  .back-button {
-    margin-top: 2rem;
-    align-self: flex-start;
-  }
 }
+.back-button {
+  margin-top: 2rem;
+  align-self: flex-start;
+  width: 14srem;
+  height: 3.2rem;
+  font-size: large;
+  padding: 0.5rem 1rem;
+  background-color: #c62828;
+  color: white;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: white;
+  color: #c62828;
+  border:  2px solid #c62828;
+}
+
+
 
 // === RESPONSIVE DESIGN ===
 @media (max-width: 768px) {
