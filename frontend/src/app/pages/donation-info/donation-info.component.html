@@ -1,0 +1,177 @@
+<div class="dashboard-container">
+  <!-- ESTATÍSTICAS GERAIS -->
+  <section class="app-card card-overflow">
+    <div class="app-card-header">
+      <i class="fas fa-info-circle app-card-icon"></i>
+      <h2 class="app-card-title">Estatísticas Gerais</h2>
+    </div>
+
+    <app-preloader *ngIf="loadingStats" type="skeleton-cards" [count]="3" [size]="'large'" [visible]="true"></app-preloader>
+
+    <div class="cards-grid-medium" style="margin-top: 1rem;" *ngIf="!loadingStats">
+        <article class="card stat-card stat-scheduled">
+            <header class="card-header">
+                <i class="fas fa-calendar-check stat-icon"></i>
+                <div class="stat-info">
+                    <h3 class="stat-value">{{ stats.scheduledDonations }}</h3>
+                    <p class="stat-label">Doações Agendadas</p>
+                </div>
+            </header>
+        </article>
+
+        <article class="card stat-card stat-total">
+            <header class="card-header">
+                <i class="fas fa-hand-holding-heart stat-icon"></i>
+                <div class="stat-info">
+                    <h3 class="stat-value">{{ stats.totalDonations }}</h3>
+                    <p class="stat-label">Total de Doações</p>
+                </div>
+            </header>
+        </article>
+
+        <article class="card stat-card stat-average">
+            <header class="card-header">
+                <i class="fas fa-chart-bar stat-icon"></i>
+                <div class="stat-info">
+                    <h3 class="stat-value">{{ stats.monthlyAverage }}</h3>
+                    <p class="stat-label">Média de Doações Mensais</p>
+                </div>
+            </header>
+        </article>
+    </div>
+  </section>
+
+  <!-- ESTATÍSTICAS POR STATUS-->
+
+    <section class="app-card card-overflow">
+    <div class="app-card-header">
+      <i class="fas fa-info-circle app-card-icon"></i>
+      <h2 class="app-card-title">Estatísticas por Status</h2>
+    </div>
+
+    <app-preloader *ngIf="loadingStats" type="skeleton-cards" [count]="3" [size]="'large'" [visible]="true"></app-preloader>
+
+    <div class="cards-grid-small" style="margin-top: 1rem;" *ngIf="!loadingStats">
+        <article class="card stat-card stat-pending">
+            <header class="card-header">
+                <i class="fa-regular fa-hourglass-half stat-icon icon-pending"></i>
+                <div class="stat-info">
+                    <h3 class="stat-value">{{ stats.pending }}</h3>
+                    <p class="stat-label">Doações Pendentes</p>
+                </div>
+            </header>
+        </article>
+
+        <article class="card stat-card stat-confirmed">
+            <header class="card-header">
+                <i class="fas fa-check stat-icon stats-confirmed icon-confirmed" ></i>
+                <div class="stat-info">
+                    <h3 class="stat-value">{{ stats.confirmed }}</h3>
+                    <p class="stat-label">Doações confirmadas</p>
+                </div>
+            </header>
+        </article>
+
+        <article class="card stat-card stat-completed">
+            <header class="card-header">
+                <i class="fas fa-check-double stat-icon icon-completed"></i>
+                <div class="stat-info">
+                    <h3 class="stat-value">{{ stats.completed }}</h3>
+                    <p class="stat-label">Doações completadas</p>
+                </div>
+            </header>
+        </article>
+
+        <article class="card stat-card stat-cancelled">
+            <header class="card-header">
+                <i class="fas fa-times stat-icon icon-cancelled"></i>
+                <div class="stat-info">
+                    <h3 class="stat-value">{{ stats.cancelled }}</h3>
+                    <p class="stat-label">Doações canceladas</p>
+                </div>
+            </header>
+        </article>
+    </div>
+  </section>
+
+  <!-- LISTA DE DOADORES POR DATA -->
+  <section class="app-card card-overflow">
+    <div class="app-card-header">
+      <i class="fa fa-list app-card-icon"></i>
+      <h2 class="app-card-title">Lista de Agendamentos</h2>
+    </div>
+
+    <div class="app-card-header">
+      <label for="date-picker">Data: </label>
+      <mat-form-field appearance="outline" class="custom-form-field full-width"> 
+        <mat-label>Data disponível: </mat-label>
+        <input matInput
+          [matDatepicker]="datepicker" 
+          [(ngModel)]="selectedDate"
+          (dateChange)="onDateChange($event)"
+        >
+        <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+        <mat-datepicker #datepicker [calendarHeaderComponent]="customHeader"></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <app-preloader *ngIf="loadingDonations" type="skeleton-cards" [count]="5" [visible]="true"></app-preloader>
+
+    <div class="tab-content" *ngIf="!loadingDonations">
+      <ul class="ranking-list" *ngIf="todayDonations.length > 0; else noDonations">
+        <li *ngFor="let donation of todayDonations; let i = index">
+          <span class="position">{{ i + 1 }}º</span>
+          <span class="name">{{ donation.userName }}</span>
+          <!-- <span class="bloodtype">{{ donation.bloodType }}</span> -->
+          <span class="hour">{{ donation.hour }}</span>
+          <span class="status" [ngClass]="getStatusClass(donation.status)">
+            {{ getStatusLabel(donation.status) }}
+          </span>
+          
+          <!-- Ações disponíveis baseadas no status -->
+          <span class="actions">
+            <!-- Confirmar (apenas se PENDING) -->
+            <button 
+              *ngIf="canConfirm(donation.status)"
+              class="btn-action btn-confirm" 
+              (click)="confirmDonation(donation.id)"
+              title="Confirmar doação">
+              <i class="fas fa-check"></i> <span> Confirmar</span>
+            </button>
+            
+            <!-- Completar (se PENDING ou CONFIRMED) -->
+            <button 
+              *ngIf="canComplete(donation.status)"
+              class="btn-action btn-complete" 
+              (click)="completeDonation(donation.id)"
+              title="Marcar como completada">
+              <i class="fas fa-check-double"></i> <span> Completar</span>
+            </button>
+            
+            <!-- Cancelar (se PENDING ou CONFIRMED) -->
+            <button 
+              *ngIf="canCancel(donation.status)"
+              class="btn-action btn-cancel" 
+              (click)="cancelDonation(donation.id, donation.userId)"
+              title="Cancelar doação">
+              <i class="fas fa-times"></i> <span> Cancelar</span>
+            </button>
+            
+            <!-- Mensagem quando não há ações disponíveis -->
+            <span *ngIf="!canConfirm(donation.status) && !canComplete(donation.status) && !canCancel(donation.status)" 
+                  class="no-actions">
+              -
+            </span>
+          </span>
+        </li>
+      </ul>
+
+      <ng-template #noDonations>
+        <div class="no-data">
+          <i class="fas fa-calendar-times"></i>
+          <p>Nenhuma doação agendada para esta data</p>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+</div>

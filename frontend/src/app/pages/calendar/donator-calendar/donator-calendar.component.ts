@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewEncapsulation, OnInit, inject } from '@angular/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -11,14 +11,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { NotificationBannerService } from '../../../shared/notification-banner/notification-banner.service';
-import { NotificationBannerComponent } from "../../../shared/notification-banner/notification-banner.component";
 
 @Component({
   selector: 'app-donator-calendar',
   standalone: true,
   imports: [
     MatDatepickerModule, MatCardModule, CommonModule, MatFormFieldModule, 
-    MatSelectModule, MatInputModule, FormsModule, ReactiveFormsModule, NotificationBannerComponent
+    MatSelectModule, MatInputModule, FormsModule, ReactiveFormsModule
   ],
   templateUrl: './donator-calendar.component.html',
   styleUrl: './donator-calendar.component.scss',
@@ -44,12 +43,14 @@ export class DonatorCalendarComponent implements OnInit {
   availableDonationHours: Slot[] = [];
   visible: boolean = false;
   dailyAvailabilityData: DailyAvailability [] = [];
+  availableHours: any[] = [];
 
   constructor(
-    private donationService: DonationService,
     private authService: AuthService,
     private notificationService: NotificationBannerService
   ) {}
+
+  donationService = inject(DonationService);
 
   async ngOnInit(): Promise<void> {
     this.loadBloodBanks();
@@ -78,10 +79,6 @@ export class DonatorCalendarComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  private normalize(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  }
-
   // Quando muda o banco
   onSelectBloodBankChange(bloodBankId: string) {
     this.selectedBloodBankId = bloodBankId;
@@ -89,8 +86,6 @@ export class DonatorCalendarComponent implements OnInit {
     this.scheduleForm.get('donationTime')?.reset();
     this.selectedDate = null;
     this.availableDates = [];
-    let dailyAvailability: DailyAvailability[] = [];
-    let slot: Slot[] = [];
     this.availableDonationHours = [];
 
     this.donationService.getAvailableDonationDates(bloodBankId)
@@ -98,8 +93,8 @@ export class DonatorCalendarComponent implements OnInit {
         next: dates => {
           this.dailyAvailabilityData = dates;
           this.availableDates = dates
-          .filter(d => d.slots.some(slot => slot.availableSpots > 0))
-          .map(d => new Date(d.date));
+          .filter((d: { slots: any[]; }) => d.slots.some((slot: { availableSpots: number; }) => slot.availableSpots > 0))
+          .map((d: { date: string | number | Date; }) => new Date(d.date));
         },
         error: (err) => {
           this.availableDates = [];
@@ -108,25 +103,36 @@ export class DonatorCalendarComponent implements OnInit {
     })
   }
 
-  // Quando o usuário seleciona uma data
   onDateSelected(date: Date | null) {
     if (!date || !this.selectedBloodBankId) return;
-
+    
     this.selectedDate = date;
     this.scheduleForm.get('donationTime')?.reset();
     this.availableDonationHours = [];
+    
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0')
 
-    const dateString = date.toISOString().split('T')[0]; // 'yyyy-MM-dd'
-
-    const selectDayData = this.dailyAvailabilityData.find(d => d.date === dateString);
-
-    if (selectDayData && selectDayData.slots.length > 0) {
-      this.availableDonationHours = selectDayData.slots
-        .filter(slot => slot.availableSpots > 0)
-    } else {
-      this.notificationService.show('Nenhum horário disponível para essa data!', 'warning', 3000);
-    }
-  }
+    const newDate = `${yyyy}-${mm}-${dd}`;
+    
+    this.donationService.getAvailableSlots(this.selectedBloodBankId, newDate).subscribe({
+      next: (slotsData) => {
+        this.availableDonationHours = slotsData.slots
+          .filter((slot: { availableSpots: number; }) => slot.availableSpots > 0)
+          .map((slot: { time: any; availableSpots: any; totalSpots: any; bookedSpots: any; }) => ({
+            time: slot.time,
+            availableSpots: slot.availableSpots,
+            totalSpots: slot.totalSpots,
+            bookedSpots: slot.bookedSpots
+          }));
+      },
+      error: (err) => {
+        this.availableDonationHours = [];
+        this.notificationService.show('Erro ao carregar horários disponíveis', 'error', 3000);
+      }
+  });
+}
 
   // Agendamento
   scheduleDonation() {
@@ -150,9 +156,19 @@ export class DonatorCalendarComponent implements OnInit {
     };
 
     this.donationService.scheduleDonation(appointment).subscribe({
-      next: () => this.notificationService.show('Agendamento realizado com sucesso', 'success', 3000),
-      error: () => this.notificationService.show('Erro ao realizar agendamento!', 'error', 3000)
+      next: () => {
+        this.notificationService.show('Agendamento realizado com sucesso', 'success', 3000);        
+        // Recarrega os slots da mesma data
+        if (this.selectedDate) {
+          setTimeout(() => {
+            this.onDateSelected(this.selectedDate);
+          }, 500);
+        }
+        this.scheduleForm.get('donationTime')?.reset();
+      },
+      error: (err) => {
+        this.notificationService.show('Erro ao realizar agendamento!', 'error', 3000);
+      }
     });
   }
-
 }

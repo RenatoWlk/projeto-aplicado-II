@@ -1,0 +1,345 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.stat-card {
+  padding: 1.5rem;
+  gap: 1rem;
+  border-left: 5px solid #ccc;
+  background-color: #f9f9f9;
+
+  &.stat-pending, &.stat-confirmed, &.stat-completed, &.stat-cancelled {
+    width: 20%;
+  }
+
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  color: #666;
+
+  &.icon-pending {
+    color:#856404;
+  }
+
+  &.icon-confirmed {
+    color:#17a2b8;
+  }
+
+  &.icon-completed {
+    color:#28a745;
+  }
+
+  &.icon-cancelled {
+    color:#dc3545;
+  }
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: #666;
+    margin: 0;
+}
+
+.stat-scheduled {
+  border-left-color: #3498db;
+}
+
+.stat-total {
+  border-left-color: #e74c3c;
+}
+
+.stat-average {
+  border-left-color: #8e44ad;
+}
+
+.stat-scheduled .stat-icon {
+  color: #3498db;
+}
+
+.stat-total .stat-icon {
+    color: #e74c3c;
+}
+
+.stat-average .stat-icon {
+    color: #8e44ad;
+}
+
+.date-input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+}
+
+.ranking-list li {
+  display: grid;
+  // grid-template-columns: 1fr 2fr 1fr 1.5fr 2.5fr;
+  grid-template-columns: 10% 30% 10% 25% 25%;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.position {
+  width: 60px;
+}
+
+.name {
+  width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  justify-self: center;
+}
+
+.bloodtype {
+  width: 100px;
+  text-align: center;
+}
+
+.hour {
+  width: 80px;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+  justify-self: center;
+}
+
+.status {
+  font-family: 'Poppins', sans-serif !important;
+  width: 130px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  justify-self: center;
+}
+
+.actions {
+  width: 250px;
+  min-width: 250px; 
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+}
+
+.btn-action {
+  font-family: 'Poppins', sans-serif !important;
+  padding: 0.4rem 0.6rem; 
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  flex-shrink: 0; 
+}
+
+.no-actions {
+  color: #999;
+  font-style: italic;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.stat-pending {
+  border-left-color: #856404;
+}
+
+
+.status-confirmed {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.stat-confirmed {
+  border-left-color: #17a2b8;
+}
+
+.status-completed {
+  background-color: #28a745;
+  color: white;
+}
+
+.stat-completed {
+  border-left-color: #28a745;
+}
+
+.status-cancelled {
+  background-color: #dc3545;
+  color: white;
+}
+
+.stat-cancelled {
+  border-left-color: #dc3545;
+}
+
+
+.btn-confirm {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background-color: #138496;
+  transform: translateY(-1px);
+}
+
+.btn-complete {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-complete:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+}
+
+.no-data i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.mat-label {
+  font-size: large;
+}
+
+.mat-label,
+.mat-mdc-select-min-line,
+.mat-mdc-form-field-infix,
+.mdc-list-item {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.mat-mdc-select-panel {
+  background-color: white !important;
+}
+
+.stats-section {
+  flex: 1;
+  max-width: 600px;
+}
+
+.calendar-wrapper {
+  margin-top: 50px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex: 1;
+}
+
+.calendar {
+  font-family: 'Poppins', sans-serif;
+  padding: 60px;
+}
+
+.mat-calendar {
+  width: 400px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mat-calendar-table-header {
+  margin-top: 5px;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mat-calendar-body-label {
+  font-family: 'Poppins', sans-serif;
+}
+
+.mat-mdc-card {
+  justify-content: space-evenly;
+}
+
+.mat-calendar-body-today {
+  border: none !important;
+  background-color: none !important;
+}
+
+.selected-date {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-left: 4px solid #c62828;
+  background-color: #ffecec;
+  border-radius: 0.5rem;
+  width: 450px;
+}
+
+.mat-calendar-body-selected {
+  border-color: #c62828 !important;
+  background-color: #c62828 !important;
+  color:white;
+}
+
+.mat-calendar-table-header th {
+  padding: 10px 0px 0px 0px !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+}
+
+.mat-calendar-body-cell-content {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600 !important;
+}
+
+.mat-calendar-content {
+  background-color: white !important;
+  border-bottom-right-radius: 15px !important;
+  border-bottom-left-radius: 15px !important;
+}

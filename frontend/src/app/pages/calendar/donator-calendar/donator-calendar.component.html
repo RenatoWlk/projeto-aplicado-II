@@ -1,5 +1,3 @@
-<app-notification-banner></app-notification-banner>
-
 <div>
   <div class="calendar-layout">
     <div class="app-card schedule-card">
@@ -9,7 +7,7 @@
         </div>
         <form [formGroup]="scheduleForm" (ngSubmit)="scheduleDonation()" style="margin-top:50px">
             <!-- Select bloodbank -->
-            <div class="form-body">
+            <div class="form-body bloodBank-selector">
                 <mat-form-field appearance="outline" class="custom-form-field select full-width">
                 <mat-label>Selecione o banco de sangue disponível: </mat-label>
                 <mat-select formControlName="availableBloodBanks" required (selectionChange)="onSelectBloodBankChange($event.value)">
@@ -24,7 +22,7 @@
             <div *ngIf="selectedBloodBankId" class="form-body">
                 <mat-form-field appearence="outline"  class="custom-form-field full-width">
                     <mat-label>Data disponível: </mat-label>
-                    <input matInput 
+                    <input matInput class="selector"
                         [matDatepicker]="datepicker" 
                         (dateChange)="onDateSelected($event.value)"
                         [matDatepickerFilter]="availableDonationDates"
@@ -34,11 +32,11 @@
                     <mat-datepicker #datepicker [calendarHeaderComponent]="customHeader"></mat-datepicker>
                 </mat-form-field>
                 
-                <mat-form-field *ngIf="availableDonationHours" appearence="outline"  class="custom-form-field full-width">
+                <mat-form-field *ngIf="availableDonationHours" appearence="outline"  class="custom-form-field select full-width">
                     <mat-label>Horário disponível: </mat-label>
                     <mat-select formControlName="donationTime"  class="custom-form-field full-width">
                         <mat-option *ngFor="let slot of availableDonationHours" [value]="slot.time">
-                        {{ slot.time }} - {{ slot.availableSpots }} vaga(s)
+                        {{ slot.time }} - {{ slot.availableSpots}} vaga(s)
                         </mat-option>
                     </mat-select>
                 </mat-form-field>

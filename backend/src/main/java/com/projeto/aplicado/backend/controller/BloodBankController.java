@@ -3,19 +3,17 @@ package com.projeto.aplicado.backend.controller;
 import com.projeto.aplicado.backend.dto.CampaignDTO;
 import com.projeto.aplicado.backend.dto.DonationScheduleDTO;
 import com.projeto.aplicado.backend.dto.bloodbank.*;
-import com.projeto.aplicado.backend.model.BloodBankAvailability;
+import com.projeto.aplicado.backend.dto.donation.AvailableSlotsDTO;
+import com.projeto.aplicado.backend.dto.donation.DailyAvailabilityDTO;
+import com.projeto.aplicado.backend.dto.donation.SlotDTO;
 import com.projeto.aplicado.backend.model.DailyAvailability;
 import com.projeto.aplicado.backend.model.Slot;
 import com.projeto.aplicado.backend.model.users.BloodBank;
 import com.projeto.aplicado.backend.service.BloodBankService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,16 +90,24 @@ public class BloodBankController {
         return ResponseEntity.ok(bloodBankService.findCampaignsById(id));
     }
 
-    @PostMapping("/availability")
+    @PostMapping("/publish-dates")
     public ResponseEntity<Void> addAvailabilitySlots(@RequestBody BloodBankAvailabilityDTO slotsDTO) {
         bloodBankService.addAvailabilitySlots(slotsDTO);
-        System.out.println(slotsDTO);
         return ResponseEntity.ok().build();
     }
     @GetMapping("/available-slots")
     public ResponseEntity<List<BloodBank>> getBloodBanksWithAvailableSpots() {
         List<BloodBank> bloodBanks = bloodBankService.findBloodBanksWithAvailableSlots();
         return ResponseEntity.ok(bloodBanks);
+    }
+
+    @GetMapping("/{bloodBankId}/available-slots/{date}")
+    public ResponseEntity<AvailableSlotsDTO> getAvailableSlots(
+            @PathVariable String bloodBankId,
+            @PathVariable String date) {
+
+        AvailableSlotsDTO slots = bloodBankService.getAvailableSlotsForDate(bloodBankId, date);
+        return ResponseEntity.ok(slots);
     }
 
     @GetMapping("/{id}/availability")

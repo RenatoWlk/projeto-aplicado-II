@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
 import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 import { CalendarStats } from '../calendar.service';
-import { BloodbankService, DonationSlots } from './bloodbank-calendar.service';
+import { BloodbankService } from './bloodbank-calendar.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
@@ -12,18 +12,19 @@ import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { provideNativeDateAdapter } from '@angular/material/core'; 
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { NotificationBannerService } from '../../../shared/notification-banner/notification-banner.service';
 
 @Component({
   selector: 'app-bloodbank-calendar',
   imports: [MatDatepickerModule, MatCardModule, CommonModule, MatFormFieldModule, MatDateRangeInput, MatTimepickerModule, ReactiveFormsModule, MatInputModule,
-    MatFormFieldModule,
-  ],
+    MatFormFieldModule],
   templateUrl: './bloodbank-calendar.component.html',
   styleUrl: './bloodbank-calendar.component.scss',
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
+
 export class BloodbankCalendarComponent {
 
   readonly customHeader = CustomHeaderComponent;
@@ -44,11 +45,12 @@ export class BloodbankCalendarComponent {
   });
 
 
+
   constructor(
     private bloodbankService: BloodbankService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationBannerService,
   ) {}
-
 
   addAvailableSlots() {
     const id = this.authService.getCurrentUserId();
@@ -60,17 +62,21 @@ export class BloodbankCalendarComponent {
 
 
     if (availableSpots <= 0) {
-      //banner de erro
-
+      this.notificationService.show('Erro ao disponibilizar datas, preencha corretamente o número de vagas!', "error", 3000);
       return;
     }
 
     const slotsByDate = this.generateSlotsByDate(startDate, endDate, startTime, endTime, availableSpots)
     const payload = {id: id, availabilitySlots: slotsByDate};
 
-    this.bloodbankService.addAvailableSlots(payload).subscribe(() => {
-      console.log('Slots adicionados com sucesso');
-    })
+    this.bloodbankService.addAvailableSlots(payload).subscribe({
+      next: () => {
+        this.notificationService.show('Datas disponibilizadas com sucesso!', "success", 3000);
+      },
+      error: (err) => {
+        this.notificationService.show('Erro ao disponibilizar datas', "error", 3000);
+      }
+    });
 
   }
 

@@ -102,27 +102,6 @@
     padding: 1rem;
 }
 
-.schedule-btn {
-    width: 14srem;
-    height: 3.2rem;
-    font-size: large;
-    padding: 0.5rem 1rem;
-    background-color: #c62828;
-    color: white;
-    border: 2px solid transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-}
-
-.schedule-btn:hover {
-  background-color: white;
-  color: #c62828;
-  border:  2px solid #c62828 ;
-}
-
 .mat-calendar-table-header th {
     padding: 10px 0px 0px 0px !important;
     font-family: 'Poppins', sans-serif;

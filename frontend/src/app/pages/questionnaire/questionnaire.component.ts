@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { QuestionnaireService, QuestionnaireData } from './questionnaire.service';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 @Component({
   selector: 'app-questionnaire',
@@ -53,7 +54,8 @@ export class QuestionnaireComponent {
   constructor(
     private fb: FormBuilder,
     private questionnaireService: QuestionnaireService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationBannerService,
   ) {
     this.form = this.buildForm();
     this.handleGenderValidation();
@@ -157,13 +159,10 @@ export class QuestionnaireComponent {
       userId: this.authService.getCurrentUserId(),
     };
 
-    console.log('Dados enviados para o backend:', data);
-
     this.questionnaireService.submitQuestionnaire(data)
     .subscribe({
-        next: response => console.log('Resposta do backend:', response),
-        error: err => console.error('Erro ao enviar questionário:', err),
-        complete: () => console.log('Requisição finalizada')
+        next: response => this.notificationService.show('Questionário respondido com sucesso!', 'success', 3000),
+        error: err => this.notificationService.show('Erro ao enviar questionário!', 'error', 3000),
     });
 
   }

@@ -28,11 +28,12 @@
     gap: 2rem;
 }
 
-mat-label {
+.mat-label {
+    font-family: 'Poppins', sans-serif !important;
     font-size: large;
 }
 
-mat-label,
+.mat-label,
 .mat-mdc-select-min-line,
 .mat-mdc-form-field-infix,
 .mdc-list-item {
@@ -87,7 +88,7 @@ mat-label,
 }
 
 .selected-date {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     margin: 0;
     padding: 0.5rem 1rem;
     border-left: 4px solid #c62828;
@@ -161,12 +162,12 @@ mat-label,
 
 .mat-calendar-table-header th {
     padding: 10px 0px 0px 0px !important;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     font-weight: 600;
 }
 
 .mat-calendar-body-cell-content {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     font-weight: 600 !important;
 }
 
@@ -174,4 +175,9 @@ mat-label,
     background-color: white !important;
     border-bottom-right-radius: 15px !important;
     border-bottom-left-radius: 15px !important;
+}
+
+.mat-mdc-form-field-has-icon-suffix .mat-mdc-text-field-wrapper {
+    background-color: white !important;
+    border: solid 1px;
 }

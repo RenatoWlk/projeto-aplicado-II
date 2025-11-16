@@ -62,6 +62,11 @@ export const routes: Routes = [
           .then(m => m.MapComponent)
       },
       {
+        path: 'donation-info',
+        loadComponent: () => import('../app/pages/donation-info/donation-info.component')
+          .then(c => c.DonationInfoComponent)
+      },
+      {
         path: 'questionnaire',
         loadComponent: () => import('../app/pages/questionnaire/questionnaire.component')
           .then(m => m.QuestionnaireComponent)
