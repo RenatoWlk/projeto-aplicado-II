@@ -1,8 +1,8 @@
-<img src="https://github.com/RenatoWlk/projeto-aplicado/blob/master/frontend/public/assets/logo.png" alt="Logo" width="152px" height="69px" style="align-items: end;"/>
+<a href="https://quatrovidas-frontend-331626707561.southamerica-east1.run.app"><img src="https://github.com/RenatoWlk/projeto-aplicado/blob/master/frontend/public/assets/logo.png" alt="Logo" width="152px" height="69px" style="align-items: end;"/></a>
 
-# Applied Project I
+# Applied Project II
 
-Repository for the Applied Project I. A web application developed using Spring Boot and Angular called 4vidas (four lives).
+Repository for the Applied Project II. Continuation of the [4 vidas (four lives) application](https://github.com/RenatoWlk/projeto-aplicado).
 
 ## Description
 
@@ -19,17 +19,19 @@ The application features an interactive dashboard, an achievement-based reward s
 
 ## How to Use
 
+**Access the website [4 Vidas](https://quatrovidas-frontend-331626707561.southamerica-east1.run.app)** or download it locally:
+
 **Step 1:**
 
 Download or clone this repository using the link:
 
 ```
-https://github.com/RenatoWlk/projeto-aplicado
+https://github.com/RenatoWlk/projeto-aplicado-II
 ```
 
 **Step 2:**
 
-Open a command prompt, navigate to the `projeto-aplicado/backend` folder, and run the following commands:
+Open a command prompt, navigate to the `projeto-aplicado-II/backend` folder, and run the following commands:
 
 ```
 gradlew build
@@ -38,7 +40,7 @@ gradlew bootRun
 
 **Step 3:**
 
-Open another command prompt, navigate to the `projeto-aplicado/frontend` folder, and run the following commands:
+Open another command prompt, navigate to the `projeto-aplicado-II/frontend` folder, and run the following commands:
 
 ```
 yarn install
@@ -119,7 +121,7 @@ ng serve --proxy-config proxy.conf.json
 Main folder structure and definitions:
 
 ```
-projeto-aplicado/
+projeto-aplicado-II/
 ├── backend/
 │   └── src/main/java/com/projeto/aplicado/
 │       ├── constants/                        # Centralized constants used across the backend
