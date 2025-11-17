@@ -7,7 +7,7 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5); // Preto 50% opaco
   z-index: 999; // Abaixo do banner
-  backdrop-filter: blur(3px); // Efeito blur opcional
+  //backdrop-filter: blur(3px); // Efeito blur opcional
   transition: opacity 0.3s ease;
   opacity: 0;
 }
