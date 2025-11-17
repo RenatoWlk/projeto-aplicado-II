@@ -20,24 +20,13 @@
       "installMode": "lazy",
       "updateMode": "prefetch",
       "resources": {
-        "files": [
-          "/assets/**"
-        ]
+        "files": ["/assets/**"]
       }
     }
   ],
-  "dataGroups": [
-    {
-      "name": "api",
-      "urls": [
-        "http://localhost:8080/api/**"
-      ],
-      "cacheConfig": {
-        "maxSize": 100,
-        "maxAge": "1d",
-        "strategy": "freshness",
-        "timeout": "10s"
-      }
-    }
+  "navigationUrls": [
+    "/**",
+    "!/**/*.*",
+    "!/api/**"
   ]
 }

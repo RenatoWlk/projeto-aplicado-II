@@ -19,8 +19,9 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     init: true
-    ports:
-      - "2000:80"
+    environment:
+      - PORT=8080
+      - BACKEND_URL=https://quatrovidas-backend-331626707561.southamerica-east1.run.app/api/
     networks:
       - appnet
     depends_on:
