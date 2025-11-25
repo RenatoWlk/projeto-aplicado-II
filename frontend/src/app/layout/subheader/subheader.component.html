@@ -4,25 +4,25 @@
         <!----------------- DONOR SUBHEADER------------>
         <ng-container *ngIf="userRole === roles.User">
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/dashboard">
+                <a [routerLink]="'/' + appRoutesPaths.DASHBOARD">
                     <i class="fas fa-home subheader-icon"></i>
                     <span class="subheader-text">Dashboard</span>
                 </a>
             </li>
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/calendar">
+                <a [routerLink]="'/' + appRoutesPaths.CALENDAR">
                     <i class="fas fa-calendar-days subheader-icon"></i>
                     <span class="subheader-text">Pré Agendamento</span>
                 </a>
             </li>
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/map">
+                <a [routerLink]="'/' + appRoutesPaths.MAP">
                     <i class="fas fa-map-location-dot subheader-icon"></i>
                     <span class="subheader-text">Mapa</span>
                 </a>
             </li>
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/questionnaire">
+                <a [routerLink]="'/' + appRoutesPaths.QUESTIONNAIRE">
                     <i class="fas fa-clipboard-list subheader-icon"></i>
                     <span class="subheader-text">Questionário</span>
                 </a>
@@ -32,25 +32,25 @@
         <!-------------- BLOODBANK SUBHEADER ---------------------->
         <ng-container *ngIf="userRole === roles.Bloodbank">
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/dashboard">
+                <a [routerLink]="'/' + appRoutesPaths.DASHBOARD">
                     <i class="fas fa-home subheader-icon"></i>
                     <span class="subheader-text">Home</span>
                 </a>
             </li>
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/calendar">
+                <a [routerLink]="'/' + appRoutesPaths.CALENDAR">
                     <i class="fas fa-calendar-days subheader-icon"></i>
                     <span class="subheader-text">Disponibilizar Datas</span>
                 </a>
             </li>
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/map">
+                <a [routerLink]="'/' + appRoutesPaths.MAP">
                     <i class="fas fa-map-location-dot subheader-icon"></i>
                     <span class="subheader-text">Mapa</span>
                 </a>
             </li>
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/donation-info">
+                <a [routerLink]="'/' + appRoutesPaths.DONATION_INFO">
                     <i class="fas fa-info-circle subheader-icon"></i>
                     <span class="subheader-text">Informações de Doações</span>
                 </a>
@@ -60,13 +60,13 @@
         <!-------------- PARTNER SUBHEADER ---------------------->
         <ng-container *ngIf="userRole === roles.Partner">
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/dashboard">
+                <a [routerLink]="'/' + appRoutesPaths.DASHBOARD">
                     <i class="fas fa-home subheader-icon"></i>
                     <span class="subheader-text">Home</span>
                 </a>
             </li>
             <li routerLinkActive="active" (click)="changeSlogan()">
-                <a routerLink="/map">
+                <a [routerLink]="'/' + appRoutesPaths.MAP">
                     <i class="fas fa-map-location-dot subheader-icon"></i>
                     <span class="subheader-text">Mapa</span>
                 </a>

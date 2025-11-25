@@ -17,12 +17,12 @@
 
     <div class="actions">
       <button type="submit" class="app-button">Entrar</button>
-      <a routerLink="/forgotPassword" class="forgot">Esqueci minha senha</a>
+      <a [routerLink]="'/' + appRoutesPaths.FORGOT_PASSWORD" class="forgot">Esqueci minha senha</a>
     </div>
 
     <div class="divider"></div>
 
-    <button type="button" class="register" routerLink="/register">Criar Conta</button>
+    <button type="button" class="register" [routerLink]="'/' + appRoutesPaths.REGISTER">Criar Conta</button>
     
     <div class="error-message" *ngIf="errorMessage">
       {{ errorMessage }}

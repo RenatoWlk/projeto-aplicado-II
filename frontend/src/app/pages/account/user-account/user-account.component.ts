@@ -6,17 +6,19 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Achievement, DashboardService, UserStats } from '../../dashboard/dashboard.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
-import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { QuestionnairePdfService } from './questionnaire-pdf.service';
+import { AppRoutesPaths } from '../../../shared/app.constants';
 
 @Component({
   selector: 'app-user-account',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule,RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './user-account.component.html',
   styleUrls: ['./user-account.component.scss'],
 })
 export class UserAccountComponent implements OnInit {
+  readonly appRoutesPaths = AppRoutesPaths;
   user: User | null = null;
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
@@ -50,7 +52,8 @@ export class UserAccountComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private dashboardService: DashboardService,
-    private pdfService: QuestionnairePdfService
+    private pdfService: QuestionnairePdfService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -471,12 +474,11 @@ export class UserAccountComponent implements OnInit {
   }
 
   onNewQuestionnaire(): void {
-    // this.router.navigate(['/questionnaire']);
+    this.router.navigate(['/' + this.appRoutesPaths.QUESTIONNAIRE]);
   }
 
-
   onFindBloodBank(): void {
-    // this.router.navigate(['/blood-banks']);
+    this.router.navigate(['/' + this.appRoutesPaths.MAP]);
   }
 
   downloadQuestionnairePDF(): void {

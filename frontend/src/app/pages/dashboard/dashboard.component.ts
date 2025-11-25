@@ -10,6 +10,7 @@ import { FormCreateItemComponent } from '../../shared/form-create-item/form-crea
 import { BloodbankDashboardComponent } from './bloodbank-dashboard/bloodbank-dashboard.component';
 import { LeaderboardsComponent } from "./leaderboards/leaderboards.component";
 import { PreloaderComponent } from "../../shared/preloader/preloader.component";
+import { AppRoutesPaths } from '../../shared/app.constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,6 +21,7 @@ import { PreloaderComponent } from "../../shared/preloader/preloader.component";
 })
 export class DashboardComponent implements OnInit {
   // Constants
+  readonly appRoutesPaths = AppRoutesPaths;
   public readonly POSTS_SECTION_TITLE: string = DashboardConstants.POSTS_SECTION_TITLE;
   public readonly OFFERS_SECTION_TITLE: string = DashboardConstants.OFFERS_SECTION_TITLE;
   public readonly NEARBY_BLOODBANKS_SECTION_TITLE: string = DashboardConstants.NEARBY_BLOODBANKS_SECTION_TITLE;

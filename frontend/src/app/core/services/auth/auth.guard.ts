@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
 import { AuthService } from './auth.service';
+import { AppRoutesPaths } from '../../../shared/app.constants';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
+  readonly appRoutesPaths = AppRoutesPaths;
+
   constructor(
     private auth: AuthService,
     private router: Router
@@ -14,7 +17,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    this.router.navigate(['/login'], {
+    this.router.navigate(['/' + this.appRoutesPaths.LOGIN], {
       queryParams: { returnUrl: state.url }
     });
     

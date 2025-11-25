@@ -276,11 +276,11 @@
       <h2 class="register-title">Bem-vindo!</h2>
       <p class="register-msg">Seu cadastro foi realizado com sucesso.</p>
       <div class="actions-register">
-        <button mat-button routerLink="/login" (click)="submit()" class="app-button">Acessar o site</button>
+        <button mat-button [routerLink]="'/' + appRoutesPaths.LOGIN" (click)="submit()" class="app-button">Acessar o site</button>
       </div>
     </mat-step>
 
   </mat-horizontal-stepper>
 
-  <a routerLink="/login">Já possuo uma conta</a>
+  <a [routerLink]="'/' + appRoutesPaths.LOGIN">Já possuo uma conta</a>
 </div>

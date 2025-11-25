@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { RegisterService } from '../../pages/register/register.service';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
+import { AppRoutesPaths } from '../../shared/app.constants';
 
 @Component({
   selector: 'app-register',
@@ -23,6 +24,7 @@ import { NotificationBannerService } from '../../shared/notification-banner/noti
   encapsulation: ViewEncapsulation.None,
 })
 export class RegisterComponent {
+  readonly appRoutesPaths = AppRoutesPaths;
   userForm!: FormGroup;
 
   constructor(private fb: FormBuilder, private registerService: RegisterService, private notificationService: NotificationBannerService) {}

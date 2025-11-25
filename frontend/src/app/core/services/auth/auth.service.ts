@@ -5,6 +5,7 @@ import { TokenService } from '../token/token.service';
 import { jwtDecode } from 'jwt-decode';
 import { UserRole } from '../../../shared/app.enums';
 import { Router } from '@angular/router';
+import { AppRoutesPaths } from '../../../shared/app.constants';
 
 interface AuthRequest {
   email: string;
@@ -30,6 +31,7 @@ interface DecodedToken {
   providedIn: 'root'
 })
 export class AuthService {
+  readonly appRoutesPaths = AppRoutesPaths;
   private readonly API = '/api/auth';
 
   constructor(
@@ -62,7 +64,7 @@ export class AuthService {
    */
   logout(): void {
     this.tokenService.clearToken();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/' + this.appRoutesPaths.LOGIN]);
   }
 
   /**

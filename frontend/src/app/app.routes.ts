@@ -2,30 +2,31 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 import { LayoutComponent } from './layout/layout.component';
 import { AuthGuard } from '../app/core/services/auth/auth.guard';
+import { AppRoutesPaths } from './shared/app.constants';
 
 export const routes: Routes = [
   /** 
    * Public login routes
    */
   {
-    path: 'login',
+    path: AppRoutesPaths.LOGIN,
     loadComponent: () => import('./pages/login/login.component')
       .then(m => m.LoginComponent)
   },
   {
-    path: 'forgotPassword',
+    path: AppRoutesPaths.FORGOT_PASSWORD,
     loadComponent: () => import('./pages/forgot-password/forgot-password.component')
       .then(m => m.ForgotPasswordComponent)
   },
   {
-    path: 'register',
+    path: AppRoutesPaths.REGISTER,
     loadComponent: () => import('./pages/register/register.component')
       .then(m => m.RegisterComponent)
   },
   
   // Public dashboard route
   {
-    path: 'dashboard',
+    path: AppRoutesPaths.DASHBOARD,
     component: LayoutComponent,
     children: [
       {
@@ -37,42 +38,42 @@ export const routes: Routes = [
   },
 
   // Always redirect to dashboard if no path is provided
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: AppRoutesPaths.DASHBOARD, pathMatch: 'full' },
 
   // Protected routes under Layout
   {
     path: '',
     component: LayoutComponent,
     // Comment out the AuthGuard to test the routes
-    //canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     children: [
       {
-        path: 'account',
+        path: AppRoutesPaths.ACCOUNT,
         loadComponent: () => import('../app/pages/account/account.component')
           .then(m => m.AccountComponent)
       },
       {
-        path: 'calendar',
+        path: AppRoutesPaths.CALENDAR,
         loadComponent: () => import('../app/pages/calendar/calendar.component')
           .then(m => m.CalendarComponent)
       },
       {
-        path: 'map',
+        path: AppRoutesPaths.MAP,
         loadComponent: () => import('../app/pages/map/map.component')
           .then(m => m.MapComponent)
       },
       {
-        path: 'donation-info',
+        path: AppRoutesPaths.DONATION_INFO,
         loadComponent: () => import('../app/pages/donation-info/donation-info.component')
           .then(c => c.DonationInfoComponent)
       },
       {
-        path: 'questionnaire',
+        path: AppRoutesPaths.QUESTIONNAIRE,
         loadComponent: () => import('../app/pages/questionnaire/questionnaire.component')
           .then(m => m.QuestionnaireComponent)
       },
       {
-        path: 'segredinho',
+        path: AppRoutesPaths.SCRT,
         loadComponent: () => import('../app/pages/scrt/scrt.component')
           .then(m => m.ScrtComponent)
       }
@@ -80,7 +81,7 @@ export const routes: Routes = [
   },
 
   // Fallback for unknown routes
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '**', redirectTo: AppRoutesPaths.DASHBOARD }
 ];
 
 @NgModule({

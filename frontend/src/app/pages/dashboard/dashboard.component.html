@@ -252,7 +252,7 @@
   <ng-template #loginPrompt>
     <div class="card">
       <p class="card-title">{{ LOGIN_REQUIRED_MESSAGE }}</p>
-      <button routerLink="/login" class="app-button">Fazer Login</button>
+      <button [routerLink]="'/' + appRoutesPaths.LOGIN" class="app-button">Fazer Login</button>
     </div>
   </ng-template>
 

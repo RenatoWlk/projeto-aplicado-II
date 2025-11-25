@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { HeaderService } from './header.service';
+import { AppRoutesPaths } from '../../shared/app.constants';
 
 @Component({
   selector: 'app-header',
@@ -12,10 +13,11 @@ import { HeaderService } from './header.service';
   styleUrls: ['./header.component.scss',]
 })
 export class HeaderComponent implements OnInit {
+  readonly appRoutesPaths = AppRoutesPaths;
   isMenuOpen: boolean = false;
   isLoggedIn: boolean = false;
-  userName: string = 'Renas';
-  userEmail: string = 'renas@gmail.com';
+  userName: string = '';
+  userEmail: string = '';
   slogan: string = '';
 
   private slogans: string[] = [
@@ -65,7 +67,6 @@ export class HeaderComponent implements OnInit {
   handleOutsideClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
 
-    // só fecha se clicar fora do botão/menu
     if (!target.closest('.left')) {
       this.isMenuOpen = false;
     }

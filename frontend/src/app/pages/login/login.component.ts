@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
+import { AppRoutesPaths } from '../../shared/app.constants';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +14,7 @@ import { NotificationBannerService } from '../../shared/notification-banner/noti
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
+  readonly appRoutesPaths = AppRoutesPaths;
   loginForm: FormGroup;
   errorMessage: string = '';
 

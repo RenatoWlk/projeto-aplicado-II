@@ -1,7 +1,7 @@
 <div class="header">
 
     <div class="right">
-      <button class="logo-btn" [routerLink]="'/segredinho'">
+      <button class="logo-btn" [routerLink]="'/' + appRoutesPaths.SCRT">
         <img src="assets/logo.png" alt="Logo" class="logo" style="width: 152px; height: 69px;">
       </button>
     </div>
@@ -18,10 +18,10 @@
         </button>
         <div class="dropdown-menu" *ngIf="isMenuOpen">
           <ul>
-            <li class="list-button" (click)="navigateTo('/login')">
+            <li class="list-button" (click)="navigateTo('/' + appRoutesPaths.LOGIN)">
               <a>Login</a>
             </li>
-            <li class="list-button" (click)="navigateTo('/register')">
+            <li class="list-button" (click)="navigateTo('/' + appRoutesPaths.REGISTER)">
               <a>Criar conta</a>
             </li>
           </ul>
@@ -41,7 +41,7 @@
             <ul>
               <p class="menu-name">{{ userName }}</p>
               <p class="menu-email">{{ userEmail }}</p>
-              <li class="list-button" (click)="navigateTo('/account')">
+              <li class="list-button" (click)="navigateTo('/' + appRoutesPaths.ACCOUNT)">
                 <a>Conta</a>
               </li>
               <li class="list-button" (click)="logout()">

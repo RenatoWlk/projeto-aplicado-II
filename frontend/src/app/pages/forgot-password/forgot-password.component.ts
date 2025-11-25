@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AppRoutesPaths } from '../../shared/app.constants';
 
 @Component({
   standalone: true,
@@ -11,6 +12,7 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, ReactiveFormsModule, RouterModule]
 })
 export class ForgotPasswordComponent {
+  readonly appRoutesPaths = AppRoutesPaths;
   forgotForm: FormGroup;
 
   constructor(private fb: FormBuilder) {
