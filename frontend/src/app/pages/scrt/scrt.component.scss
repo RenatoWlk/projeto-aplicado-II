@@ -1,6 +1,135 @@
-.container {
+.dedication-intro {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 2rem;
+    text-align: center;
+    line-height: 1.8;
+}
+
+.dedication-list {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    padding-left: 20px;
-}	
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.dedication-item {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+    border-left: 4px solid #e53935;
+    border-radius: 8px;
+    
+    h3 {
+        color: #e53935;
+        margin: 0 0 0.75rem 0;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        i {
+            font-size: 1rem;
+        }
+    }
+    
+    p {
+        margin: 0;
+        color: #555;
+        line-height: 1.7;
+    }
+}
+
+.dedication-closure {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #ffe0e0;
+    color: #666;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    
+    strong {
+        color: #e53935;
+    }
+}
+
+.team-intro {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+
+.team-thanks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.team-member-thanks {
+    background: linear-gradient(135deg, #fff9f9 0%, #ffffff 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px solid #ffe5e5;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        border-color: #e53935;
+        box-shadow: 0 4px 12px rgba(229, 57, 53, 0.1);
+        transform: translateY(-2px);
+    }
+}
+
+.member-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #ffe5e5;
+}
+
+.member-avatar {
+    i {
+        font-size: 3rem;
+        color: #e53935;
+    }
+}
+
+.member-info {
+    flex: 1;
+}
+
+.member-name {
+    margin: 0 0 0.25rem 0;
+    color: #e53935;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.member-role {
+    color: #888;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.member-message {
+    p {
+        margin: 0;
+        color: #555;
+        line-height: 1.8;
+        text-align: justify;
+    }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+    .member-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .member-message p {
+        text-align: left;
+    }
+}

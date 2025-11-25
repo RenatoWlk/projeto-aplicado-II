@@ -217,3 +217,82 @@
 .épico { background-color: #ba68c8; }
 .lendário { background: linear-gradient(to right, #FFD200, #F7971E); }
 .mítico { background: linear-gradient(to right, #004e92, #000428); }
+
+
+.welcome-app-card-header,
+.guide-card-header {
+  display: flex;
+  align-items: center;
+}
+
+.welcome-app-card-body {
+  font-size: large;
+}
+
+.welcome-title,
+.guide-title {
+  padding-left: 10px;
+}
+
+.welcome-impact {
+  display: flex;
+  justify-content: center;
+}
+
+.guide-app-card-title {
+  color: #e53935;
+
+  .bloodbank {
+    display: flex;
+    justify-content: end;
+  }
+}
+
+.card.guide {
+  position: relative;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.card-header.donator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.guide-info-donator {
+  flex: 1;
+}
+
+.guide-info-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.guide-info-donator p {
+  margin: 0;
+  font-size: 1.20rem;
+}
+
+.card-header.donator i {
+  font-size: 2.5rem;
+  color: white;
+  background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// Hover effect
+.card.guide:hover .card-header.donator i {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(229, 57, 53, 0.4);
+  transition: all 0.3s ease;
+}

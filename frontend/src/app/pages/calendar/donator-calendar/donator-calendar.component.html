@@ -3,7 +3,14 @@
     <div class="app-card schedule-card">
         <div class="app-card-header">
             <i class="fa-solid fa-calendar-days app-card-icon"></i>
-            <h2 class="app-card-title">Agende sua doação!</h2>
+            <h2 class="app-card-title">Pré-agende sua doação!</h2>
+        </div>
+        <div>
+            <ul class="app-card-steps">
+                <li>Encontre bancos de sangue próximos;</li>
+                <li>Verifique a disponibilidade de datas;</li>
+                <li>Realize uma reserva de horário;</li>
+            </ul>
         </div>
         <form [formGroup]="scheduleForm" (ngSubmit)="scheduleDonation()" style="margin-top:50px">
             <!-- Select bloodbank -->
