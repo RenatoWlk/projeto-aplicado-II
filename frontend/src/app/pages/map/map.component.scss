@@ -66,3 +66,82 @@
   color: white;
   font-weight: bold;
 }
+
+/* ============================================================= */
+/* ====================== MAP PAGE - MOBILE ===================== */
+/* ============================================================= */
+@media (max-width: 768px) {
+  .map-container {
+    flex-direction: column;
+    height: auto;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .map-card {
+    width: 90% !important;
+    height: auto;
+    padding: 1rem;
+  }
+
+  .map-card:first-child {
+    order: 1;
+  }
+
+  .map-card:last-child {
+    order: 2;
+  }
+
+  .tabs-container {
+    max-height: 200px;
+    padding-right: 4px;
+  }
+
+  .tab {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .card {
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card-body {
+    font-size: 0.95rem;
+  }
+
+  .info-icon {
+    font-size: 18px;
+  }
+
+  #map {
+    height: 350px !important;
+    min-height: 320px !important;
+    flex-grow: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    padding: 0.5rem;
+  }
+
+  .tabs-container {
+    max-height: 160px;
+  }
+
+  .tab {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  #map {
+    height: 300px !important;
+    min-height: 280px !important;
+  }
+}

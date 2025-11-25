@@ -55,3 +55,42 @@
     width: 560px;
     height: 300px;
 }
+
+@media (max-width: 768px) {
+  .preloader-container {
+    min-height: 120px;
+    padding: 0 1rem;
+  }
+
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border-width: 3px;
+  }
+
+  .skeleton-cards {
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .skeleton-card {
+    width: 100%;
+    max-width: 320px;
+    height: 160px;
+  }
+
+  .skeleton-card.small {
+    max-width: 220px;
+    height: 130px;
+  }
+
+  .skeleton-card.medium {
+    max-width: 280px;
+    height: 150px;
+  }
+
+  .skeleton-card.large {
+    max-width: 320px;
+    height: 160px;
+  }
+}

@@ -5,12 +5,10 @@
   <!-- =================== -->
   <app-bloodbank-dashboard *ngIf="userRole === roles.Bloodbank"></app-bloodbank-dashboard>
 
-  
-  <!-- ================= -->
+  <!-- =============== -->
   <!-- WELCOME SECTION -->
-  <!-- ================= -->
-
-  <section class="app-card card-overflow">
+  <!-- =============== -->
+  <section class="app-card card-overflow" *ngIf="userRole === null">
     <div class="welcome-app-card">
         <div class="welcome-app-card-header">
           <i class="fa-solid fa-droplet app-card-icon"></i>
@@ -29,11 +27,10 @@
     </div>
   </section>
 
-  <!-- ================= -->
+  <!-- ============= -->
   <!-- GUIDE SECTION -->
-  <!-- ================= -->
-   
-  <section class="app-card card-overflow">
+  <!-- ============= -->
+  <section class="app-card card-overflow" *ngIf="userRole === null">
     <div class="guide-app-card">
       <div class="guide-card-header">
         <i class="fa-solid fa-circle-question app-card-icon"></i>
@@ -80,7 +77,6 @@
         </article>
     </div>
   </section>
-
 
   <!-- ================= -->
   <!-- CAMPAIGNS SECTION -->

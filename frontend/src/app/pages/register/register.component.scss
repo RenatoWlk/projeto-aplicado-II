@@ -182,3 +182,122 @@ body, html {
   flex-direction: column;
   gap: 16px;
 }
+
+@media (max-width: 1024px) {
+  body, html {
+    height: auto;
+    display: block;
+    padding: 0;
+  }
+
+  .stepper.app-card {
+    width: calc(100% - 2rem);
+    max-width: 700px;
+    height: auto;
+    padding: 1rem;
+    margin: 1rem auto;
+    overflow: visible;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  .custom-radio-group {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 16px;
+  }
+
+  .radio-option {
+    width: 100%;
+    height: 140px;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease;
+  }
+
+  .radio-option .app-card-icon {
+    font-size: 40px;
+    margin-bottom: 6px;
+  }
+
+  .radio-option span {
+    font-size: 14px;
+  }
+
+  .radio-option::after {
+    bottom: -28px;
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .mat-horizontal-content-container {
+    padding: 12px !important;
+  }
+
+  .custom-form-field {
+    margin-bottom: 12px;
+  }
+
+  .custom-form-field .mat-input-element {
+    padding: 10px 10px;
+    font-size: 0.95rem;
+  }
+
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .column {
+    flex: 1 1 100%;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .actions .app-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.98rem;
+  }
+
+  .actions .app-button:last-child {
+    margin-bottom: 0;
+  }
+
+  .register-title {
+    font-size: 22px;
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  .register-msg {
+    font-size: 0.95rem;
+    padding: 0 6px;
+    text-align: center;
+  }
+
+  .mat-stepper-horizontal {
+    padding: 0;
+  }
+
+  .mat-stepper-horizontal .mat-step-header {
+    min-width: 0;
+    padding: 6px 8px;
+  }
+
+  .mat-stepper-horizontal .mat-step-header .mat-step-label {
+    font-size: 11px;
+  }
+
+  .mat-stepper-horizontal .mat-step-header .mat-step-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+}

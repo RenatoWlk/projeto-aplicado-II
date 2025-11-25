@@ -13,7 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class NotificationBannerComponent implements OnDestroy {
   @Input() message: string = '';
   @Input() type: 'success' | 'warning' | 'error' = 'success';
-  @Input() duration: number = 5000;
+  @Input() duration: number = 2000;
 
   visible = false;
   fadingOut = false;

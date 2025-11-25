@@ -91,3 +91,68 @@
   font-size: 0.95rem;
   margin-right: 10rem;
 }
+
+@media (max-width: 768px) {
+  .tabs {
+    margin-bottom: 0.5rem;
+  }
+
+  .tab-button {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .ranking-list li {
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.4rem;
+    border-radius: 8px;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .ranking-list li > * {
+    margin: 0;
+  }
+
+  .rank-top-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .rank-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-left: 52px;
+  }
+
+  .position {
+    min-width: 32px;
+    font-size: 0.9rem;
+    margin-left: 0;
+  }
+
+  .name {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .bloodtype {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+
+  .value {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-right: 0;
+  }
+
+  .ranking-list li:nth-child(1),
+  .ranking-list li:nth-child(2),
+  .ranking-list li:nth-child(3) {
+    background-size: cover;
+  }
+}

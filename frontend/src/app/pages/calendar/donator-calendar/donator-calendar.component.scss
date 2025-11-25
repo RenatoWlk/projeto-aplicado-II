@@ -1,47 +1,51 @@
+mat-label {
+  font-family: 'Poppins', sans-serif !important;
+}
+
 .calendar-layout {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-    gap: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  gap: 20px;
 }
 
 .schedule-card {
-    height: 680px;
-    width: 600px;
+  height: auto;
+  width: 600px;
 }
 
 .form-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .schedule-button-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .full-width {
-    width: 30rem;
-    gap: 2rem;
+  width: 30rem;
+  gap: 2rem;
 }
 
 .mat-label {
-    font-family: 'Poppins', sans-serif !important;
-    font-size: large;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: large;
 }
 
 .mat-label,
 .mat-mdc-select-min-line,
 .mat-mdc-form-field-infix,
 .mdc-list-item {
-    font-family: 'Poppins', sans-serif !important;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .mat-mdc-select-panel {
-    background-color: white !important;
+  background-color: white !important;
 }
 
 .stats-section {
@@ -50,134 +54,190 @@
 }
 
 .calendar-wrapper {
-    margin-top: 50px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    flex: 1;
+  margin-top: 50px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex: 1;
 }
 
 .calendar {
-    font-family: 'Poppins', sans-serif;
-    padding: 60px;
+  font-family: 'Poppins', sans-serif;
+  padding: 60px;
 }
 
 .mat-calendar {
-    width: 400px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .mat-calendar-table-header {
-    margin-top: 5px;
-    color: white;
-    font-family: 'Poppins', sans-serif;
+  margin-top: 5px;
+  color: white;
+  font-family: 'Poppins', sans-serif;
 }
 
 .mat-calendar-body-label {
-    font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 .mat-mdc-card {
-    justify-content: space-evenly;
+  justify-content: space-evenly;
 }
 
 .mat-calendar-body-today {
-    border: none !important;
-    background-color: none !important;
+  border: none !important;
+  background-color: none !important;
 }
 
 .selected-date {
-    font-family: 'Poppins', sans-serif !important;
-    margin: 0;
-    padding: 0.5rem 1rem;
-    border-left: 4px solid #c62828;
-    background-color: #ffecec;
-    border-radius: 0.5rem;
-    width: 450px;
+  font-family: 'Poppins', sans-serif !important;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-left: 4px solid #c62828;
+  background-color: #ffecec;
+  border-radius: 0.5rem;
+  width: 450px;
 }
 
 .mat-calendar-body-selected {
-    border-color: #c62828 !important;
-    background-color: #c62828 !important;
-    color:white;
+  border-color: #c62828 !important;
+  background-color: #c62828 !important;
+  color:white;
 }
 
 .calendar-layout .app-card .app-card-header {
-    justify-content: center;
+  justify-content: center;
 }
 
 .calendar-stats .stats-grid .card {
-    margin: 16px;
-    justify-content: center;
+  margin: 16px;
+  justify-content: center;
 }
 
 .calendar-stats .calendar-stats-grid .card {
-    justify-items: center;
-    margin: 12px;
+  justify-items: center;
+  margin: 12px;
 }
 
 .calendar-stat-value {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .calendar-layout .app-card {
-    max-height: 800px;
-    max-width: 600px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  max-height: 800px;
+  max-width: 600px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .date-wrapper {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 1rem;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 1rem;
 }
 
 .schedule-btn {
-    width: 14srem;
-    height: 3.2rem;
-    font-size: large;
-    padding: 0.5rem 1rem;
-    background-color: #c62828;
-    color: white;
-    border: 2px solid transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
+  width: 14srem;
+  height: 3.2rem;
+  font-size: large;
+  padding: 0.5rem 1rem;
+  background-color: #c62828;
+  color: white;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
 }
 
 .schedule-btn:hover {
   background-color: white;
   color: #c62828;
-  border:  2px solid #c62828 ;
+  border:  2px solid #c62828;
 }
 
 .mat-calendar-table-header th {
-    padding: 10px 0px 0px 0px !important;
-    font-family: 'Poppins', sans-serif !important;
-    font-weight: 600;
+  padding: 10px 0px 0px 0px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600;
 }
 
 .mat-calendar-body-cell-content {
-    font-family: 'Poppins', sans-serif !important;
-    font-weight: 600 !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600 !important;
 }
 
 .mat-calendar-content {
-    background-color: white !important;
-    border-bottom-right-radius: 15px !important;
-    border-bottom-left-radius: 15px !important;
+  background-color: white !important;
+  border-bottom-right-radius: 15px !important;
+  border-bottom-left-radius: 15px !important;
 }
 
 .mat-mdc-form-field-has-icon-suffix .mat-mdc-text-field-wrapper {
-    background-color: white !important;
-    border: solid 1px;
+  background-color: white !important;
+  border: solid 1px;
+}
+
+@media (max-width: 768px) {
+  .calendar-layout {
+    flex-direction: column;
+    padding: 20px 12px;
+    gap: 0;
+  }
+
+  .schedule-card {
+    width: 90%;
+    height: auto;
+    padding-bottom: 30px;
+  }
+
+  .form-body {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .custom-form-field.full-width {
+    width: 100%;
+  }
+
+  .bloodBank-selector {
+    margin-bottom: 10px;
+  }
+
+  .mat-mdc-form-field {
+    width: 100% !important;
+  }
+
+  .mat-mdc-select-panel {
+    max-height: 260px !important;
+  }
+
+  .mat-calendar {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .selected-date {
+    width: 100%;
+  }
+
+  .schedule-button-container {
+    margin-top: 16px;
+  }
+
+  .schedule-btn {
+    width: 100%;
+    height: 3.2rem;
+    font-size: 1rem;
+  }
 }

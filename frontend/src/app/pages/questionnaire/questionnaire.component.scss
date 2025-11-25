@@ -151,17 +151,53 @@ select.erro {
   background-color: #125ea2;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .container {
-    padding: 1rem;
+    max-width: 80%;
+    padding: 1.2rem;
+    margin: 1rem auto;
+    border-radius: 0.8rem;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  form {
+    gap: 1rem;
   }
 
   form label {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+
+    select {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
   }
 
-  form select,
-  form button {
-    font-size: 0.95rem;
+  .mensagem-erro {
+    font-size: 0.8rem;
+  }
+
+  button {
+    padding: 0.7rem;
+    font-size: 1rem;
+  }
+
+  .alerta-sucesso {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-refazer {
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+  }
+
+  .tooltip::after {
+    font-size: 0.8rem;
+    max-width: 180px;
   }
 }

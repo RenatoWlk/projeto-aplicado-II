@@ -27,7 +27,7 @@
 
         <!-- Top 50 Donors -->
         <ul *ngIf="activeTab === 'donors' && !isLoadingLeaderboards" class="ranking-list">
-            <li *ngFor="let donor of topDonors; let i = index">
+            <li class="top-donor" *ngFor="let donor of topDonors; let i = index">
                 <span class="position">
                     <span class="position">
                         <ng-container [ngSwitch]="i">
@@ -46,7 +46,7 @@
 
         <!-- Top 50 by Points -->
         <ul *ngIf="activeTab === 'points' && !isLoadingLeaderboards" class="ranking-list">
-            <li *ngFor="let user of topPoints; let i = index">
+            <li class="top-points" *ngFor="let user of topPoints; let i = index">
                 <span class="position">
                     <span class="position">
                         <ng-container [ngSwitch]="i">

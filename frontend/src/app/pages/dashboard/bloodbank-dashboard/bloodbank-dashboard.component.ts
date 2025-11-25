@@ -39,48 +39,44 @@ export class BloodbankDashboardComponent implements OnInit {
   public donationsOverTimeChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    
+
+    layout: {
+      padding: 0
+    },
+
     scales: {
       y: {
         beginAtZero: true,
-        min: 0
-      }
-    },
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          font: {
-            family: 'Poppins, sans-serif',
-            size: 18,
-            weight: 'bold',
-          }
+        ticks: {
+          font: (ctx) => ({
+            size: window.innerWidth < 768 ? 10 : 14,
+            family: 'Poppins'
+          })
         }
       },
-      tooltip: {
-        enabled: true,
-        backgroundColor: '#333',
-        titleColor: '#fff',
-        bodyColor: '#ddd',
-        borderColor: '#888',
-        borderWidth: 1,
-        cornerRadius: 8,
-        padding: 10,
-        titleFont: {
-          size: 17,
-          weight: 'bold'
-        },
-        bodyFont: {
-          size: 15
-        },
-        callbacks: {
-          label: (context) => {
-            const value = context.raw;
-            return ` ${context.label}: ${value} doações`;
-          },
-        },
-      },
+      x: {
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45,
+          font: (ctx) => ({
+            size: window.innerWidth < 768 ? 9 : 14,
+            family: 'Poppins'
+          })
+        }
+      }
     },
+
+    plugins: {
+      legend: {
+        position: window.innerWidth < 768 ? 'bottom' : 'right',
+        labels: {
+          font: {
+            size: window.innerWidth < 768 ? 12 : 18,
+            weight: 'bold'
+          }
+        }
+      }
+    }
   };
 
   /**
@@ -121,47 +117,26 @@ export class BloodbankDashboardComponent implements OnInit {
   public bloodTypeChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    
+
     plugins: {
       legend: {
-        position: 'right',
+        position: window.innerWidth < 768 ? 'bottom' : 'right',
         labels: {
           font: {
-            family: 'Poppins, sans-serif',
-            size: 20,
-            weight: 'bold'
+            size: window.innerWidth < 768 ? 13 : 20,
+            family: 'Poppins'
           }
         }
       },
       tooltip: {
-        enabled: true,
-        backgroundColor: '#333',
-        titleColor: '#fff',
-        bodyColor: '#ddd',
-        borderColor: '#888',
-        borderWidth: 1,
-        cornerRadius: 8,
-        padding: 10,
-        titleFont: {
-          size: 17,
-          weight: 'bold'
-        },
         bodyFont: {
-          size: 15
+          size: window.innerWidth < 768 ? 12 : 15
         },
-        callbacks: {
-          label: (context) => {
-            const bags = context.raw as number;
-            const averageLiters = 0.445; // 445ml = média entre 420ml e 470ml
-            const totalLiters = (bags * averageLiters).toFixed(1);
-            return [
-              ` Bolsas disponíveis: ${bags}`,
-              ` Volume aproximado: ${totalLiters} L`
-            ];
-          },
-        },
-      },
-    },
+        titleFont: {
+          size: window.innerWidth < 768 ? 13 : 17
+        }
+      }
+    }
   };
 
   constructor(private bbDashboardService: BloodBankDashboardService, private authService: AuthService) {}

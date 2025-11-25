@@ -11,3 +11,9 @@
     margin: 0;
     padding: 0;
 }
+
+@media (max-width: 768px) {
+  .footer-content {
+    font-size: 0.7rem;
+  }
+}

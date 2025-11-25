@@ -5,7 +5,6 @@ form {
   background-color: #fff;
   padding: 2rem;
   border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   max-width: 600px;
   margin: auto;
 }
@@ -59,4 +58,34 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  form {
+    gap: 0.85rem;
+  }
+
+  label {
+    font-size: 0.95rem;
+  }
+
+  input,
+  textarea {
+    padding: 0.65rem;
+    font-size: 0.95rem;
+  }
+
+  textarea {
+    min-height: 80px;
+  }
+
+  .discount-container {
+    gap: 0.4rem;
+  }
+
+  .app-button {
+    width: 100%;
+    height: 3rem;
+    font-size: 1rem;
+  }
 }

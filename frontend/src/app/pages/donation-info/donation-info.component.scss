@@ -12,9 +12,9 @@
   background-color: #f9f9f9;
 
   &.stat-pending, &.stat-confirmed, &.stat-completed, &.stat-cancelled {
-    width: 20%;
+    min-width: 20%;
+    width: auto;
   }
-
 }
 
 .stat-icon {
@@ -342,4 +342,103 @@
   background-color: white !important;
   border-bottom-right-radius: 15px !important;
   border-bottom-left-radius: 15px !important;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .cards-grid-medium,
+  .cards-grid-small {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .ranking-list li {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "position hour"
+      "name name"
+      "status status"
+      "actions actions";
+    gap: 0.5rem;
+    padding: 0.8rem;
+  }
+
+  .position {
+    grid-area: position;
+    font-size: 1rem;
+  }
+
+  .hour {
+    grid-area: hour;
+    font-size: 0.9rem;
+  }
+
+  .name {
+    grid-area: name;
+    width: 100%;
+    text-align: left;
+    font-size: 1rem;
+  }
+
+  .status {
+    grid-area: status;
+    width: 100%;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+
+  .actions {
+    grid-area: actions;
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .btn-action {
+    width: 100%;
+    justify-content: center;
+    padding: 0.45rem;
+    font-size: 0.85rem;
+  }
+
+  .custom-form-field {
+    width: 100% !important;
+  }
+
+  .mat-calendar {
+    width: 100% !important;
+    max-width: 340px;
+  }
+
+  .selected-date {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+
+  .card-overflow {
+    overflow-x: hidden;
+  }
 }

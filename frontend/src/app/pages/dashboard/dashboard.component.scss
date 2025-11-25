@@ -218,7 +218,7 @@
 .lendário { background: linear-gradient(to right, #FFD200, #F7971E); }
 .mítico { background: linear-gradient(to right, #004e92, #000428); }
 
-
+/* ----------------------------- WELCOME & GUIDE ----------------------------- */
 .welcome-app-card-header,
 .guide-card-header {
   display: flex;
@@ -226,7 +226,7 @@
 }
 
 .welcome-app-card-body {
-  font-size: large;
+  font-size: 1rem;
 }
 
 .welcome-title,
@@ -290,9 +290,178 @@
   flex-shrink: 0;
 }
 
-// Hover effect
 .card.guide:hover .card-header.donator i {
   transform: scale(1.05);
   box-shadow: 0 6px 16px rgba(229, 57, 53, 0.4);
   transition: all 0.3s ease;
+}
+
+/* =============================== */
+/*           MOBILE LAYOUT         */
+/* =============================== */
+@media (max-width: 1024px) {
+  .card.guide {
+    padding: 1rem;
+  }
+
+  .card-header.donator {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .card-header.donator i {
+    font-size: 2rem;
+    padding: 1rem;
+    min-width: 60px;
+    border-radius: 10px;
+  }
+
+  .guide-info-title {
+    font-size: 1.1rem;
+  }
+
+  .guide-info-donator p {
+    font-size: 0.9rem;
+  }
+
+  .welcome-app-card p {
+    font-size: 0.9rem;
+  }
+
+  .welcome-app-card-body {
+    font-size: 1rem;
+  }
+
+  .welcome-impact {
+    font-size: 1rem;
+  }
+
+  .welcome-title,
+  .guide-title {
+    padding-left: 6px;
+    font-size: 1.3rem;
+  }
+
+  .guide-app-card-title .bloodbank {
+    justify-content: flex-start;
+  }
+
+  .welcome-impact {
+    justify-content: center;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  /* ---------- DASHBOARD CONTAINER ---------- */
+  .dashboard-container {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  /* ---------- CREATE OFFER BUTTON ---------- */
+  .create-post-container {
+    padding-left: 0;
+  }
+
+  .create-post-button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+
+  .create-post-icon {
+    font-size: 0.9rem;
+  }
+
+  /* ============================================= */
+  /*               POSTS & OFFERS CARDS            */
+  /* ============================================= */
+  .offer-valid-until,
+  .address {
+    font-size: 0.7rem;
+  }
+
+  .offer-discount {
+    font-size: 0.9rem;
+  }
+
+  /* ---------- PHONE LINK ---------- */
+  .phone-link {
+    font-size: 0.8rem;
+  }
+
+  /* ============================================= */
+  /*          NEARBY BLOODBANKS SECTION            */
+  /* ============================================= */
+  .bloodbank {
+    font-size: 1rem;
+  }
+
+  .bloodbank .address {
+    font-size: 0.85rem;
+  }
+
+  /* ============================================= */
+  /*                STATS SECTION                  */
+  /* ============================================= */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 8px;
+    min-height: 70px;
+    border-radius: 8px;
+    gap: 4px;
+  }
+
+  .stat-icon {
+    font-size: 18px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    line-height: 1.1;
+    opacity: 0.9;
+  }
+
+  /* ============================================= */
+  /*             ACHIEVEMENTS SECTION              */
+  /* ============================================= */
+  .achievements-grid {
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .achievement-square-card {
+    width: 100px;
+    height: 80px;
+    padding: 10px 6px;
+  }
+
+  .achievement-icon {
+    font-size: 26px;
+  }
+
+  .achievement-title {
+    font-size: 12px;
+  }
+
+  .achievement-points {
+    font-size: 10px;
+  }
+
+  /* ---------- TOOLTIP ---------- */
+  .tooltip {
+    font-size: 0.75rem;
+    max-width: 160px;
+  }
 }

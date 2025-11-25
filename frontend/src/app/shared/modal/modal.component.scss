@@ -1,7 +1,8 @@
 .modal-overlay {
   position: fixed;
   top: 0; left: 0;
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
@@ -9,7 +10,7 @@
   z-index: 1000;
 }
 
-.modal-content {
+.modal-structure {
   display: flex;
   flex-direction: column;
   background: white;
@@ -22,4 +23,34 @@
 .modal-footer {
   margin-top: 1rem;
   text-align: right;
+}
+
+@media (max-width: 1024px) {
+  .modal-content {
+    overflow-y: auto;
+  }
+
+  .modal-structure {
+    max-width: 90%;
+    height: 85%;
+    padding: 1.2rem;
+    border-radius: 10px;
+    margin: 0 1rem;
+  }
+
+  .modal-structure h2 {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .modal-footer {
+    margin-top: 1.2rem;
+    text-align: center;
+  }
+
+  .app-button.cancel {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
 }

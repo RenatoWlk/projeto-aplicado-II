@@ -30,7 +30,7 @@ export class LoginComponent {
 
   login() {
     if (this.loginForm.invalid) {
-      this.notificationService.show('Preencha todos os campos corretamente', 'error', 3000);
+      this.notificationService.show('Preencha todos os campos corretamente', 'error', 1500);
       return;
     }
 
@@ -39,13 +39,13 @@ export class LoginComponent {
 
     this.authService.login(email, password).subscribe({
       next: () => {
-        this.notificationService.show('Login realizado com sucesso!', 'success', 3000);
+        this.notificationService.show('Login realizado com sucesso!', 'success', 1500);
         setTimeout(() => {
           this.router.navigate(['/dashboard']);
-        }, 3500);      
+        }, 500);
       },
       error: (err) => {
-        this.notificationService.show('Email ou senha inválidos!', 'error', 3000);
+        this.notificationService.show('Email ou senha inválidos!', 'error', 1500);
       }
     });
 

@@ -104,3 +104,106 @@ body, html {
     }
   }
 }
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .login-box {
+    padding: 28px;
+    max-width: 330px;
+
+    h2 {
+      font-size: 1.5rem;
+
+      img {
+        width: 32px;
+        height: 32px;
+        margin-right: 6px;
+      }
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+
+      label {
+        font-size: 0.95rem;
+      }
+
+      input {
+        padding: 9px;
+        font-size: 0.95rem;
+      }
+    }
+
+    .actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+
+      button {
+        width: 100%;
+      }
+
+      .forgot {
+        font-size: 13px;
+      }
+    }
+
+    .divider {
+      margin: 16px 0;
+    }
+
+    .register {
+      font-size: 0.95rem;
+      padding: 10px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0.75rem;
+  }
+
+  .login-box {
+    padding: 22px;
+    max-width: 300px;
+
+    h2 {
+      font-size: 1.35rem;
+
+      img {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .input-group {
+      label {
+        font-size: 0.9rem;
+      }
+
+      input {
+        padding: 8px;
+        font-size: 0.9rem;
+      }
+    }
+
+    .actions {
+      gap: 8px;
+
+      .forgot {
+        font-size: 12px;
+      }
+    }
+
+    .register {
+      padding: 9px;
+      font-size: 0.9rem;
+    }
+  }
+}
