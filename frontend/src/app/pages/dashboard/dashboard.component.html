@@ -5,6 +5,83 @@
   <!-- =================== -->
   <app-bloodbank-dashboard *ngIf="userRole === roles.Bloodbank"></app-bloodbank-dashboard>
 
+  
+  <!-- ================= -->
+  <!-- WELCOME SECTION -->
+  <!-- ================= -->
+
+  <section class="app-card card-overflow">
+    <div class="welcome-app-card">
+        <div class="welcome-app-card-header">
+          <i class="fa-solid fa-droplet app-card-icon"></i>
+          <h1 class="welcome-title">Bem vindo ao Quatro Vidas!</h1>
+        </div>
+        <div class="welcome-app-card-body">
+          <p>
+            Doar sangue não precisa ser complicado. O <strong>Quatro Vidas</strong> 
+            conecta você aos bancos de sangue de forma simples e prática, tornando 
+            cada doação mais fácil e significativa. Aqui você encontra campanhas, 
+            acompanha seu histórico, recebe lembretes e ainda pode ser reconhecido 
+            pelo seu impacto!
+          </p>
+          <h3 class="welcome-impact">Junte-se a nós e transforme vidas com apenas alguns cliques!</h3>
+        </div>
+    </div>
+  </section>
+
+  <!-- ================= -->
+  <!-- GUIDE SECTION -->
+  <!-- ================= -->
+   
+  <section class="app-card card-overflow">
+    <div class="guide-app-card">
+      <div class="guide-card-header">
+        <i class="fa-solid fa-circle-question app-card-icon"></i>
+        <h1 class="guide-title">Informações Gerais:</h1>
+      </div>
+        <article class="card guide donator">
+            <header class="card-header donator">
+                <div class="guide-info-donator">
+                    <h3 class="guide-info-title">Para Doadores: </h3>
+                    <p class="guide-info-description">
+                      Responda questionários de aptidão, agende suas doações, encontre 
+                      bancos de sangue próximos no mapa e troque pontos por ofertas 
+                      exclusivas de parceiros. Doe sangue e seja recompensado!
+                    </p>                
+                </div>
+                <i class="fa-solid fa-users icon-donators"></i>
+            </header>
+        </article>
+                <article class="card guide donator">
+            <header class="card-header donator">
+                <div class="guide-info-donator">
+                    <h3 class="guide-info-title">Para Bancos de Sangue: </h3>
+                    <p class="guide-info-description">
+                      Promova campanhas de doação, disponibilize datas para agendamento 
+                      e acompanhe estatísticas detalhadas. Gerencie doações confirmando, 
+                      completando ou cancelando agendamentos de forma prática.
+                    </p>
+                </div>
+                <i class="fa-solid fa-hospital"></i>
+            </header>
+        </article>
+                <article class="card guide donator">
+            <header class="card-header donator">
+                <div class="guide-info-donator">
+                    <h3 class="guide-info-title">Para Parceiros: </h3>
+                    <p class="guide-info-description">
+                      Engaje doadores oferecendo descontos e brindes exclusivos. 
+                      Crie postagens com ofertas especiais e reconheça usuários 
+                      ativos através do sistema de pontos da plataforma.
+                    </p>
+                </div>
+                <i class="fa-solid fa-handshake-angle"></i>
+            </header>
+        </article>
+    </div>
+  </section>
+
+
   <!-- ================= -->
   <!-- CAMPAIGNS SECTION -->
   <!-- ================= -->
