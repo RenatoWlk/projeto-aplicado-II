@@ -1,1 +1,74 @@
-<p>rewards works!</p>
+<div class="rewards-page-container">
+
+  <section class="app-card">
+    <div class="app-card-header">
+      <i class="fas fa-coins app-card-icon"></i>
+      <h2 class="app-card-title">Recompensas</h2>
+    </div>
+
+    <div class="rewards-top">
+      <div class="points-summary">
+        <p class="points-label">Seus pontos</p>
+        <p class="points-value">{{ formatPoints(userPoints) }}</p>
+      </div>
+
+      <div class="controls">
+        <input class="search-input" type="text" placeholder="Buscar recompensas..." [(ngModel)]="query" />
+        <div class="filter-buttons">
+          <button type="button" [class.active]="filter==='all'" (click)="filter='all'">Todas</button>
+          <button type="button" [class.active]="filter==='available'" (click)="filter='available'">Disponíveis</button>
+          <button type="button" [class.active]="filter==='redeemed'" (click)="filter='redeemed'">Resgatadas</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards-grid-medium cards-grid-overflow-medium">
+      <article class="card reward-card" *ngFor="let reward of visibleRewards">
+        <header class="card-header">
+          <div class="reward-header-left">
+            <div class="reward-meta">
+              <h3 class="card-title">{{ reward.partnerName }}: {{ reward.title }}</h3>
+              <p class="card-subtitle">{{ reward.description }}</p>
+            </div>
+          </div>
+
+          <div class="reward-actions">
+            <p class="required-points">{{ reward.requiredPoints | number:'1.0-0' }} pontos para resgatar</p>
+            <p class="stock" *ngIf="reward.stock > 0">{{ reward.stock }} restantes</p>
+            <p class="stock out" *ngIf="reward.stock === 0">Esgotado</p>
+
+            <button class="app-button"
+                    [disabled]="!canRedeem(reward)"
+                    (click)="openRedeemModal(reward)">
+              {{ reward.redeemed ? 'Resgatado' : (canRedeem(reward) ? 'Resgatar' : 'Não pode resgatar') }}
+            </button>
+          </div>
+        </header>
+      </article>
+
+      <div *ngIf="visibleRewards.length === 0" class="card">
+        <p class="card-body">Nenhum resultado encontrado.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()"></div>
+  <div class="modal" *ngIf="isModalOpen" role="dialog" aria-modal="true" aria-labelledby="redeemTitle">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3 id="redeemTitle">{{ selectedReward?.title }}</h3>
+      <p class="modal-partner">{{ selectedReward?.partnerName }}</p>
+      <p class="modal-desc">{{ selectedReward?.description }}</p>
+      <p class="modal-required">{{ selectedReward?.requiredPoints }} pontos necessários</p>
+
+      <div class="modal-actions">
+        <button class="app-button" (click)="confirmRedeem()" [disabled]="!selectedReward || !canRedeem(selectedReward)">
+          Confirmar resgate
+        </button>
+        <button class="app-button" (click)="closeModal()" style="background-color: white; color: #c62828; border: 2px solid #c62828;">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

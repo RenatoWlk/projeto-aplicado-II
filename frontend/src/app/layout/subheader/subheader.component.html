@@ -27,6 +27,12 @@
                     <span class="subheader-text">Questionário</span>
                 </a>
             </li>
+            <li routerLinkActive="active" (click)="changeSlogan()">
+                <a [routerLink]="'/' + appRoutesPaths.REWARDS">
+                    <i class="fas fa-coins subheader-icon"></i>
+                    <span class="subheader-text">Recompensas</span>
+                </a>
+            </li>
         </ng-container>
 
         <!-------------- BLOODBANK SUBHEADER ---------------------->

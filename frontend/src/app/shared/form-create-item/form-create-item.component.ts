@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-form-create-item',
+  selector: 'form-create-item',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './form-create-item.component.html',
   styleUrls: ['./form-create-item.component.scss']
 })
 export class FormCreateItemComponent implements OnInit, OnChanges {
-  @Input() type: 'offer' | 'post' = 'post';
+  @Input() type: 'offer' | 'post' | 'reward' = 'post';
   @Output() submitForm = new EventEmitter<any>();
 
   form: FormGroup;
@@ -36,38 +36,52 @@ export class FormCreateItemComponent implements OnInit, OnChanges {
       startDate: [''],
       endDate: [''],
       validUntil: [''],
-      discountPercentage: [0]
+      discountPercentage: [0],
+      requiredPoints: [0],
+      stock: [0]
     });
   }
 
   private updateValidators(): void {
-    const discountControl = this.form.get('discountPercentage');
+    const discount = this.form.get('discountPercentage');
     const validUntil = this.form.get('validUntil');
-    const startControl = this.form.get('startDate');
-    const endControl = this.form.get('endDate');
+    const start = this.form.get('startDate');
+    const end = this.form.get('endDate');
+    const requiredPoints = this.form.get('requiredPoints');
+    const stock = this.form.get('stock');
 
-    if (!discountControl || !startControl || !validUntil || !endControl) return;
+    if (!discount || !validUntil || !start || !end || !requiredPoints || !stock) return;
 
     if (this.isOffer) {
-      discountControl.setValidators([Validators.min(1), Validators.max(100)]);
+      discount.setValidators([Validators.min(1), Validators.max(100)]);
       validUntil.setValidators([Validators.required]);
     } else {
-      discountControl.clearValidators();
+      discount.clearValidators();
       validUntil.clearValidators();
     }
 
     if (this.isPost) {
-      startControl.setValidators([Validators.required]);
-      endControl.setValidators([Validators.required])
+      start.setValidators([Validators.required]);
+      end.setValidators([Validators.required]);
     } else {
-      startControl.clearValidators();
-      endControl.clearValidators();
+      start.clearValidators();
+      end.clearValidators();
     }
 
-    discountControl.updateValueAndValidity();
+    if (this.isReward) {
+      requiredPoints.setValidators([Validators.required, Validators.min(1)]);
+      stock.setValidators([Validators.required, Validators.min(1)]);
+    } else {
+      requiredPoints.clearValidators();
+      stock.clearValidators();
+    }
+
+    discount.updateValueAndValidity();
     validUntil.updateValueAndValidity();
-    startControl.updateValueAndValidity();
-    endControl.updateValueAndValidity();
+    start.updateValueAndValidity();
+    end.updateValueAndValidity();
+    requiredPoints.updateValueAndValidity();
+    stock.updateValueAndValidity();
   }
 
   get isOffer(): boolean {
@@ -78,6 +92,10 @@ export class FormCreateItemComponent implements OnInit, OnChanges {
     return this.type === 'post';
   }
 
+  get isReward(): boolean {
+    return this.type === 'reward';
+  }
+
   hasError(controlName: string): boolean {
     const control = this.form.get(controlName);
     return !!(control && control.invalid && control.touched);
@@ -85,8 +103,21 @@ export class FormCreateItemComponent implements OnInit, OnChanges {
 
   onSubmit(): void {
     if (this.form.valid) {
-      this.submitForm.emit(this.form.value);
-      this.form.reset({ discountPercentage: 0 });
+      const value = this.form.value;
+
+      if (this.isReward) {
+        const payload = {
+          title: value.title,
+          description: value.body,
+          requiredPoints: value.requiredPoints,
+          stock: value.stock
+        };
+        this.submitForm.emit(payload);
+      } else {
+        this.submitForm.emit(value);
+      }
+
+      this.form.reset({ discountPercentage: 0, requiredPoints: 0, stock: 0 });
     }
   }
 }

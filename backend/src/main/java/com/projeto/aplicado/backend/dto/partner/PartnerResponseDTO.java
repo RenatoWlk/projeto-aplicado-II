@@ -1,5 +1,6 @@
 package com.projeto.aplicado.backend.dto.partner;
 
+import com.projeto.aplicado.backend.model.Reward;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.Address;
 import com.projeto.aplicado.backend.model.Offer;
@@ -18,4 +19,5 @@ public class PartnerResponseDTO {
     private Role role;
     private String cnpj;
     private List<Offer> offers;
+    private List<Reward> rewards;
 }

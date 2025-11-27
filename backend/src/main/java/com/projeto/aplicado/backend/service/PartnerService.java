@@ -37,6 +37,7 @@ public class PartnerService {
         partner.setRole(Role.PARTNER);
         partner.setCnpj(dto.getCnpj());
         partner.setOffers(dto.getOffers());
+        partner.setRewards(dto.getRewards());
 
         partner = partnerRepository.save(partner);
         return toResponseDTO(partner);
@@ -65,6 +66,7 @@ public class PartnerService {
         dto.setRole(partner.getRole());
         dto.setCnpj(partner.getCnpj());
         dto.setOffers(partner.getOffers());
+        dto.setRewards(partner.getRewards());
         return dto;
     }
 
@@ -86,6 +88,7 @@ public class PartnerService {
         partner.setPhone(dto.getPhone());
         partner.setCnpj(dto.getCnpj());
         partner.setOffers(dto.getOffers());
+        partner.setRewards(dto.getRewards());
         partner = partnerRepository.save(partner);
         return toResponseDTO(partner);
     }

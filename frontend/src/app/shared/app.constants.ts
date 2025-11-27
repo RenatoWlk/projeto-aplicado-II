@@ -8,5 +8,6 @@ export class AppRoutesPaths {
     public static readonly MAP = 'mapa';
     public static readonly DONATION_INFO = 'informacoesDoacao';
     public static readonly QUESTIONNAIRE = 'questionario';
+    public static readonly REWARDS = 'recompensas';
     public static readonly SCRT = 'segredinho';
 }

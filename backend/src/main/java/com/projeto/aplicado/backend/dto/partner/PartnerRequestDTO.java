@@ -2,6 +2,7 @@ package com.projeto.aplicado.backend.dto.partner;
 
 import com.projeto.aplicado.backend.model.Address;
 import com.projeto.aplicado.backend.model.Offer;
+import com.projeto.aplicado.backend.model.Reward;
 import lombok.Data;
 
 import java.util.Collections;
@@ -16,6 +17,7 @@ public class PartnerRequestDTO {
     private String phone;
     private String cnpj;
     private List<Offer> offers;
+    private List<Reward> rewards;
 
     public List<Offer> getOffers() {
         return offers == null ? Collections.emptyList() : offers;

@@ -11,6 +11,7 @@ import { BloodbankDashboardComponent } from './bloodbank-dashboard/bloodbank-das
 import { LeaderboardsComponent } from "./leaderboards/leaderboards.component";
 import { PreloaderComponent } from "../../shared/preloader/preloader.component";
 import { AppRoutesPaths } from '../../shared/app.constants';
+import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -42,6 +43,7 @@ export class DashboardComponent implements OnInit {
   nearbyBloodbanks: Bloodbank[] = [];
   userStats: UserStats = {} as any;
   isOfferModalOpen: boolean = false;
+  isRewardModalOpen: boolean = false;
   totalLitersDonated: string = "";
 
   // Preloaders
@@ -50,7 +52,11 @@ export class DashboardComponent implements OnInit {
   loadingBloodbanks: boolean = true;
   loadingStatsAndAchievements: boolean = true;
 
-  constructor(private dashboardService: DashboardService, private authService: AuthService) {}
+  constructor(
+    private dashboardService: DashboardService, 
+    private authService: AuthService,
+    private notificationService: NotificationBannerService,
+  ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isAuthenticated();
@@ -191,7 +197,16 @@ export class DashboardComponent implements OnInit {
     this.isOfferModalOpen = false;
 
     this.dashboardService.createOffer(data).subscribe(() => {
+      this.notificationService.show('Oferta criada com sucesso!', 'success', 1500);
       this.getOffers();
+    });
+  }
+
+  createNewReward(data: any): void {
+    this.isRewardModalOpen = false;
+
+    this.dashboardService.createReward(data).subscribe(() => {
+      this.notificationService.show('Recompensa criada com sucesso!', 'success', 1500);
     });
   }
 }

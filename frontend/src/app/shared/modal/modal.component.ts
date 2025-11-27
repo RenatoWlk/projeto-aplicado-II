@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-modal',
+  selector: 'modal',
   imports: [CommonModule],
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss']

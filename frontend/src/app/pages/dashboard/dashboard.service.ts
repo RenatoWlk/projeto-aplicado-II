@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { DashboardConstants } from './constants/dashboard.constants';
 import { BloodType } from '../../shared/app.enums';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { Reward } from '../rewards/rewards.service';
 
 export interface Address {
     street: string;
@@ -89,5 +90,10 @@ export class DashboardService {
         offer.partnerEmail = this.auth.getCurrentUserEmail();
         offer.partnerName = this.auth.getCurrentUserName();
         return this.http.post<NewOffer>(DashboardConstants.CREATE_OFFER_ENDPOINT, offer);
+    }
+
+    createReward(reward: Reward): Observable<any> {
+        reward.partnerId = this.auth.getCurrentUserId();
+        return this.http.post<Reward>(DashboardConstants.CREATE_REWARD_ENDPOINT, reward);
     }
 }

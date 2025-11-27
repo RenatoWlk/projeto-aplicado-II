@@ -13,7 +13,7 @@ import { PreloaderComponent } from "../../../shared/preloader/preloader.componen
 const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 @Component({
-  selector: 'app-bloodbank-dashboard',
+  selector: 'bloodbank-dashboard',
   imports: [CommonModule, BaseChartDirective, ModalComponent, FormCreateItemComponent, PreloaderComponent],
   templateUrl: './bloodbank-dashboard.component.html',
   styleUrl: './bloodbank-dashboard.component.scss'

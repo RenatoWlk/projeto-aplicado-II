@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { PreloaderComponent } from "../../../shared/preloader/preloader.component";
 
 @Component({
-  selector: 'app-leaderboards',
+  selector: 'leaderboards',
   imports: [CommonModule, PreloaderComponent],
   templateUrl: './leaderboards.component.html',
   styleUrls: ['./leaderboards.component.scss']

@@ -115,13 +115,13 @@
 <!-- ========================= -->
 <!-- CREATE NEW CAMPAIGN MODAL -->
 <!-- ========================= -->
-<app-modal
-    [title]="'Criar nova publicação'"
+<modal
+    title="Criar nova publicação"
     [visible]="isCampaignModalOpen"
     (close)="isCampaignModalOpen = false"
     >
-    <app-form-create-item
-        [type]="'post'"
+    <form-create-item
+        type="post"
         (submitForm)="createNewCampaign($event)">
-    </app-form-create-item>
-</app-modal>
+    </form-create-item>
+</modal>

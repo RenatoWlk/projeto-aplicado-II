@@ -1,0 +1,150 @@
+.rewards-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.rewards-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.points-summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.25rem 0;
+}
+
+.points-label {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.points-value {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: #232a31;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  min-width: 220px;
+}
+
+.filter-buttons button {
+  margin-left: 6px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+.filter-buttons button.active {
+  background: #c62828;
+  color: white;
+  border-color: #c62828;
+}
+
+.reward-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.reward-header-left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.reward-image {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f3f3f3;
+}
+
+.reward-meta .card-subtitle {
+  margin: 6px 0 0 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.reward-actions {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.required-points {
+  font-weight: 700;
+  color: #333;
+}
+
+.stock {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.stock.out {
+  color: #c62828;
+}
+
+/* modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 92%;
+  max-width: 520px;
+}
+
+.modal-content {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .reward-header-left { gap: 8px; }
+  .reward-image { width: 56px; height: 56px; }
+  .controls { width: 100%; justify-content: space-between; }
+  .filter-buttons button { padding: 6px 8px; }
+}

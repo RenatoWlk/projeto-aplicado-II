@@ -3,7 +3,7 @@
   <!-- =================== -->
   <!-- BLOODBANK DASHBOARD -->
   <!-- =================== -->
-  <app-bloodbank-dashboard *ngIf="userRole === roles.Bloodbank"></app-bloodbank-dashboard>
+  <bloodbank-dashboard *ngIf="userRole === roles.Bloodbank"></bloodbank-dashboard>
 
   <!-- =============== -->
   <!-- WELCOME SECTION -->
@@ -78,10 +78,22 @@
     </div>
   </section>
 
+  <!-- PARTNER ACTION BUTTONS -->
+  <div *ngIf="userRole === roles.Partner" class="create-post-container" style="justify-content: center;">
+    <button class="app-button create-post-button" (click)="isOfferModalOpen = true">
+      <i class="fas fa-plus create-post-icon"></i>
+      Criar nova oferta
+    </button>
+    <button class="app-button create-post-button" style="margin-left: 2rem;" (click)="isRewardModalOpen = true">
+      <i class="fas fa-plus create-post-icon"></i>
+      Criar nova recompensa
+    </button>
+  </div>
+
   <!-- ================= -->
   <!-- CAMPAIGNS SECTION -->
   <!-- ================= -->
-  <section class="app-card card-overflow">
+  <section class="app-card card-overflow" *ngIf="userRole !== roles.Partner">
     <div class="app-card-header">
       <i class="fas fa-book-medical app-card-icon"></i>
       <h2 class="app-card-title">{{ POSTS_SECTION_TITLE }}</h2>
@@ -115,12 +127,6 @@
     <div class="app-card-header">
       <i class="fas fa-tags app-card-icon"></i>
       <h2 class="app-card-title">{{ OFFERS_SECTION_TITLE }}</h2>
-      <div *ngIf="userRole === roles.Partner" class="create-post-container">
-        <button class="app-button create-post-button" (click)="isOfferModalOpen = true">
-          <i class="fas fa-plus create-post-icon"></i>
-          Criar nova oferta
-        </button>
-      </div>
     </div>
 
     <app-preloader *ngIf="loadingOffers" type="skeleton-cards" [count]="3" [size]="'medium'" [visible]="true"></app-preloader>
@@ -244,7 +250,7 @@
   <!-- ==================== -->
   <!-- LEADERBOARDS SECTION -->
   <!-- ==================== -->
-  <app-leaderboards></app-leaderboards>
+  <leaderboards></leaderboards>
 
   <!-- ======================= -->
   <!-- LOGIN REQUIRED TEMPLATE -->
@@ -270,15 +276,27 @@
   <!-- ====================== -->
   <!-- CREATE NEW OFFER MODAL -->
   <!-- ====================== -->
-  <app-modal
-    [title]="'Criar nova oferta'"
+  <modal
+    title="'Criar nova oferta'"
     [visible]="isOfferModalOpen"
-    (close)="isOfferModalOpen = false"
-  >
-    <app-form-create-item
-      [type]="'offer'"
+    (close)="isOfferModalOpen = false">
+    <form-create-item
+      type="offer"
       (submitForm)="createNewOffer($event)">
-    </app-form-create-item>
-  </app-modal>
+    </form-create-item>
+  </modal>
+
+  <!-- ======================= -->
+  <!-- CREATE NEW REWARD MODAL -->
+  <!-- ======================= -->
+  <modal
+    title="Criar nova recompensa"
+    [visible]="isRewardModalOpen"
+    (close)="isRewardModalOpen = false">
+    <form-create-item
+      type="reward"
+      (submitForm)="createNewReward($event)">
+    </form-create-item>
+  </modal>
 
 </div>

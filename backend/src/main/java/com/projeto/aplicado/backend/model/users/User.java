@@ -30,4 +30,5 @@ public class User extends UserBase {
     private List<UnlockedAchievement> unlockedAchievements = new ArrayList<>();
     private int totalPoints;
     private List<ScheduledDonation> scheduledDonations = new ArrayList<>();
+    private List<String> redeemedRewardsIds = new ArrayList<>();
 }

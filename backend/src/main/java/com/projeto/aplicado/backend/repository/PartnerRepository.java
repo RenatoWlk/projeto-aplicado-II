@@ -18,5 +18,8 @@ public interface PartnerRepository extends MongoRepository<Partner, String> {
 
     @Query("{ 'role': 'PARTNER' }")
     List<Partner> findAllPartners();
+
+    @Query("{ 'rewards.id': ?0 }")
+    Optional<Partner> findByRewardId(String rewardId);
 }
 

@@ -73,6 +73,11 @@ export const routes: Routes = [
           .then(m => m.QuestionnaireComponent)
       },
       {
+        path: AppRoutesPaths.REWARDS,
+        loadComponent: () => import('../app/pages/rewards/rewards.component')
+          .then(m => m.RewardsComponent)
+      },
+      {
         path: AppRoutesPaths.SCRT,
         loadComponent: () => import('../app/pages/scrt/scrt.component')
           .then(m => m.ScrtComponent)

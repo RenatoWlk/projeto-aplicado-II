@@ -1,6 +1,7 @@
 package com.projeto.aplicado.backend.model.users;
 
 import com.projeto.aplicado.backend.model.Offer;
+import com.projeto.aplicado.backend.model.Reward;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,4 +19,5 @@ import java.util.List;
 public class Partner extends UserBase {
     private String cnpj;
     private List<Offer> offers = new ArrayList<>();
+    private List<Reward> rewards = new ArrayList<>();
 }
