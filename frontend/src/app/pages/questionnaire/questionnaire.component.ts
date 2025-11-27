@@ -120,17 +120,24 @@ export class QuestionnaireComponent {
 
   private validateEligibility(relevantFields: string[]): boolean {
     this.invalidQuestions = [];
+    console.log('--- INICIANDO VALIDAÇÃO ---');
+    console.log('Campos Relevantes:', relevantFields);
 
     relevantFields.forEach((field) => {
       const value = this.form.get(field)?.value;
-      if (
-        (this.invalidIfYes.includes(field) && value === true) ||
-        (this.invalidIfNo.includes(field) && value === false)
-      ) {
+      
+      if (this.invalidIfYes.includes(field) && value === true) {
+        console.error(`REPROVADO POR SIM: O campo '${field}' é true e está na lista invalidIfYes`);
+        this.invalidQuestions.push(field);
+      }
+      
+      else if (this.invalidIfNo.includes(field) && value === false) {
+        console.error(`REPROVADO POR NÃO: O campo '${field}' é false e está na lista invalidIfNo`);
         this.invalidQuestions.push(field);
       }
     });
 
+    console.log('Questões Inválidas Finais:', this.invalidQuestions);
     return this.invalidQuestions.length === 0;
   }
 
@@ -158,6 +165,9 @@ export class QuestionnaireComponent {
       eligible: isEligible,
       userId: this.authService.getCurrentUserId(),
     };
+
+    console.log('--- DEBUG DO ENVIO ---');
+    console.log('Objeto JSON Completo sendo enviado:', JSON.stringify(data, null, 2));
 
     this.questionnaireService.submitQuestionnaire(data)
     .subscribe({
