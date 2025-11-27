@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { EligibilityQuestionnaireDTO, User, UserAccountService } from './user-account.service';
+import { DonationService, DonationStatus, DonationResponse } from '../../calendar/donator-calendar/donator-calendar.service';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Achievement, DashboardService, UserStats } from '../../dashboard/dashboard.service';
@@ -10,7 +11,7 @@ import { Router } from '@angular/router';
 import { QuestionnairePdfService } from './questionnaire-pdf.service';
 import { AppRoutesPaths } from '../../../shared/app.constants';
 import { DonationInfoService } from '../../donation-info/donation-info.service';
-import { DonationStatus } from '../../donation-info/donation.model';
+import { RouterModule } from '@angular/router';
 
 
 interface DonationHistory {
@@ -25,7 +26,7 @@ interface DonationHistory {
 @Component({
   selector: 'app-user-account',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: './user-account.component.html',
   styleUrls: ['./user-account.component.scss'],
 })
@@ -34,6 +35,7 @@ export class UserAccountComponent implements OnInit {
   user: User | null = null;
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
+  eligibleQuestionnaire: EligibilityQuestionnaireDTO | null = null;
 
   isLoading = false;
   error: string | null = null;
@@ -61,18 +63,19 @@ export class UserAccountComponent implements OnInit {
 
   constructor(
     private userService: UserAccountService,
+    private donationService: DonationService,
     private fb: FormBuilder,
     private authService: AuthService,
     private dashboardService: DashboardService,
     private pdfService: QuestionnairePdfService,
     private router: Router,
-    private donationService: DonationInfoService,
   ) {}
 
   ngOnInit(): void {
     this.userId = this.authService.getCurrentUserId();
     this.loadUser();
     this.initForms();
+    this.loadDonationHistory();
     this.getUserStats();
     this.loadDonationHistory();
   }
@@ -85,6 +88,8 @@ export class UserAccountComponent implements OnInit {
         this.user = userData;
         this.patchProfileForm();
         this.isLoading = false;
+
+        this.calculateDonationStatus();
       },
       error: () => {
         this.error = 'Failed to load user data';
@@ -98,8 +103,8 @@ export class UserAccountComponent implements OnInit {
       name: ['', Validators.required],
       email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
       address: [''],
-      phone: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
-      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+      phone: ['', [Validators.required, Validators.pattern(/^[\d\(\)\-\s]{11,16}$/)]],
+      cpf: ['', [Validators.required, Validators.pattern(/^[\d\.\-]{11,14}$/)]],
       gender: ['', Validators.required],
     });
 
@@ -123,26 +128,55 @@ export class UserAccountComponent implements OnInit {
     });
   }
 
+  activeAppointment: any | null = null; 
+
   private loadDonationHistory(): void {
     const userId = this.authService.getCurrentUserId();
     this.isLoading = true;
+
     this.donationService.getUserDonations(userId).subscribe({
-      next: (donation) => {
+      next: (donations: any[]) => { // Tipando como array
         this.isLoading = false;
-        this.donationHistory = donation.map((donation) => ({
+
+        const sortedDonations = donations.sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        this.donationHistory = sortedDonations.map((donation) => ({
           userName: donation.userName,
-          date: this.formatDate(donation.date),
+          date: this.formatDate(donation.date), // Mantendo sua formatação
           hour: donation.hour,
           status: donation.status,
           bloodBankName: donation.bloodBankName
-        }))
-        console.log(this.donationHistory)
+        }));
+
+        const futureAppointment = sortedDonations.find(d => 
+          d.status === DonationStatus.PENDING || 
+          d.status === DonationStatus.CONFIRMED
+        );
+        
+        this.activeAppointment = futureAppointment || null;
+
+        const lastCompleted = sortedDonations.find(d => d.status === DonationStatus.COMPLETED);
+
+        if (this.user) {
+          if (lastCompleted) {
+            this.user.lastDonation = lastCompleted.date;
+            this.calculateNextEligibleDate(lastCompleted.date);
+          } else {
+            this.user.lastDonation = ''; 
+            this.user.nextEligibleDonation = new Date().toISOString(); // Pode hoje
+          }
+        }
+
+        console.log('Histórico:', this.donationHistory);
+        console.log('Agendamento Ativo:', this.activeAppointment);
       },
       error: () => {
         this.error = 'Failed to load donation history';
         this.isLoading = false;
       }
-    })
+    });
   }
 
    /**
@@ -212,8 +246,6 @@ export class UserAccountComponent implements OnInit {
     this.editProfileMode = false;
     this.changePasswordMode = false;
     this.showQuestionnaires = false;
-
-    // TODO Load achievements logic here
   }
 
   showQuestionnairesView(): void {
@@ -237,12 +269,22 @@ export class UserAccountComponent implements OnInit {
   saveProfile(): void {
     if (this.profileForm.invalid) return;
 
-    this.isLoading = true;
-    const updatedData = {
-      ...this.user,
-      ...this.profileForm.getRawValue(),
-      address: { street: this.profileForm.value.address }
-    };
+  this.isLoading = true;
+
+  const rawData = this.profileForm.getRawValue();
+
+  if (rawData.phone) {
+      rawData.phone = rawData.phone.replace(/\D/g, ''); 
+  }
+  if (rawData.cpf) {
+      rawData.cpf = rawData.cpf.replace(/\D/g, '');
+  }
+
+  const updatedData = {
+    ...this.user,
+    ...rawData,
+    address: { street: this.profileForm.value.address }
+  };
 
     this.userService.updateUser(updatedData).subscribe({
       next: (updatedUser) => {
@@ -309,17 +351,65 @@ export class UserAccountComponent implements OnInit {
     }
   }
 
+  private calculateNextEligibleDate(lastDonationDateStr: string): void {
+    if (!this.user || !this.user.gender) return;
+
+    const lastDate = new Date(lastDonationDateStr);
+    const nextDate = new Date(lastDate);
+
+    // Regra de Negócio: Homens 60 dias, Mulheres 90 dias
+    const intervalDays = this.user.gender === 'Masculino' ? 60 : 90;
+    
+    // Adiciona os dias na data
+    nextDate.setDate(lastDate.getDate() + intervalDays);
+
+    // Converte para string ISO (YYYY-MM-DD) para salvar no objeto user
+    this.user.nextEligibleDonation = nextDate.toISOString().split('T')[0];
+  }
+
+  // --- MÉTODOS QUE ERAM "TODO" E AGORA ESTÃO IMPLEMENTADOS ---
+
   calculateDaysSinceLastDonation(): number | null {
-    return null;
+    if (!this.user?.lastDonation) return null;
+
+    const lastDate = new Date(this.user.lastDonation);
+    const today = new Date();
+
+    // Diferença em milissegundos
+    const diffTime = Math.abs(today.getTime() - lastDate.getTime());
+    // Converte para dias (1000ms * 60s * 60min * 24h)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    return diffDays;
   }
 
-  calculateDaysUntilNextDonation(): number | null {
-    return null;
+ calculateDaysUntilNextDonation(): number {
+    if (!this.user?.nextEligibleDonation) return 0;
+
+    const nextDate = new Date(this.user.nextEligibleDonation);
+    const today = new Date();
+    
+    // Zera horas para comparar apenas datas
+    today.setHours(0, 0, 0, 0);
+    nextDate.setHours(0, 0, 0, 0);
+
+    if (today >= nextDate) return 0;
+
+    const diffTime = nextDate.getTime() - today.getTime();
+    // Converte ms em dias
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
+  // Verifica se está apto pelo tempo
   canDonateNow(): boolean {
-    return false;
+    // Se não tem próxima data definida (nunca doou), então pode
+    if (!this.user?.nextEligibleDonation) return true;
+    
+    const daysRemaining = this.calculateDaysUntilNextDonation();
+    return daysRemaining <= 0;
   }
+
+  
 
   isFieldInvalid(form: FormGroup, field: string): boolean {
     const control = form.get(field);
@@ -342,10 +432,29 @@ export class UserAccountComponent implements OnInit {
   }
 
   public getUserStats(): void {
-    this.dashboardService.getUserStats(this.userId).subscribe((stats: UserStats) => {
-      stats.achievements = this.sortAchievementsByRarity(stats.achievements);
-      this.userStats = stats;
-      this.loadingStatsAndAchievements = false;
+    this.loadingStatsAndAchievements = true;
+
+    this.dashboardService.getUserStats(this.userId).subscribe({
+      next: (stats: UserStats) => {
+        if (stats.achievements) {
+          stats.achievements = this.sortAchievementsByRarity(stats.achievements);
+          
+          this.hasAchievements = stats.achievements.length > 0;
+          this.achievementsCount = stats.achievements.length;
+          this.userAchievements = stats.achievements;
+        } else {
+          this.hasAchievements = false;
+          this.achievementsCount = 0;
+        }
+
+        this.userStats = stats;
+        this.loadingStatsAndAchievements = false;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar stats', err);
+        this.loadingStatsAndAchievements = false;
+        this.hasAchievements = false; 
+      }
     });
   }
 
@@ -380,19 +489,82 @@ export class UserAccountComponent implements OnInit {
     return eligibilityFields.includes(fieldName);
   }
 
-  getAnswerClass(answer: boolean | null): string {
-  if (answer === null) return 'neutral';
-  return answer ? 'yes' : 'no';
+  getAnswerClass(field: string, answer: boolean | null | undefined): string {
+  if (answer === null || answer === undefined) return 'neutral';
+
+  const expected = this.expectedAnswers[field];
+
+  if (expected === undefined) return 'neutral';
+
+  return answer === expected ? 'yes' : 'no';
 }
   getAnswerIcon(answer: boolean | null): string {
   if (answer === null) return 'fa-question';
   return answer ? 'fa-check' : 'fa-xmark';
 }
 
-  getFormattedAnswer(answer: boolean | null): string {
+getFormattedAnswer(answer: boolean | null): string {
   if (answer === null) return '-';
   return answer ? 'Sim' : 'Não';
 }
+
+formatPhone(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    
+    if (value.length > 11) value = value.substring(0, 11);
+
+    if (value.length > 10) {
+      value = value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
+    } else if (value.length > 5) {
+      value = value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    } else if (value.length > 2) {
+      value = value.replace(/^(\d\d)(\d{0,5}).*/, '($1) $2');
+    }
+
+    input.value = value;
+    
+    this.profileForm.get('phone')?.setValue(value, { emitEvent: false });
+  }
+
+  formatCPF(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, ''); // Remove letras
+    
+    if (value.length > 11) value = value.substring(0, 11);
+
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+
+    input.value = value;
+    this.profileForm.get('cpf')?.setValue(value, { emitEvent: false });
+  }
+
+  getFormattedPhone(phone: string | undefined): string {
+    if (!phone) return 'Não informado';
+    
+    const value = phone.replace(/\D/g, '');
+    
+    if (value.length > 10) {
+      return value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
+    } else if (value.length > 5) {
+      return value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    } else {
+      return value;
+    }
+  }
+
+  getFormattedCPF(cpf: string | undefined): string {
+    if (!cpf) return 'Não informado';
+    
+    const value = cpf.replace(/\D/g, '');
+    
+    if (value.length <= 11) {
+      return value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    return value;
+  }
 
   getFormattedResultMessage(questionnaire: EligibilityQuestionnaireDTO): string {
     if (questionnaire.eligible) {
@@ -401,6 +573,7 @@ export class UserAccountComponent implements OnInit {
       return questionnaire.resultMessage || 'Algumas das suas respostas indicam que você não está apto para doação no momento. Consulte um profissional de saúde para mais informações.';
     }
   }
+  
 
   getRecommendations(questionnaire: EligibilityQuestionnaireDTO): string[] {
     const recommendations: string[] = [];
@@ -557,4 +730,64 @@ export class UserAccountComponent implements OnInit {
       this.pdfService.generatePDF(this.lastQuestionnaire, this.user.name);
     }
   }
+
+  private readonly expectedAnswers: Record<string, boolean> = {
+  // TRUE EXPECTED
+  age: true,
+  weight: true,
+  healthy: true,
+  donationBefore60: true,
+  // FALSE EXPECTED
+  pregnant: false,
+  recentChildbirth: false,
+  symptoms: false,
+  diseases: false,
+  medications: false,
+  procedures: false,
+  drugs: false,
+  partners: false,
+  tattooOrPiercing: false,
+  lastDonationMale: false,
+  lastDonationFemale: false,
+  covidVaccine: false,
+  yellowFeverVaccine: false,
+  travelRiskArea: false
+};
+
+private calculateDonationStatus(): void {
+    if (!this.user || !this.userId) return;
+
+    this.donationService.getUserDonations(this.userId).subscribe({
+      next: (donations: DonationResponse[]) => {
+        
+        const completedDonations = donations.filter(
+          donation => donation.status === DonationStatus.COMPLETED
+        );
+
+        if (completedDonations.length > 0) {
+          if (!this.user) return;
+          const lastDonation = completedDonations.sort((a, b) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          )[0];
+
+          this.user.lastDonation = lastDonation.date;
+
+          const intervalDays = (this.user.gender === 'Masculino') ? 90 : 120;
+
+          const lastDate = new Date(lastDonation.date);
+          const nextDate = new Date(lastDate);
+          nextDate.setDate(lastDate.getDate() + intervalDays);
+
+          this.user.nextEligibleDonation = nextDate.toISOString();
+        } else {
+          if (this.user) {
+            this.user.lastDonation = ''; 
+            this.user.nextEligibleDonation = new Date().toISOString();
+          }
+        }
+      },
+      error: (err) => console.error('Erro ao calcular status de doação', err)
+    });
+  }
+
 }

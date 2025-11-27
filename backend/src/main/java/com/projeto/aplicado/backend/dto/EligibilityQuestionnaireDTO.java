@@ -28,6 +28,5 @@ public class EligibilityQuestionnaireDTO {
     private boolean covidVaccine;
     private boolean yellowFeverVaccine;
     private boolean travelRiskArea;
-     @JsonProperty("isEligible")
     private boolean eligible;
 }
