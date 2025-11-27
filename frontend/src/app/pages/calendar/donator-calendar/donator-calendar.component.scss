@@ -241,3 +241,73 @@ mat-label {
     font-size: 1rem;
   }
 }
+
+.appointment-details {
+  margin: 16px 0;
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #666;
+    }
+
+    .value {
+      color: #333;
+    }
+  }
+}
+
+.info-message {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 4px;
+  color: #856404;
+  font-size: 14px;
+  text-align: center;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-confirmed {
+  background-color: #17a2b8;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-completed {
+  background-color: #28a745;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-cancelled {
+  background-color: #dc3545;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}

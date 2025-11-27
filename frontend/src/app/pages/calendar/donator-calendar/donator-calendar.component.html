@@ -1,57 +1,88 @@
 <div>
   <div class="calendar-layout">
     <div class="app-card schedule-card">
-        <div class="app-card-header">
-            <i class="fa-solid fa-calendar-days app-card-icon"></i>
-            <h2 class="app-card-title">Pré-agende sua doação!</h2>
-        </div>
-        <div>
-            <ul class="app-card-steps">
-                <li>Encontre bancos de sangue próximos;</li>
-                <li>Verifique a disponibilidade de datas;</li>
-                <li>Realize uma reserva de horário;</li>
-            </ul>
-        </div>
-        <form [formGroup]="scheduleForm" (ngSubmit)="scheduleDonation()" style="margin-top:20px">
-            <!-- Select bloodbank -->
-            <div class="form-body bloodBank-selector">
-                <mat-form-field appearance="outline" class="custom-form-field select full-width" subscriptSizing="dynamic">
-                    <mat-label>Selecione o banco de sangue disponível: </mat-label>
-                    <mat-select formControlName="availableBloodBanks" required (selectionChange)="onSelectBloodBankChange($event.value)">
-                        <mat-option *ngFor="let bloodBank of availableBloodBanks" [value]="bloodBank.id"> {{bloodBank.name}} </mat-option>
-                    </mat-select>
-                </mat-form-field>
+        <ng-container *ngIf="isLoadingAppointment">
+            <app-preloader type="spinner" [visible]="true"></app-preloader>
+        </ng-container>
+        <ng-container *ngIf="hasActiveAppointment && activeAppointment">
+            <div>
+                <h3>Verifique seu agendamento!</h3>
+            </div>
+            <div class="appointment-details">
+                <div class="detail-row">
+                    <span class="label">Data:</span>
+                    <span class="value">{{ activeAppointment.date }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Horário:</span>
+                    <span class="value">{{ activeAppointment.hour }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Banco de Sangue:</span>
+                    <span class="value">{{ activeAppointment.bloodBankName }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Status:</span>
+                    <span class="value" [ngClass]="getStatusClass(activeAppointment.status)">{{ activeAppointment.status }}</span>
+                </div>
+            </div>
+            <p class="info-message">
+                Você poderá realizar um novo agendamento após este ser cancelado ou completado.
+            </p>
+        </ng-container>
+        <ng-container *ngIf="hasActiveAppointment === false">
+            <div class="app-card-header">
+                <i class="fa-solid fa-calendar-days app-card-icon"></i>
+                <h2 class="app-card-title">Pré-agende sua doação!</h2>
             </div>
             <div>
-                <!-- Select date and time -->
-                <div *ngIf="selectedBloodBankId" class="form-body">
-                    <mat-form-field appearence="outline" class="custom-form-field full-width" subscriptSizing="dynamic">
-                        <mat-label>Data disponível: </mat-label>
-                        <input matInput class="selector"
-                            [matDatepicker]="datepicker" 
-                            (dateChange)="onDateSelected($event.value)"
-                            [matDatepickerFilter]="availableDonationDates"
-                            formControlName="selectedDate"
-                            >
-                        <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
-                        <mat-datepicker #datepicker [calendarHeaderComponent]="customHeader"></mat-datepicker>
-                    </mat-form-field>
-                    
-                    <mat-form-field *ngIf="availableDonationHours" appearence="outline" class="custom-form-field select full-width" subscriptSizing="dynamic">
-                        <mat-label>Horário disponível: </mat-label>
-                        <mat-select formControlName="donationTime"  class="custom-form-field full-width">
-                            <mat-option *ngFor="let slot of availableDonationHours" [value]="slot.time">
-                            {{ slot.time }} - {{ slot.availableSpots}} vaga(s)
-                            </mat-option>
+                <ul class="app-card-steps">
+                    <li>Encontre bancos de sangue próximos;</li>
+                    <li>Verifique a disponibilidade de datas;</li>
+                    <li>Realize uma reserva de horário;</li>
+                </ul>
+            </div>
+            <form [formGroup]="scheduleForm" (ngSubmit)="scheduleDonation()" style="margin-top:20px">
+                <!-- Select bloodbank -->
+                <div class="form-body bloodBank-selector">
+                    <mat-form-field appearance="outline" class="custom-form-field select full-width" subscriptSizing="dynamic">
+                        <mat-label>Selecione o banco de sangue disponível: </mat-label>
+                        <mat-select formControlName="availableBloodBanks" required (selectionChange)="onSelectBloodBankChange($event.value)">
+                            <mat-option *ngFor="let bloodBank of availableBloodBanks" [value]="bloodBank.id"> {{bloodBank.name}} </mat-option>
                         </mat-select>
                     </mat-form-field>
                 </div>
+                <div>
+                    <!-- Select date and time -->
+                    <div *ngIf="selectedBloodBankId" class="form-body">
+                        <mat-form-field appearence="outline" class="custom-form-field full-width" subscriptSizing="dynamic">
+                            <mat-label>Data disponível: </mat-label>
+                            <input matInput class="selector"
+                                [matDatepicker]="datepicker" 
+                                (dateChange)="onDateSelected($event.value)"
+                                [matDatepickerFilter]="availableDonationDates"
+                                formControlName="selectedDate"
+                                >
+                            <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+                            <mat-datepicker #datepicker [calendarHeaderComponent]="customHeader"></mat-datepicker>
+                        </mat-form-field>
+                        
+                        <mat-form-field *ngIf="availableDonationHours" appearence="outline" class="custom-form-field select full-width" subscriptSizing="dynamic">
+                            <mat-label>Horário disponível: </mat-label>
+                            <mat-select formControlName="donationTime"  class="custom-form-field full-width">
+                                <mat-option *ngFor="let slot of availableDonationHours" [value]="slot.time">
+                                {{ slot.time }} - {{ slot.availableSpots}} vaga(s)
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
 
-                <!-- SUBMIT -->
-                <div class="schedule-button-container">
-                    <button type="submit" class="schedule-btn">Agendar</button>
+                    <!-- SUBMIT -->
+                    <div class="schedule-button-container">
+                        <button type="submit" class="schedule-btn">Agendar</button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </ng-container>
     </div>
 </div>

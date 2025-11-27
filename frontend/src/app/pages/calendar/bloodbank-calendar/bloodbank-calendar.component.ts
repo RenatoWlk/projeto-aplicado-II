@@ -16,7 +16,8 @@ import { NotificationBannerService } from '../../../shared/notification-banner/n
 
 @Component({
   selector: 'app-bloodbank-calendar',
-  imports: [MatDatepickerModule, MatCardModule, CommonModule, MatFormFieldModule, MatDateRangeInput, MatTimepickerModule, ReactiveFormsModule, MatInputModule,
+  imports: [MatDatepickerModule, MatCardModule, CommonModule, MatFormFieldModule, MatDateRangeInput, MatTimepickerModule, ReactiveFormsModule, 
+    MatInputModule,
     MatFormFieldModule],
   templateUrl: './bloodbank-calendar.component.html',
   styleUrl: './bloodbank-calendar.component.scss',
@@ -124,4 +125,27 @@ export class BloodbankCalendarComponent {
     }
     return result;
   }
+
+  // // Filtro do calendário: habilita apenas datas a partir de amanhã
+  // availableSchedulingDates = new FormControl<d: Date | null>(boolean) => {
+  //   if (!d) return false;
+    
+  //   const tomorrow = new Date();
+  //   tomorrow.setDate(tomorrow.getDate() + 1);
+  //   tomorrow.setHours(0, 0, 0, 0); // Zera as horas
+    
+  //   const selectedDate = new Date(d);
+  //   selectedDate.setHours(0, 0, 0, 0);
+    
+  //   if (selectedDate < tomorrow) return false;
+    
+  //   return true;
+  // };
+
+  // private formatDateToString(date: Date): string {
+  //   const year = date.getFullYear();
+  //   const month = String(date.getMonth() + 1).padStart(2, '0');
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   return `${year}-${month}-${day}`;
+  // }
 }
