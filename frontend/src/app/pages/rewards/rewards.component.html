@@ -13,16 +13,21 @@
       </div>
 
       <div class="controls">
-        <input class="search-input" type="text" placeholder="Buscar recompensas..." [(ngModel)]="query" />
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input class="search-input" type="text" placeholder="Buscar recompensas..." [(ngModel)]="query" />
+        </div>
+        
         <div class="filter-buttons">
           <button type="button" [class.active]="filter==='all'" (click)="filter='all'">Todas</button>
+          <button type="button" [class.active]="filter==='canRedeem'" (click)="filter='canRedeem'">Posso resgatar</button>
           <button type="button" [class.active]="filter==='available'" (click)="filter='available'">Disponíveis</button>
           <button type="button" [class.active]="filter==='redeemed'" (click)="filter='redeemed'">Resgatadas</button>
         </div>
       </div>
     </div>
 
-    <div class="cards-grid-medium cards-grid-overflow-medium">
+    <div class="cards-grid-medium-low cards-grid-overflow-large">
       <article class="card reward-card" *ngFor="let reward of visibleRewards">
         <header class="card-header">
           <div class="reward-header-left">
@@ -37,10 +42,19 @@
             <p class="stock" *ngIf="reward.stock > 0">{{ reward.stock }} restantes</p>
             <p class="stock out" *ngIf="reward.stock === 0">Esgotado</p>
 
-            <button class="app-button"
-                    [disabled]="!canRedeem(reward)"
-                    (click)="openRedeemModal(reward)">
-              {{ reward.redeemed ? 'Resgatado' : (canRedeem(reward) ? 'Resgatar' : 'Não pode resgatar') }}
+            <button
+              class="app-button"
+              [ngClass]="{
+                'redeem-available': canRedeem(reward) && !reward.redeemed && reward.stock > 0,
+                'redeem-blocked': !canRedeem(reward) && !reward.redeemed && reward.stock > 0,
+                'redeemed': reward.redeemed,
+                'out-of-stock': reward.stock === 0
+              }"
+              [disabled]="reward.stock === 0 || (!canRedeem(reward) && !reward.redeemed)"
+              (click)="openRedeemModal(reward)"
+            >
+              {{ reward.redeemed ? 'Resgatado' : reward.stock === 0 ? 'Esgotado' : canRedeem(reward) ? 'Resgatar' : 'Pontos insuficientes'
+              }}
             </button>
           </div>
         </header>

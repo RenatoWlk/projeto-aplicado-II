@@ -44,6 +44,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* -------------------- CARD GRID (inside app-card) -------------------- */
+.cards-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .cards-grid-large {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
@@ -56,6 +62,12 @@ h1, h2, h3, h4, h5, h6 {
   gap: 1.5rem;
 }
 
+.cards-grid-medium-low {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
 .cards-grid-small {
   display: flex;
   flex-wrap: wrap;
@@ -65,7 +77,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .cards-grid-overflow-large {
-  max-height: 330px;
+  max-height: 380px;
   overflow-y: auto;
   scroll-behavior: smooth;
   padding-right: 0.5rem;
@@ -215,6 +227,12 @@ html, body { height: 100%; }
     gap: 1rem;
   }
 
+  .cards-grid-medium-low {
+    display: grid;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
   .cards-grid-small {
     justify-content: center;
     gap: 12px;
@@ -222,7 +240,7 @@ html, body { height: 100%; }
 
   /* -------- OVERFLOW CARDS -------- */
   .cards-grid-overflow-large {
-    max-height: 260px;
+    max-height: 300px;
     padding-right: 0.25rem;
     padding-left: 0.25rem;
   }

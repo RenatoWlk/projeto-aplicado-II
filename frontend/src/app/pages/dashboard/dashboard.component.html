@@ -101,7 +101,7 @@
 
     <app-preloader *ngIf="loadingPosts" type="skeleton-cards" [count]="3" [size]="'large'" [visible]="true"></app-preloader>
 
-    <div class="cards-grid-large cards-grid-overflow-large">
+    <div class="cards-column cards-grid-overflow-large">
       <article class="card post" *ngFor="let post of posts">
         <header class="card-header">
           <h3 class="card-title dashboard-card-title">{{ post.title }}</h3>

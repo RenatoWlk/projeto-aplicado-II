@@ -32,11 +32,11 @@
 
       <div *ngIf="selectedLocation" class="card">
         <div class="card-header">
-          <h3 class="card-title">{{ selectedLocation.name }}</h3>
+          <h3 class="card-title" style="font-size: medium;">{{ selectedLocation.name }}</h3>
         </div>
         <div class="card-body">
-          <p><i class="fa fa-map-marker-alt info-icon"></i>{{ selectedLocation.address.street }} - {{ selectedLocation.address.city}}-{{ selectedLocation.address.state }} - {{ selectedLocation.address.zipCode }}</p>
-          <a class="phone-link" style="cursor: pointer;" [href]="'tel:' + selectedLocation.phone"><i class="fa fa-phone info-icon"></i>{{ selectedLocation.phone }}</a>
+          <p style="font-size: small;"><i class="fa fa-map-marker-alt info-icon"></i>{{ selectedLocation.address.street }} - {{ selectedLocation.address.city}}-{{ selectedLocation.address.state }} - {{ selectedLocation.address.zipCode }}</p>
+          <a class="phone-link" style="cursor: pointer; font-size: small;" [href]="'tel:' + selectedLocation.phone"><i class="fa fa-phone info-icon"></i>{{ selectedLocation.phone }}</a>
         </div>
       </div>
     </ng-container>

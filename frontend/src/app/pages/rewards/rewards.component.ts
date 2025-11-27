@@ -14,7 +14,7 @@ import { NotificationBannerService } from '../../shared/notification-banner/noti
 export class RewardsComponent implements OnInit {
   userPoints = 0;
   query = '';
-  filter: 'all' | 'available' | 'redeemed' = 'all';
+  filter: 'all' | 'available' | 'canRedeem' | 'redeemed' = 'all';
 
   isModalOpen = false;
   selectedReward: Reward | null = null;
@@ -66,6 +66,7 @@ export class RewardsComponent implements OnInit {
         if (!matchesQuery) return false;
 
         if (this.filter === 'available') return !r.redeemed && r.stock > 0;
+        if (this.filter === 'canRedeem') return this.canRedeem(r);
         if (this.filter === 'redeemed') return !!r.redeemed;
         return true;
       })

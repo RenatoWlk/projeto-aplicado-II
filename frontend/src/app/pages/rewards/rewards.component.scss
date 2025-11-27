@@ -39,6 +39,16 @@
   gap: 1rem;
 }
 
+.search-container {
+  align-items: center;
+}
+
+.search-icon {
+  font-size: 17px;
+  color: #e53935;
+  margin-right: 8px;
+}
+
 .search-input {
   padding: 8px 12px;
   border-radius: 6px;
@@ -94,6 +104,57 @@
   gap: 6px;
 }
 
+/* ---------------- Reward action button styles ---------------- */
+
+/* Base button reset for reward state logic */
+.reward-actions .app-button {
+  width: 150px;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* Redeemable state (default/red) */
+.reward-actions .app-button.redeem-available {
+  background-color: #c62828;
+  border-color: #c62828;
+  color: #fff;
+}
+
+.reward-actions .app-button.redeem-available:hover {
+  background-color: #fff;
+  color: #c62828;
+}
+
+/* Not enough points */
+.reward-actions .app-button.redeem-blocked {
+  background-color: #e0e0e0;
+  border-color: #d5d5d5;
+  color: #888;
+  cursor: not-allowed;
+}
+
+/* Already redeemed */
+.reward-actions .app-button.redeemed {
+  pointer-events: none;
+  cursor: default;
+  background-color: #2e7d32;
+  border-color: #2e7d32;
+  color: white;
+}
+
+.reward-actions .app-button.redeemed:hover {
+  opacity: 0.9;
+}
+
+/* Out of stock */
+.reward-actions .app-button.out-of-stock {
+  background-color: #555;
+  border-color: #444;
+  color: white;
+  cursor: not-allowed;
+}
+
 .required-points {
   font-weight: 700;
   color: #333;
@@ -143,8 +204,117 @@
 }
 
 @media (max-width: 768px) {
-  .reward-header-left { gap: 8px; }
-  .reward-image { width: 56px; height: 56px; }
-  .controls { width: 100%; justify-content: space-between; }
-  .filter-buttons button { padding: 6px 8px; }
+
+  .rewards-page-container {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .rewards-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .points-summary {
+    align-items: flex-start;
+  }
+
+  .points-value {
+    font-size: 1.4rem;
+  }
+
+  .controls {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .search-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: unset;
+  }
+
+  .filter-buttons {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .filter-buttons button {
+    width: 100%;
+    padding: 8px 10px;
+    margin-left: 0;
+  }
+
+  /* ------- Cards ------- */
+  .cards-grid-medium-low {
+    margin-top: 1rem;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .reward-card {
+    padding: 0.8rem;
+  }
+
+  .reward-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .reward-meta .card-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .reward-actions {
+    margin-left: 0;
+    align-items: flex-start;
+  }
+
+  .required-points {
+    font-size: 0.85rem;
+  }
+
+  .stock {
+    font-size: 0.75rem;
+  }
+
+  .app-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* ------- Modal ------- */
+  .modal {
+    width: 94%;
+    max-width: none;
+  }
+
+  .modal-content {
+    padding: 1rem;
+    border-radius: 6px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-actions .app-button {
+    width: 100%;
+  }
 }
