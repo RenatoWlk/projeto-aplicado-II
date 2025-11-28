@@ -1,0 +1,32 @@
+.offer-tag {
+    background-color: #e53935;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.reward-points {
+    background-color: #232a31;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    font-size: 1rem;
+    color: #666;
+    margin-top: 1rem;
+}
+
+.offer-card,
+.reward-card {
+    position: relative;
+    padding: 1.2rem;
+}
+
+.card-subtitle strong {
+    color: #e53935;
+}

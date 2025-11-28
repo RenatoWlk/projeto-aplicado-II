@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { DashboardConstants } from './constants/dashboard.constants';
 import { BloodType } from '../../shared/app.enums';
 import { AuthService } from '../../core/services/auth/auth.service';
-import { Reward } from '../rewards/rewards.service';
 
 export interface Address {
     street: string;
@@ -22,6 +21,7 @@ export interface Achievement {
 }
 
 export interface Offer {
+    id: string;
     partnerName: string;
     title: string;
     body: string;
@@ -55,15 +55,6 @@ export interface Bloodbank {
     distance: number;
 }
 
-export interface NewOffer {
-    partnerEmail: string;
-    partnerName: string;
-    title: string;
-    body: string;
-    validUntil: Date;
-    discountPercentage: number;
-}
-
 @Injectable({
     providedIn: 'root'
 })
@@ -84,16 +75,5 @@ export class DashboardService {
 
     getUserStats(userId: string): Observable<UserStats> {
         return this.http.get<UserStats>(`/api/users/${userId}/stats`);
-    }
-
-    createOffer(offer: NewOffer): Observable<NewOffer> {
-        offer.partnerEmail = this.auth.getCurrentUserEmail();
-        offer.partnerName = this.auth.getCurrentUserName();
-        return this.http.post<NewOffer>(DashboardConstants.CREATE_OFFER_ENDPOINT, offer);
-    }
-
-    createReward(reward: Reward): Observable<any> {
-        reward.partnerId = this.auth.getCurrentUserId();
-        return this.http.post<Reward>(DashboardConstants.CREATE_REWARD_ENDPOINT, reward);
     }
 }

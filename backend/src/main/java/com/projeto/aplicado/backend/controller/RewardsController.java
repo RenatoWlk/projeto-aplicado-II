@@ -30,4 +30,13 @@ public class RewardsController {
     public ResponseEntity<RewardResponseDTO> create(@RequestBody RewardDTO dto) {
         return ResponseEntity.ok(rewardsService.create(dto));
     }
+
+    @DeleteMapping("/delete/{partnerId}/{rewardId}")
+    public ResponseEntity<Void> deleteReward(
+            @PathVariable String partnerId,
+            @PathVariable String rewardId
+    ) {
+        rewardsService.deleteReward(partnerId, rewardId);
+        return ResponseEntity.noContent().build();
+    }
 }

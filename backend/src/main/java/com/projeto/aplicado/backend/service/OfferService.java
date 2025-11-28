@@ -4,9 +4,13 @@ import com.projeto.aplicado.backend.dto.OfferDTO;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.Offer;
 import com.projeto.aplicado.backend.model.enums.Role;
+import com.projeto.aplicado.backend.model.users.Partner;
 import com.projeto.aplicado.backend.repository.PartnerRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,6 +35,7 @@ public class OfferService {
                 .orElseThrow(() -> new UserNotFoundException(Role.PARTNER, "Partner not found with email provided when creating an offer"));
 
         Offer offer = new Offer();
+        offer.setId(new ObjectId().toHexString());
         offer.setTitle(dto.getTitle());
         offer.setBody(dto.getBody());
         offer.setValidUntil(dto.getValidUntil());
@@ -40,6 +45,19 @@ public class OfferService {
         partnerRepository.save(partner);
 
         return toOfferDTO(partner.getName(), offer);
+    }
+
+    public void deleteOffer(String partnerId, String offerId) {
+        Partner partner = partnerRepository.findById(partnerId)
+                .orElseThrow(() -> new UserNotFoundException(Role.PARTNER, "Partner not found"));
+
+        boolean removed = partner.getOffers().removeIf(o -> o.getId().equals(offerId));
+
+        if (!removed) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Offer not found");
+        }
+
+        partnerRepository.save(partner);
     }
 
     /**
@@ -56,6 +74,7 @@ public class OfferService {
 
     private OfferDTO toOfferDTO(String partnerName, Offer offer) {
         OfferDTO dto = new OfferDTO();
+        dto.setId(offer.getId());
         dto.setPartnerName(partnerName);
         dto.setTitle(offer.getTitle());
         dto.setBody(offer.getBody());

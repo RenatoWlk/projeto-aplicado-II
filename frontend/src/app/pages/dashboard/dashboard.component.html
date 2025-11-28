@@ -5,6 +5,11 @@
   <!-- =================== -->
   <bloodbank-dashboard *ngIf="userRole === roles.Bloodbank"></bloodbank-dashboard>
 
+  <!-- ================= -->
+  <!-- PARTNER DASHBOARD -->
+  <!-- ================= -->
+  <partner-dashboard *ngIf="userRole === roles.Partner"></partner-dashboard>
+
   <!-- =============== -->
   <!-- WELCOME SECTION -->
   <!-- =============== -->
@@ -77,18 +82,6 @@
         </article>
     </div>
   </section>
-
-  <!-- PARTNER ACTION BUTTONS -->
-  <div *ngIf="userRole === roles.Partner" class="create-post-container" style="justify-content: center;">
-    <button class="app-button create-post-button" (click)="isOfferModalOpen = true">
-      <i class="fas fa-plus create-post-icon"></i>
-      Criar nova oferta
-    </button>
-    <button class="app-button create-post-button" style="margin-left: 2rem;" (click)="isRewardModalOpen = true">
-      <i class="fas fa-plus create-post-icon"></i>
-      Criar nova recompensa
-    </button>
-  </div>
 
   <!-- ================= -->
   <!-- CAMPAIGNS SECTION -->
@@ -272,31 +265,5 @@
       </p>
     </div>
   </ng-template>
-
-  <!-- ====================== -->
-  <!-- CREATE NEW OFFER MODAL -->
-  <!-- ====================== -->
-  <modal
-    title="'Criar nova oferta'"
-    [visible]="isOfferModalOpen"
-    (close)="isOfferModalOpen = false">
-    <form-create-item
-      type="offer"
-      (submitForm)="createNewOffer($event)">
-    </form-create-item>
-  </modal>
-
-  <!-- ======================= -->
-  <!-- CREATE NEW REWARD MODAL -->
-  <!-- ======================= -->
-  <modal
-    title="Criar nova recompensa"
-    [visible]="isRewardModalOpen"
-    (close)="isRewardModalOpen = false">
-    <form-create-item
-      type="reward"
-      (submitForm)="createNewReward($event)">
-    </form-create-item>
-  </modal>
 
 </div>

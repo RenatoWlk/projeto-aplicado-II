@@ -89,6 +89,19 @@ public class RewardsService {
         return response;
     }
 
+    public void deleteReward(String partnerId, String rewardId) {
+        Partner partner = partnerRepository.findById(partnerId)
+                .orElseThrow(() -> new UserNotFoundException(Role.PARTNER, "Partner not found"));
+
+        boolean removed = partner.getRewards().removeIf(r -> r.getId().equals(rewardId));
+
+        if (!removed) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reward not found");
+        }
+
+        partnerRepository.save(partner);
+    }
+
     /**
      * Redeem a reward for a user. Backend is authoritative.
      * This method:

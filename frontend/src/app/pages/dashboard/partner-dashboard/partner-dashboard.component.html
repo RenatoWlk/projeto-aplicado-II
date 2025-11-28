@@ -1,0 +1,141 @@
+<!-- ====================== -->
+<!-- PARTNER ACTION BUTTONS -->
+<!-- ====================== -->
+<section class="app-card" style="margin-bottom: 2rem;">
+    <div class="app-card-header">
+        <i class="fas fa-handshake app-card-icon"></i>
+        <h2 class="app-card-title">Gerenciar ofertas e recompensas</h2>
+    </div>
+    <!-- PARTNER ACTION BUTTONS -->
+    <div class="create-post-container" style="display: flex; flex: 1; justify-content: center;">
+        <button class="app-button create-post-button" (click)="isOfferModalOpen = true">
+            <i class="fas fa-plus create-post-icon"></i>
+            Criar nova oferta 
+        </button>
+        <button 
+            class="app-button create-post-button"
+            style="margin-left: 2rem;"
+            (click)="isRewardModalOpen = true">
+                <i class="fas fa-plus create-post-icon"></i>
+                Criar nova recompensa
+        </button>
+    </div>
+</section>
+
+<!-- ============== -->
+<!-- PARTNER OFFERS -->
+<!-- ============== -->
+<section class="app-card">
+    <div class="app-card-header">
+        <i class="fas fa-tags app-card-icon"></i>
+        <h2 class="app-card-title">Minhas ofertas</h2>
+    </div>
+
+    <app-preloader *ngIf="isLoadingOffers" type="spinner" [visible]="true"></app-preloader>
+
+    <div class="cards-grid-large" *ngIf="!isLoadingOffers && partnerOffers.length > 0">
+        <article class="card offer-card" *ngFor="let offer of partnerOffers">
+            <button class="delete-icon" (click)="openDeleteModal('offer', offer)">
+                <i class="fas fa-trash"></i>
+            </button>
+
+            <header class="card-header">
+                <h3 class="card-title">{{ offer.title }}</h3>
+            </header>
+
+            <p class="card-body">{{ offer.body }}</p>
+
+            <footer class="card-footer">
+                <p class="card-subtitle">
+                    Válido até <strong>{{ offer.validUntil | date:'dd/MM/yyyy' }}</strong>
+                </p>
+                <span class="offer-tag">{{ offer.discountPercentage }}% OFF</span>
+            </footer>
+        </article>
+    </div>
+
+    <p *ngIf="!isLoadingOffers && partnerOffers.length === 0" class="empty-state">
+        Nenhuma oferta criada ainda.
+    </p>
+</section>
+
+
+<!-- =============== -->
+<!-- PARTNER REWARDS -->
+<!-- =============== -->
+<section class="app-card" style="margin-top: 2rem;">
+    <div class="app-card-header">
+        <i class="fas fa-gift app-card-icon"></i>
+        <h2 class="app-card-title">Minhas recompensas</h2>
+    </div>
+
+    <app-preloader *ngIf="isLoadingRewards" type="spinner" [visible]="true"></app-preloader>
+
+    <div class="cards-grid-large" *ngIf="!isLoadingRewards && partnerRewards.length > 0">
+        <article class="card reward-card" *ngFor="let reward of partnerRewards">
+            <button class="delete-icon" (click)="openDeleteModal('reward', reward)">
+                <i class="fas fa-trash"></i>
+            </button>
+
+            <header class="card-header">
+                <h3 class="card-title">{{ reward.title }}</h3>
+            </header>
+
+            <p class="card-body">{{ reward.description }}</p>
+
+            <footer class="card-footer">
+                <p class="stock" *ngIf="reward.stock > 0">{{ reward.stock }} restantes</p>
+                <p class="stock out" *ngIf="reward.stock === 0">Esgotado</p>
+                <span class="reward-points">{{ reward.requiredPoints }} pontos</span>
+            </footer>
+        </article>
+    </div>
+
+    <p *ngIf="!isLoadingRewards && partnerRewards.length === 0" class="empty-state">
+        Nenhuma recompensa criada ainda.
+    </p>
+</section>
+
+
+<!-- ====================== -->
+<!-- CREATE NEW OFFER MODAL -->
+<!-- ====================== -->
+<modal
+    title="Criar nova oferta"
+    [visible]="isOfferModalOpen"
+    (close)="isOfferModalOpen = false">
+    <form-create-item
+        type="offer"
+        (submitForm)="createNewOffer($event)">
+    </form-create-item>
+</modal>
+
+<!-- ======================= -->
+<!-- CREATE NEW REWARD MODAL -->
+<!-- ======================= -->
+<modal
+    title="Criar nova recompensa"
+    [visible]="isRewardModalOpen"
+    (close)="isRewardModalOpen = false">
+    <form-create-item
+        type="reward"
+        (submitForm)="createNewReward($event)">
+    </form-create-item>
+</modal>
+
+<!-- ==================== -->
+<!-- DELETE CONFIRM MODAL -->
+<!-- ==================== -->
+<modal
+    title="Confirmar exclusão"
+    [visible]="isDeleteModalOpen"
+    (close)="isDeleteModalOpen = false">
+
+    <div style="text-align: center; padding: 1rem;">
+        <p>Deseja realmente excluir esta {{ deleteType === 'offer' ? 'oferta' : 'recompensa' }}?</p>
+
+        <button class="app-button delete-button" (click)="confirmDelete()">
+            Excluir
+        </button>
+    </div>
+</modal>

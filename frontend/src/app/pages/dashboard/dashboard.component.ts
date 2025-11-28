@@ -5,18 +5,16 @@ import { UserStats, Bloodbank, Campaign, DashboardService, Offer } from './dashb
 import { AuthService } from '../../core/services/auth/auth.service';
 import { RouterModule } from '@angular/router';
 import { UserRole } from '../../shared/app.enums';
-import { ModalComponent } from '../../shared/modal/modal.component';
-import { FormCreateItemComponent } from '../../shared/form-create-item/form-create-item.component';
 import { BloodbankDashboardComponent } from './bloodbank-dashboard/bloodbank-dashboard.component';
 import { LeaderboardsComponent } from "./leaderboards/leaderboards.component";
 import { PreloaderComponent } from "../../shared/preloader/preloader.component";
 import { AppRoutesPaths } from '../../shared/app.constants';
-import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
+import { PartnerDashboardComponent } from "./partner-dashboard/partner-dashboard.component";
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, ModalComponent, FormCreateItemComponent, BloodbankDashboardComponent, LeaderboardsComponent, PreloaderComponent],
+  imports: [CommonModule, RouterModule,  BloodbankDashboardComponent, LeaderboardsComponent, PreloaderComponent, PartnerDashboardComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -42,8 +40,6 @@ export class DashboardComponent implements OnInit {
   offers: Offer[] = [];
   nearbyBloodbanks: Bloodbank[] = [];
   userStats: UserStats = {} as any;
-  isOfferModalOpen: boolean = false;
-  isRewardModalOpen: boolean = false;
   totalLitersDonated: string = "";
 
   // Preloaders
@@ -55,7 +51,6 @@ export class DashboardComponent implements OnInit {
   constructor(
     private dashboardService: DashboardService, 
     private authService: AuthService,
-    private notificationService: NotificationBannerService,
   ) {}
 
   ngOnInit(): void {
@@ -191,22 +186,5 @@ export class DashboardComponent implements OnInit {
 
   calculateLitersDonated(donations: number): string {
     return (donations * this.LITERS_PER_DONATION).toFixed(2).toString() + " Litros";
-  }
-
-  createNewOffer(data: any): void {
-    this.isOfferModalOpen = false;
-
-    this.dashboardService.createOffer(data).subscribe(() => {
-      this.notificationService.show('Oferta criada com sucesso!', 'success', 1500);
-      this.getOffers();
-    });
-  }
-
-  createNewReward(data: any): void {
-    this.isRewardModalOpen = false;
-
-    this.dashboardService.createReward(data).subscribe(() => {
-      this.notificationService.show('Recompensa criada com sucesso!', 'success', 1500);
-    });
   }
 }

@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Offer {
+    private String id;
     private String title;
     private String body;
     private LocalDate validUntil;
