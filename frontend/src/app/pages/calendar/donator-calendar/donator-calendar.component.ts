@@ -48,7 +48,9 @@ export class DonatorCalendarComponent implements OnInit {
   availableHours: any[] = [];
   donations: any[] = [];
   isLoadingAppointment: boolean = true;
-
+  gender: string | null = null;
+  canDonateAgain: boolean = true;
+  nextDonationDate: string | null = null;
   // Propriedades para agendamento ativo
   hasActiveAppointment: boolean | null = null;
   activeAppointment: {
@@ -62,12 +64,14 @@ export class DonatorCalendarComponent implements OnInit {
     private authService: AuthService,
     private notificationService: NotificationBannerService,
     private cdr: ChangeDetectorRef,
+    private userService: UserAccountService,
   ) {}
 
   donationService = inject(DonationService);
 
   async ngOnInit(): Promise<void> {
     await this.checkActiveAppointment();
+    await this.checkIfUserCanDonate();
   }
 
   private loadBloodBanks() {
@@ -79,6 +83,71 @@ export class DonatorCalendarComponent implements OnInit {
       error: () => this.notificationService.show('Erro ao carregar bancos de sangue')
     });
   }
+
+  private async checkIfUserCanDonate(): Promise<void> {
+    const userId = this.authService.getCurrentUserId();
+    
+    this.userService.getUser().subscribe({
+      next: (user: any) => {
+        this.gender = user.gender;
+        
+        // Define o intervalo de dias baseado no gênero
+        const intervalDays = this.gender === 'Masculino' ? 90 : 120;
+        
+        // Busca as doações do usuário
+        this.donationService.getUserDonations(userId).subscribe({
+          next: (donations: any[]) => {
+            // Encontra a última doação completada
+            const completedDonations = donations.filter(
+              donation => donation.status === 'COMPLETED'
+            );
+            
+            if (completedDonations.length > 0) {
+              // Ordena por data decrescente e pega a mais recente
+              const lastCompletedDonation = completedDonations.sort((a, b) => 
+                new Date(b.date).getTime() - new Date(a.date).getTime()
+              )[0];
+              
+              // Calcula a data da última doação
+              const lastDonationDate = new Date(lastCompletedDonation.date);
+              
+              // Calcula a próxima data permitida
+              const nextAllowedDate = new Date(lastDonationDate);
+              nextAllowedDate.setDate(nextAllowedDate.getDate() + intervalDays);
+              
+              // Verifica se já passou o intervalo necessário
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              nextAllowedDate.setHours(0, 0, 0, 0);
+              
+              if (today < nextAllowedDate) {
+                this.canDonateAgain = false;
+                this.nextDonationDate = this.formatAppointmentDate(nextAllowedDate.toISOString());
+              } else {
+                this.canDonateAgain = true;
+                this.nextDonationDate = null;
+              }
+            } else {
+              // Se não há doações completadas, pode doar
+              this.canDonateAgain = true;
+              this.nextDonationDate = null;
+            }
+            
+            this.cdr.markForCheck();
+          },
+          error: () => {
+            this.notificationService.show('Erro ao verificar histórico de doações');
+            this.cdr.markForCheck();
+          }
+        });
+      },
+      error: () => {
+        this.notificationService.show('Erro ao carregar usuário');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
 
   /**
    * Verifica se o usuário possui um agendamento ativo
@@ -98,7 +167,6 @@ export class DonatorCalendarComponent implements OnInit {
         if (activeDonation) {
           this.isLoadingAppointment = false;
           this.hasActiveAppointment = true;
-          console.log(activeDonation);
           this.updateActiveAppointmentData(activeDonation);
         } else {
           this.isLoadingAppointment = false;
