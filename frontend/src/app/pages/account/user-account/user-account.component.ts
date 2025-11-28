@@ -9,6 +9,18 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { QuestionnairePdfService } from './questionnaire-pdf.service';
 import { AppRoutesPaths } from '../../../shared/app.constants';
+import { DonationInfoService } from '../../donation-info/donation-info.service';
+import { DonationStatus } from '../../donation-info/donation.model';
+
+
+interface DonationHistory {
+  userName?: string;
+  date: string;
+  hour: string;
+  status: DonationStatus;
+  bloodBankName?: string;
+}
+
 
 @Component({
   selector: 'app-user-account',
@@ -26,7 +38,7 @@ export class UserAccountComponent implements OnInit {
   isLoading = false;
   error: string | null = null;
   successMessage: string | null = null;
-
+  donationHistory: DonationHistory[] = [];
   userStats: UserStats = {} as any;
   private userId: string = '';
   editProfileMode = false;
@@ -54,6 +66,7 @@ export class UserAccountComponent implements OnInit {
     private dashboardService: DashboardService,
     private pdfService: QuestionnairePdfService,
     private router: Router,
+    private donationService: DonationInfoService,
   ) {}
 
   ngOnInit(): void {
@@ -61,6 +74,7 @@ export class UserAccountComponent implements OnInit {
     this.loadUser();
     this.initForms();
     this.getUserStats();
+    this.loadDonationHistory();
   }
 
 
@@ -107,6 +121,63 @@ export class UserAccountComponent implements OnInit {
       cpf: this.user.cpf,
       gender: this.user.gender,
     });
+  }
+
+  private loadDonationHistory(): void {
+    const userId = this.authService.getCurrentUserId();
+    this.isLoading = true;
+    this.donationService.getUserDonations(userId).subscribe({
+      next: (donation) => {
+        this.isLoading = false;
+        this.donationHistory = donation.map((donation) => ({
+          userName: donation.userName,
+          date: this.formatDate(donation.date),
+          hour: donation.hour,
+          status: donation.status,
+          bloodBankName: donation.bloodBankName
+        }))
+        console.log(this.donationHistory)
+      },
+      error: () => {
+        this.error = 'Failed to load donation history';
+        this.isLoading = false;
+      }
+    })
+  }
+
+   /**
+   * Formata a data para exibição
+   */
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('pt-BR');
+  }
+
+  /**
+   * Retorna classe CSS baseada no status
+   */
+  getStatusClass(status: DonationStatus): string {
+    switch(status) {
+      case DonationStatus.PENDING: return 'status-pending';
+      case DonationStatus.CONFIRMED: return 'status-confirmed';
+      case DonationStatus.COMPLETED: return 'status-completed';
+      case DonationStatus.CANCELLED: return 'status-cancelled';
+      default: return '';
+    }
+  }
+
+  /**
+   * Retorna texto legível do status
+   */
+  getStatusLabel(status: DonationStatus): string {
+    switch(status) {
+      case DonationStatus.PENDING: return 'Pendente';
+      case DonationStatus.CONFIRMED: return 'Confirmado';
+      case DonationStatus.COMPLETED: return 'Completado';
+      case DonationStatus.CANCELLED: return 'Cancelado';
+      case DonationStatus.NO_SHOW: return 'Não Compareceu';
+      default: return status;
+    }
   }
 
   passwordMatchValidator(group: FormGroup) {
