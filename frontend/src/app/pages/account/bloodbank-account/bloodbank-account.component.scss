@@ -182,11 +182,10 @@ form {
 
 // Cards melhorados
 .app-card {
-  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #fff 40%, #f8f9fa 100%);
   border-radius: 16px;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 8px 32px rgba(183, 28, 28, 0.08);
   border: 1px solid rgba(183, 28, 28, 0.1);
 
   .app-card-header {

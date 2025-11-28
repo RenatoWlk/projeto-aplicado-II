@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 import { CommonModule } from '@angular/common';
-import { BloodBank, DailyAvailability, DonationDate, DonationService, DonationStatus, Slot } from './donator-calendar.service';
+import { BloodBank, DailyAvailability, DonationDate, DonationService, Slot } from './donator-calendar.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -18,7 +18,7 @@ import { PreloaderComponent } from '../../../shared/preloader/preloader.componen
   selector: 'app-donator-calendar',
   standalone: true,
   imports: [
-    MatDatepickerModule, MatCardModule, CommonModule, MatFormFieldModule, 
+    MatDatepickerModule, MatCardModule, CommonModule, MatFormFieldModule,
     MatSelectModule, MatInputModule, FormsModule, ReactiveFormsModule, PreloaderComponent
   ],
   templateUrl: './donator-calendar.component.html',
@@ -28,8 +28,15 @@ import { PreloaderComponent } from '../../../shared/preloader/preloader.componen
   encapsulation: ViewEncapsulation.None,
 })
 export class DonatorCalendarComponent implements OnInit {
-
   readonly customHeader = CustomHeaderComponent;
+
+  constructor(
+    private authService: AuthService,
+    private notificationService: NotificationBannerService,
+    private cdr: ChangeDetectorRef,
+    private userService: UserAccountService,
+    private donationService: DonationService,
+  ) {}
 
   availableBloodBanks: BloodBank[] = [];
   selectedBloodBankId: string | null = null;
@@ -43,14 +50,14 @@ export class DonatorCalendarComponent implements OnInit {
   selectedDate: Date | null = null;
   availableDates: Date[] = [];
   availableDonationHours: Slot[] = [];
-  visible: boolean = false;
-  dailyAvailabilityData: DailyAvailability [] = [];
-  availableHours: any[] = [];
-  donations: any[] = [];
+
+  dailyAvailabilityData: DailyAvailability[] = [];
   isLoadingAppointment: boolean = true;
+
   gender: string | null = null;
-  canDonateAgain: boolean = true;
+  canDonateAgain?: boolean;
   nextDonationDate: string | null = null;
+
   hasActiveAppointment: boolean | null = null;
   activeAppointment: {
     date: string;
@@ -61,79 +68,43 @@ export class DonatorCalendarComponent implements OnInit {
     status: string;
   } | null = null;
 
-  constructor(
-    private authService: AuthService,
-    private notificationService: NotificationBannerService,
-    private cdr: ChangeDetectorRef,
-    private userService: UserAccountService,
-  ) {}
-
-  donationService = inject(DonationService);
-
   async ngOnInit(): Promise<void> {
     await this.checkActiveAppointment();
     await this.checkIfUserCanDonate();
   }
 
-  private loadBloodBanks() {
-    this.donationService.getBloodBanksWithAvailableSlots().subscribe({
-      next: banks => {
-        this.availableBloodBanks = banks;
-        this.cdr.markForCheck();
-      },
-      error: () => this.notificationService.show('Erro ao carregar bancos de sangue')
-    });
-  }
-
+  /* -------------------------------------------------------------------------- */
+  /*                          Donor Eligibility Check                            */
+  /* -------------------------------------------------------------------------- */
   private async checkIfUserCanDonate(): Promise<void> {
     const userId = this.authService.getCurrentUserId();
-    
+
     this.userService.getUser().subscribe({
       next: (user: any) => {
         this.gender = user.gender;
-        
-        // Define o intervalo de dias baseado no gênero
         const intervalDays = this.gender === 'Masculino' ? 90 : 120;
-        
-        // Busca as doações do usuário
+
         this.donationService.getUserDonations(userId).subscribe({
           next: (donations: any[]) => {
-            // Encontra a última doação completada
-            const completedDonations = donations.filter(
-              donation => donation.status === 'COMPLETED'
-            );
-            
-            if (completedDonations.length > 0) {
-              // Ordena por data decrescente e pega a mais recente
-              const lastCompletedDonation = completedDonations.sort((a, b) => 
-                new Date(b.date).getTime() - new Date(a.date).getTime()
-              )[0];
-              
-              // Calcula a data da última doação
-              const lastDonationDate = new Date(lastCompletedDonation.date);
-              
-              // Calcula a próxima data permitida
-              const nextAllowedDate = new Date(lastDonationDate);
-              nextAllowedDate.setDate(nextAllowedDate.getDate() + intervalDays);
-              
-              // Verifica se já passou o intervalo necessário
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              nextAllowedDate.setHours(0, 0, 0, 0);
-              
-              if (today < nextAllowedDate) {
-                this.canDonateAgain = false;
-                this.nextDonationDate = this.formatAppointmentDate(nextAllowedDate.toISOString());
-              } else {
-                this.canDonateAgain = true;
-                this.nextDonationDate = null;
-              }
-            } else {
-              // Se não há doações completadas, pode doar
+            const completed = donations
+              .filter(d => d.status === 'COMPLETED')
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+            if (completed.length === 0) {
               this.canDonateAgain = true;
-              this.nextDonationDate = null;
+            } else {
+              const last = new Date(completed[0].date);
+              const next = new Date(last);
+              next.setDate(next.getDate() + intervalDays);
+
+              const today = new Date();
+              today.setHours(0,0,0,0);
+              next.setHours(0,0,0,0);
+
+              this.canDonateAgain = today >= next;
+              this.nextDonationDate = this.formatAppointmentDate(next.toISOString());
             }
-            
+
             this.cdr.markForCheck();
           },
           error: () => {
@@ -149,35 +120,34 @@ export class DonatorCalendarComponent implements OnInit {
     });
   }
 
-
-  /**
-   * Verifica se o usuário possui um agendamento ativo
-   * (status diferente de "cancelado" ou "completado")
-   */
+  /* -------------------------------------------------------------------------- */
+  /*                         Active Appointment Check                            */
+  /* -------------------------------------------------------------------------- */
   private async checkActiveAppointment(): Promise<void> {
     const userId = this.authService.getCurrentUserId();
-    
+
+    this.isLoadingAppointment = true;
+
     this.donationService.getUserDonations(userId).subscribe({
       next: (donations: any[]) => {
-        // Filtra apenas agendamentos ativos (não cancelados nem completados)
         const activeDonation = donations.find(
-          donation => donation.status !== 'CANCELLED' && 
-                     donation.status !== 'COMPLETED'
+          d => d.status !== 'CANCELLED' && d.status !== 'COMPLETED'
         );
 
         if (activeDonation) {
-          this.isLoadingAppointment = false;
-          this.hasActiveAppointment = true;
+          this.activeAppointment = null;
           this.updateActiveAppointmentData(activeDonation);
         } else {
-          this.isLoadingAppointment = false;
-          this.hasActiveAppointment = false;
           this.activeAppointment = null;
           this.loadBloodBanks();
         }
+
+        this.isLoadingAppointment = false;
         this.cdr.markForCheck();
       },
       error: () => {
+        this.isLoadingAppointment = false;
+        this.activeAppointment = null;
         this.notificationService.show('Erro ao verificar agendamentos');
         this.cdr.markForCheck();
       }
@@ -185,19 +155,19 @@ export class DonatorCalendarComponent implements OnInit {
   }
 
   private updateActiveAppointmentData(donation: any): void {
-    // Carrega os bancos para pegar o nome
     this.donationService.getBloodBanksWithAvailableSlots().subscribe({
       next: banks => {
-        const bloodBank = banks.find(bank => bank.id === donation.bloodBankId);
-        
+        const bank = banks.find(b => b.id === donation.bloodBankId);
+
         this.activeAppointment = {
           date: this.formatAppointmentDate(donation.date),
           hour: donation.hour,
-          bloodBankName: bloodBank?.name || 'Banco não encontrado',
-          bloodBankTelephone: bloodBank?.phone || 'Telefone não disponível',
-          bloodBankEmail: bloodBank?.email || 'Email não disponível',
+          bloodBankName: bank?.name || 'Banco não encontrado',
+          bloodBankTelephone: bank?.phone || 'Telefone não disponível',
+          bloodBankEmail: bank?.email || 'Email não disponível',
           status: this.translateStatus(donation.status)
         };
+
         this.cdr.markForCheck();
       },
       error: () => {
@@ -214,52 +184,67 @@ export class DonatorCalendarComponent implements OnInit {
     });
   }
 
+  /* -------------------------------------------------------------------------- */
+  /*                                  Helpers                                   */
+  /* -------------------------------------------------------------------------- */
+  private loadBloodBanks(): void {
+    this.donationService.getBloodBanksWithAvailableSlots().subscribe({
+      next: banks => {
+        this.availableBloodBanks = banks;
+        this.cdr.markForCheck();
+      },
+      error: () => this.notificationService.show('Erro ao carregar bancos de sangue')
+    });
+  }
+
   private translateStatus(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'PENDING': 'Pendente',
-      'CONFIRMED': 'Confirmado',
-      'COMPLETED': 'Completado',
-      'CANCELLED': 'Cancelado'
+    const map: Record<string, string> = {
+      PENDING: 'Pendente',
+      CONFIRMED: 'Confirmado',
+      COMPLETED: 'Completado',
+      CANCELLED: 'Cancelado',
     };
-    return statusMap[status] || status;
+    return map[status] ?? status;
   }
 
-  private formatAppointmentDate(dateString: string): string {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+  private formatAppointmentDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return `${String(date.getDate()).padStart(2, '0')}/${String(
+      date.getMonth() + 1
+    ).padStart(2, '0')}/${date.getFullYear()}`;
   }
-
-  // Filtro do calendário: habilita apenas datas disponíveis
-  availableDonationDates = (d: Date | null): boolean => {
-    if (!d || this.dailyAvailabilityData.length === 0) return false;
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const selectedDate = new Date(d);
-    selectedDate.setHours(0, 0, 0, 0);
-    
-    if (selectedDate <= today) return false;
-    
-    // Verifica disponibilidade
-    const dateString = this.formatDateToString(d);
-    const dayData = this.dailyAvailabilityData.find(data => data.date === dateString);
-
-    return dayData ? dayData.slots.some(slot => slot.availableSpots > 0) : false;
-  };
 
   private formatDateToString(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      '0'
+    )}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
-  // Quando muda o banco
+  /* -------------------------------------------------------------------------- */
+  /*                                Calendar                                    */
+  /* -------------------------------------------------------------------------- */
+  availableDonationDates = (d: Date | null): boolean => {
+    if (!d || this.dailyAvailabilityData.length === 0) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const selected = new Date(d);
+    selected.setHours(0, 0, 0, 0);
+
+    if (selected <= today) return false;
+
+    const dateString = this.formatDateToString(d);
+    const day = this.dailyAvailabilityData.find(day => day.date === dateString);
+
+    return !!day?.slots.some(slot => slot.availableSpots > 0);
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /*                          Blood Bank Selection                               */
+  /* -------------------------------------------------------------------------- */
   onSelectBloodBankChange(bloodBankId: string) {
-    // Impede alteração se houver agendamento ativo
     if (this.hasActiveAppointment) {
       this.notificationService.show('Você já possui um agendamento ativo', 'warning', 3000);
       return;
@@ -272,47 +257,43 @@ export class DonatorCalendarComponent implements OnInit {
     this.availableDates = [];
     this.availableDonationHours = [];
 
-    this.donationService.getAvailableDonationDates(bloodBankId)
-      .subscribe({    
-        next: dates => {
-          this.dailyAvailabilityData = dates;
-          this.availableDates = dates
-          .filter((d: { slots: any[]; }) => d.slots.some((slot: { availableSpots: number; }) => slot.availableSpots > 0))
-          .map((d: { date: string | number | Date; }) => new Date(d.date));
-        },
-        error: (err) => {
-          this.availableDates = [];
-          this.notificationService.show('Erro ao carregar as datas disponíveis', 'error', 3000);
-        },
-    })
+    this.donationService.getAvailableDonationDates(bloodBankId).subscribe({
+      next: dates => {
+        this.dailyAvailabilityData = dates;
+        this.availableDates = dates
+          .filter(d => d.slots.some(s => s.availableSpots > 0))
+          .map(d => new Date(d.date));
+      },
+      error: () => {
+        this.availableDates = [];
+        this.notificationService.show('Erro ao carregar as datas disponíveis', 'error', 3000);
+      }
+    });
   }
 
   onDateSelected(date: Date | null) {
     if (!date || !this.selectedBloodBankId) return;
-    
+
     this.selectedDate = date;
     this.scheduleForm.get('donationTime')?.reset();
     this.availableDonationHours = [];
-    
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0')
 
-    const newDate = `${yyyy}-${mm}-${dd}`;
-    
-    this.donationService.getAvailableSlots(this.selectedBloodBankId, newDate).subscribe({
-      next: (slotsData) => {
-        this.availableDonationHours = slotsData.slots
-          .filter((slot: { availableSpots: number; }) => slot.availableSpots > 0)
-          .map((slot: { time: any; availableSpots: any; totalSpots: any; bookedSpots: any; }) => ({
-            time: slot.time,
-            availableSpots: slot.availableSpots,
-            totalSpots: slot.totalSpots,
-            bookedSpots: slot.bookedSpots
+    const formatted = this.formatDateToString(date);
+
+    this.donationService.getAvailableSlots(this.selectedBloodBankId, formatted).subscribe({
+      next: slots => {
+        this.availableDonationHours = slots.slots
+          .filter((s: { availableSpots: number; }) => s.availableSpots > 0)
+          .map((s: { time: any; availableSpots: any; totalSpots: any; bookedSpots: any; }) => ({
+            time: s.time,
+            availableSpots: s.availableSpots,
+            totalSpots: s.totalSpots,
+            bookedSpots: s.bookedSpots
           }));
+
         this.cdr.markForCheck();
       },
-      error: (err) => {
+      error: () => {
         this.availableDonationHours = [];
         this.notificationService.show('Erro ao carregar horários disponíveis', 'error', 3000);
         this.cdr.markForCheck();
@@ -320,65 +301,62 @@ export class DonatorCalendarComponent implements OnInit {
     });
   }
 
-  // Agendamento
+  /* -------------------------------------------------------------------------- */
+  /*                                Scheduling                                   */
+  /* -------------------------------------------------------------------------- */
   scheduleDonation() {
-    // Impede agendamento se já existir um ativo
-    if (this.hasActiveAppointment) {
+    if (this.activeAppointment) {
       this.notificationService.show('Você já possui um agendamento ativo', 'warning', 3000);
       return;
     }
 
     if (!this.selectedBloodBankId) return;
 
-    const selectedDate: string | undefined = this.scheduleForm.get('selectedDate')?.value ?? undefined;
-    const selectedHour: string | undefined = this.scheduleForm.get('donationTime')?.value ?? undefined;
+    const selectedDate = this.scheduleForm.get('selectedDate')?.value;
+    const selectedHour = this.scheduleForm.get('donationTime')?.value;
 
     if (!selectedDate || !selectedHour) return;
 
-    const [hour, minute] = selectedHour.split(':').map(Number);
-    const appointmentDate = new Date(selectedDate);
-    appointmentDate.setHours(hour, minute, 0, 0);
+    const [h, m] = selectedHour.split(':').map(Number);
+    const date = new Date(selectedDate);
+    date.setHours(h, m, 0, 0);
 
     const appointment: DonationDate = {
       userId: this.authService.getCurrentUserId(),
       bloodBankId: this.selectedBloodBankId,
-      date: appointmentDate.toISOString(),
-      hour: appointmentDate.toTimeString().substring(0, 5),
+      date: date.toISOString(),
+      hour: date.toTimeString().substring(0, 5),
       slot: 1,
     };
 
     this.donationService.scheduleDonation(appointment).subscribe({
       next: () => {
-        this.notificationService.show('Agendamento realizado com sucesso', 'success', 3000);        
-        
-        // Recarrega a verificação de agendamento ativo
+        this.notificationService.show('Agendamento realizado com sucesso', 'success', 3000);
         this.checkActiveAppointment();
-        
-        // Recarrega os slots da mesma data
+
         if (this.selectedDate) {
-          setTimeout(() => {
-            this.onDateSelected(this.selectedDate);
-          }, 500);
+          setTimeout(() => this.onDateSelected(this.selectedDate!), 500);
         }
+
         this.scheduleForm.get('donationTime')?.reset();
       },
-      error: (err) => {
+      error: () => {
         this.notificationService.show('Erro ao realizar agendamento!', 'error', 3000);
       }
     });
   }
-  
+
   getStatusClass(status: string): string {
-    const statusClassMap: { [key: string]: string } = {
-      'PENDING': 'status-pending',
-      'CONFIRMED': 'status-confirmed',
-      'COMPLETED': 'status-completed',
-      'CANCELLED': 'status-cancelled',
-      'Pendente': 'status-pending',
-      'Confirmado': 'status-confirmed',
-      'Completado': 'status-completed',
-      'Cancelado': 'status-cancelled'
+    const map: Record<string, string> = {
+      PENDING: 'status-pending',
+      CONFIRMED: 'status-confirmed',
+      COMPLETED: 'status-completed',
+      CANCELLED: 'status-cancelled',
+      Pendente: 'status-pending',
+      Confirmado: 'status-confirmed',
+      Completado: 'status-completed',
+      Cancelado: 'status-cancelled'
     };
-    return statusClassMap[status] || 'status-pending';
+    return map[status] || 'status-pending';
   }
 }
