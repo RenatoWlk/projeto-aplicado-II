@@ -28,8 +28,8 @@
 }
 
 .skeleton-card {
-    width: 560px;
-    height: 300px;
+    width: 520px;
+    height: 280px;
     border-radius: 8px;
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
     background-size: 400% 100%;
@@ -47,13 +47,13 @@
 }
 
 .skeleton-card.medium {
-    width: 460px;
-    height: 260px;
+    width: 430px;
+    height: 250px;
 }
 
 .skeleton-card.large {
-    width: 560px;
-    height: 300px;
+    width: 680px;
+    height: 280px;
 }
 
 @media (max-width: 768px) {
