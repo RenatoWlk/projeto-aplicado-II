@@ -417,7 +417,6 @@
   }
 
   .btn-action {
-    width: 100%;
     justify-content: center;
     padding: 0.45rem;
     font-size: 0.85rem;
@@ -442,3 +441,145 @@
     overflow-x: hidden;
   }
 }
+
+.table-wrapper {
+  position: relative;
+}
+
+.table-scroll {
+  height:150px;
+  overflow:auto;  
+  margin-top:20px;
+}
+
+/* Table layout */
+.donations-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-family: 'Poppins', sans-serif;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Header */
+.donations-table thead {
+  background-color: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.donations-table th {
+  text-align: left;
+  padding: 0.85rem 0.9rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+/* Column width hints */
+.donations-table th.col-index {
+  width: 5%;
+}
+.donations-table th.col-name {
+  width: 40%;
+}
+.donations-table th.col-hour {
+  width: 10%;
+}
+.donations-table th.col-status {
+  width: 15%;
+}
+.donations-table th.col-actions {
+  width: 30%;
+}
+
+.donations-table tbody {
+  overflow: auto;
+}
+
+/* Body cells */
+.donations-table td {
+  padding: 0.85rem 0.9rem;
+  border-bottom: 1px solid #f1f1f1;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+/* Row striping */
+.donations-table tbody tr:nth-child(even) {
+  background-color: #fbfbfb;
+}
+
+/* Name column specifics */
+.col-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hour column alignment */
+.col-hour {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Status pill */
+.status-pill {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  min-width: 92px;
+}
+
+/* Status colors */
+.status-pending    { background-color: #fff3cd; color: #856404; }
+.status-confirmed  { background-color: #17a2b8; color: white; }
+.status-completed  { background-color: #28a745; color: white; }
+.status-cancelled  { background-color: #dc3545; color: white; }
+
+/* Actions column */
+.col-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Buttons with icon + text */
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  white-space: nowrap;
+}
+
+.btn-action i { font-size: 0.95rem; }
+
+/* Button colors */
+.btn-confirm { background: #17a2b8; color: #fff; }
+.btn-complete{ background: #28a745; color: #fff; }
+.btn-cancel  { background: #dc3545; color: #fff; }
+
+.btn-action:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+
+/* No-actions placeholder */
+.no-actions { color: #999; font-style: italic; }
+
+/* Table actions (sort buttons) */
+.table-actions { display:flex; justify-content:flex-end; gap:0.5rem; margin-bottom: 0.8rem; }

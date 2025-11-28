@@ -94,7 +94,6 @@
     </div>
   </section>
 
-  <!-- LISTA DE DOADORES POR DATA -->
   <section class="app-card card-overflow">
     <div class="app-card-header">
       <i class="fa fa-list app-card-icon"></i>
@@ -102,7 +101,6 @@
     </div>
 
     <div class="app-card-header">
-      <label for="date-picker">Data: </label>
       <mat-form-field appearance="outline" class="custom-form-field full-width"> 
         <mat-label>Data disponível: </mat-label>
         <input matInput
@@ -115,56 +113,89 @@
       </mat-form-field>
     </div>
 
-    <app-preloader *ngIf="loadingDonations" type="skeleton-cards" [count]="5" [visible]="true"></app-preloader>
+    <app-preloader *ngIf="loadingDonations" type="spinner" [visible]="true"></app-preloader>
 
     <div class="tab-content" *ngIf="!loadingDonations">
-      <ul class="ranking-list" *ngIf="todayDonations.length > 0; else noDonations">
-        <li *ngFor="let donation of todayDonations; let i = index">
-          <span class="position">{{ i + 1 }}º</span>
-          <span class="name">{{ donation.userName }}</span>
-          <!-- <span class="bloodtype">{{ donation.bloodType }}</span> -->
-          <span class="hour">{{ donation.hour }}</span>
-          <span class="status" [ngClass]="getStatusClass(donation.status)">
-            {{ getStatusLabel(donation.status) }}
-          </span>
-          
-          <!-- Ações disponíveis baseadas no status -->
-          <span class="actions">
-            <!-- Confirmar (apenas se PENDING) -->
-            <button 
-              *ngIf="canConfirm(donation.status)"
-              class="btn-action btn-confirm" 
-              (click)="confirmDonation(donation.id)"
-              title="Confirmar doação">
-              <i class="fas fa-check"></i> <span> Confirmar</span>
-            </button>
-            
-            <!-- Completar (se PENDING ou CONFIRMED) -->
-            <button 
-              *ngIf="canComplete(donation.status)"
-              class="btn-action btn-complete" 
-              (click)="completeDonation(donation.id)"
-              title="Marcar como completada">
-              <i class="fas fa-check-double"></i> <span> Completar</span>
-            </button>
-            
-            <!-- Cancelar (se PENDING ou CONFIRMED) -->
-            <button 
-              *ngIf="canCancel(donation.status)"
-              class="btn-action btn-cancel" 
-              (click)="cancelDonation(donation.id, donation.userId)"
-              title="Cancelar doação">
-              <i class="fas fa-times"></i> <span> Cancelar</span>
-            </button>
-            
-            <!-- Mensagem quando não há ações disponíveis -->
-            <span *ngIf="!canConfirm(donation.status) && !canComplete(donation.status) && !canCancel(donation.status)" 
-                  class="no-actions">
-              -
-            </span>
-          </span>
-        </li>
-      </ul>
+      <div class="table-actions">
+        <button class="sort-btn app-button" (click)="sortByHour()">
+          <i class="fas fa-clock"></i> Ordenar por horário
+        </button>
+
+        <button class="sort-btn app-button" (click)="sortByStatus()">
+          <i class="fas fa-flag"></i> Ordenar por status
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-scroll">
+          <table class="donations-table" *ngIf="todayDonations.length > 0; else noDonations" role="table" aria-label="Lista de agendamentos">
+            <thead>
+              <tr>
+                <th class="col-index">#</th>
+                <th class="col-name">Nome</th>
+                <th class="col-hour">Horário</th>
+                <th class="col-status">Status</th>
+                <th class="col-actions">Ações</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let donation of todayDonations; let i = index" role="row">
+                <td class="col-index" data-label="#" aria-label="Posição">{{ i + 1 }}</td>
+
+                <td class="col-name" data-label="Nome" aria-label="Nome do doador">
+                  {{ donation.userName }}
+                </td>
+
+                <td class="col-hour" data-label="Horário" aria-label="Horário">
+                  <i class="fas fa-clock hour-icon" aria-hidden="true"></i>
+                  {{ donation.hour }}
+                </td>
+
+                <td class="col-status" data-label="Status" aria-label="Status">
+                  <span class="status-pill" [ngClass]="getStatusClass(donation.status)">
+                    {{ getStatusLabel(donation.status) }}
+                  </span>
+                </td>
+
+                <td class="col-actions" data-label="Ações" aria-label="Ações">
+                  <button 
+                    *ngIf="canConfirm(donation.status)"
+                    class="btn-action btn-confirm"
+                    (click)="confirmDonation(donation.id)"
+                    title="Confirmar doação">
+                    <i class="fas fa-check" aria-hidden="true"></i>
+                    <span class="btn-text">Confirmar</span>
+                  </button>
+
+                  <button 
+                    *ngIf="canComplete(donation.status)"
+                    class="btn-action btn-complete"
+                    (click)="completeDonation(donation.id)"
+                    title="Marcar como completada">
+                    <i class="fas fa-check-double" aria-hidden="true"></i>
+                    <span class="btn-text">Completar</span>
+                  </button>
+
+                  <button 
+                    *ngIf="canCancel(donation.status)"
+                    class="btn-action btn-cancel"
+                    (click)="cancelDonation(donation.id, donation.userId)"
+                    title="Cancelar doação">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                    <span class="btn-text">Cancelar</span>
+                  </button>
+
+                  <span *ngIf="!canConfirm(donation.status) && !canComplete(donation.status) && !canCancel(donation.status)"
+                        class="no-actions" aria-hidden="true">
+                    —
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <ng-template #noDonations>
         <div class="no-data">

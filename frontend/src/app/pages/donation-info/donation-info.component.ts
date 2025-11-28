@@ -40,6 +40,8 @@ interface DonationListItem {
   encapsulation: ViewEncapsulation.None,
 })
 export class DonationInfoComponent implements OnInit {
+  sortDirectionHour: 'asc' | 'desc' = 'asc';
+  sortDirectionStatus: 'asc' | 'desc' = 'asc';
   
   bloodBankId: string = ''; 
   selectedDate: Date = new Date() // today
@@ -246,5 +248,31 @@ loadStats(): void {
    */
   canComplete(status: DonationStatus): boolean {
     return status === DonationStatus.PENDING || status === DonationStatus.CONFIRMED;
+  }
+
+  sortByHour() {
+    this.todayDonations.sort((a, b) => {
+      const timeA = a.hour.toLowerCase();
+      const timeB = b.hour.toLowerCase();
+
+      return this.sortDirectionHour === 'asc'
+        ? timeA.localeCompare(timeB)
+        : timeB.localeCompare(timeA);
+    });
+
+    this.sortDirectionHour = this.sortDirectionHour === 'asc' ? 'desc' : 'asc';
+  }
+
+  sortByStatus() {
+    this.todayDonations.sort((a, b) => {
+      const statusA = this.getStatusLabel(a.status).toLowerCase();
+      const statusB = this.getStatusLabel(b.status).toLowerCase();
+
+      return this.sortDirectionStatus === 'asc'
+        ? statusA.localeCompare(statusB)
+        : statusB.localeCompare(statusA);
+    });
+
+    this.sortDirectionStatus = this.sortDirectionStatus === 'asc' ? 'desc' : 'asc';
   }
 }

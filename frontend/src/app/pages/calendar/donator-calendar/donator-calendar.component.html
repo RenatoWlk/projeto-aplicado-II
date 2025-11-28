@@ -20,7 +20,7 @@
                 </div>
                 <div class="detail-row">
                     <span class="label">Banco de Sangue: </span>
-                    <span class="value">{{ activeAppointment.bloodBankName }}</span>
+                    <span class="value" style="line-break: anywhere;">{{ activeAppointment.bloodBankName }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="label">Status:</span>
@@ -30,6 +30,14 @@
             <p class="info-message">
                 Você poderá realizar um novo agendamento após este ser cancelado ou completado.
             </p>
+            <div class="info-message">
+                <p>
+                    Em caso de dúvidas, entre em contato com o banco de sangue:
+                </p>    
+                Telefone: <strong>{{ activeAppointment.bloodBankTelephone }}</strong><br>
+                Email: <strong>{{ activeAppointment.bloodBankEmail }}</strong>
+            </div>
+            
         </ng-container>
         
         <ng-container *ngIf="hasActiveAppointment === false">

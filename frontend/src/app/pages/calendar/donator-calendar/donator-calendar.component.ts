@@ -51,12 +51,13 @@ export class DonatorCalendarComponent implements OnInit {
   gender: string | null = null;
   canDonateAgain: boolean = true;
   nextDonationDate: string | null = null;
-  // Propriedades para agendamento ativo
   hasActiveAppointment: boolean | null = null;
   activeAppointment: {
     date: string;
     hour: string;
     bloodBankName: string;
+    bloodBankTelephone: string;
+    bloodBankEmail: string;
     status: string;
   } | null = null;
 
@@ -193,6 +194,8 @@ export class DonatorCalendarComponent implements OnInit {
           date: this.formatAppointmentDate(donation.date),
           hour: donation.hour,
           bloodBankName: bloodBank?.name || 'Banco não encontrado',
+          bloodBankTelephone: bloodBank?.phone || 'Telefone não disponível',
+          bloodBankEmail: bloodBank?.email || 'Email não disponível',
           status: this.translateStatus(donation.status)
         };
         this.cdr.markForCheck();
@@ -202,6 +205,8 @@ export class DonatorCalendarComponent implements OnInit {
           date: this.formatAppointmentDate(donation.date),
           hour: donation.hour,
           bloodBankName: 'Erro ao carregar',
+          bloodBankTelephone: 'Erro ao carregar',
+          bloodBankEmail: 'Erro ao carregar',
           status: this.translateStatus(donation.status)
         };
         this.cdr.markForCheck();

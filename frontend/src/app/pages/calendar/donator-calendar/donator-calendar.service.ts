@@ -38,6 +38,8 @@ export interface BloodBank {
     id: string;
     name: string;
     address: any;
+    phone: string;
+    email: string;
     availabilitySlots: any;
 }
 
