@@ -5,7 +5,7 @@
     <label>
       Você tem entre 16 e 69 anos?
       <select formControlName="age" [ngClass]="{'erro': form.get('age')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -25,7 +25,7 @@
     <label>
       Já doou sangue antes dos 60 anos?
       <select formControlName="donationBefore60" [ngClass]="{'erro': form.get('donationBefore60')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -35,7 +35,7 @@
     <label>
       Você pesa mais de 50kg?
       <select formControlName="weight" [ngClass]="{'erro': form.get('weight')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -45,7 +45,7 @@
     <label>
       Está se sentindo bem e saudável hoje?
       <select formControlName="healthy" [ngClass]="{'erro': form.get('healthy')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -55,7 +55,7 @@
     <label *ngIf="form.get('gender')?.value === 'feminino'">
       Está grávida?
       <select formControlName="pregnant" [ngClass]="{'erro': form.get('pregnant')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -65,7 +65,7 @@
     <label *ngIf="form.get('gender')?.value === 'feminino'">
       Teve parto nos últimos 12 meses?
       <select formControlName="recentChildbirth" [ngClass]="{'erro': form.get('recentChildbirth')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -75,7 +75,7 @@
     <label>
       Está com febre, gripe ou sintomas infecciosos?
       <select formControlName="symptoms" [ngClass]="{'erro': form.get('symptoms')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -85,7 +85,7 @@
     <label>
       Teve hepatite, doença de chagas, câncer ou doenças graves?
       <select formControlName="diseases" [ngClass]="{'erro': form.get('diseases')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -97,7 +97,7 @@
         Está tomando <span class="tooltip" data-tooltip="Exemplo: antibióticos, anticoagulantes, insulina, corticoides, etc.">medicamentos</span>?
       </span>
       <select formControlName="medications" [ngClass]="{'erro': form.get('medications')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -109,7 +109,7 @@
         Você realizou algum <span class="tooltip" data-tooltip="Exemplo: cirurgias, endoscopia, piercing, transfusão, etc.">procedimento</span> recentemente?
       </span>
       <select formControlName="procedures" [ngClass]="{'erro': form.get('procedures')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -119,7 +119,7 @@
     <label>
       Usa drogas ilícitas injetáveis?
       <select formControlName="drugs" [ngClass]="{'erro': form.get('drugs')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -129,7 +129,7 @@
     <label>
       Teve múltiplos parceiros sexuais nos últimos 12 meses?
       <select formControlName="partners" [ngClass]="{'erro': form.get('partners')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -139,7 +139,7 @@
     <label>
       Fez tatuagem nos últimos 12 meses?
       <select formControlName="tattooOrPiercing" [ngClass]="{'erro': form.get('tattooOrPiercing')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -149,7 +149,7 @@
     <label *ngIf="form.get('gender')?.value === 'masculino'">
       Doou sangue há menos de 2 meses?
       <select formControlName="lastDonationMale" [ngClass]="{'erro': form.get('lastDonationMale')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -159,7 +159,7 @@
     <label *ngIf="form.get('gender')?.value === 'feminino'">
       Doou sangue há menos de 3 meses?
       <select formControlName="lastDonationFemale" [ngClass]="{'erro': form.get('lastDonationFemale')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -169,7 +169,7 @@
     <label>
       Tomou vacina contra COVID-19 nos últimos 7 dias?
       <select formControlName="covidVaccine" [ngClass]="{'erro': form.get('covidVaccine')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -179,7 +179,7 @@
     <label>
       Tomou vacina da febre amarela nos últimos 30 dias?
       <select formControlName="yellowFeverVaccine" [ngClass]="{'erro': form.get('yellowFeverVaccine')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
@@ -189,7 +189,7 @@
     <label>
       Viajou para área com risco de malária nos últimos 12 meses?
       <select formControlName="travelRiskArea" [ngClass]="{'erro': form.get('travelRiskArea')?.invalid && submitted}">
-        <option [ngValue]="null" disabled selected hidden>Selecione</option>
+        <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
         <option [ngValue]="false">Não</option>
       </select>
