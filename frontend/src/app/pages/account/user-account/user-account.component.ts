@@ -69,6 +69,7 @@ export class UserAccountComponent implements OnInit {
     private dashboardService: DashboardService,
     private pdfService: QuestionnairePdfService,
     private router: Router,
+    private donationService: DonationInfoService,
   ) {}
 
   ngOnInit(): void {
@@ -177,6 +178,7 @@ export class UserAccountComponent implements OnInit {
         this.isLoading = false;
       }
     });
+
   }
 
    /**

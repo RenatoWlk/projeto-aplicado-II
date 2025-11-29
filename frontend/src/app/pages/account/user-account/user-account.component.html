@@ -208,6 +208,30 @@
   </div>
 </ng-container>
 
+<!-- Card de Histórico de Doações -->
+    <div class="app-card">
+    <div class="app-card-header">
+      <i class="fa-solid fa-heart app-card-icon"></i>
+      <h2 class="app-card-title">Histórico de Doação</h2>
+    </div>
+    
+    <div class="donation-status">
+      <ul class="donation-list" *ngIf="donationHistory.length > 0; else noDonations">
+        <li *ngFor="let donation of donationHistory; let i = index">
+          <span class="position">{{ i + 1 }}º</span>
+          <span class="name">{{ donation.bloodBankName }}</span>
+          <span class="date">{{ donation.date }}</span>
+          <span class="hour">{{ donation.hour }}</span>
+          <span class="status" [ngClass]="getStatusClass(donation.status)">
+            {{ getStatusLabel(donation.status) }}
+          </span>
+        </li>
+      </ul>
+      <ng-template #noDonations>
+        <p class="no-donations">Nenhuma doação registrada hoje.</p>
+      </ng-template>
+  </div>
+
 <!-- Formulário de Edição do Perfil -->
 <div *ngIf="editProfileMode" class="app-card">
   <div class="app-card-header">
