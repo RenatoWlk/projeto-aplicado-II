@@ -83,6 +83,94 @@
     </div>
   </section>
 
+  <!-- ============= -->
+  <!-- USER GUIDE SECTION -->
+  <!-- ============= -->
+<section class="app-card card-overflow" *ngIf="showTutorial">
+  <div class="guide-app-card">
+    <div class="guide-card-header">
+      <i class="fa-solid fa-heart app-card-icon-tutorial"></i>
+      <div class="donator-tutorial-header">
+        <h1 class="guide-title">Como doar sangue</h1>
+        <p class="guide-subtitle">Siga estes passos simples e salve vidas!</p>
+      </div>
+    </div>
+    
+    <article class="card guide donator">
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3 class="step-title">Verifique sua eligibilidade</h3>
+            <p class="step-description">Responda um questionário rápido para saber se você pode doar</p>
+            <a routerLink="/questionario" class="step-action">Iniciar questionário</a>
+          </div>
+          <i class="fas fa-clipboard-list step-icon"></i>
+        </div>
+
+        <div class="step-divider"></div>
+
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3 class="step-title">Encontre o banco de sangue</h3>
+            <p class="step-description">Localize o posto de coleta mais próximo de você</p>
+            <a routerLink="/mapa" class="step-action">Ver no mapa</a>
+          </div>
+          <i class="fas fa-map-location-dot step-icon"></i>
+        </div>
+
+        <div class="step-divider"></div>
+
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3 class="step-title">Agende sua doação</h3>
+            <p class="step-description">Escolha o melhor dia e horário para você</p>
+            <a routerLink="/agendamento" class="step-action">Ver disponibilidade</a>
+          </div>
+          <i class="fas fa-calendar-days step-icon"></i>
+        </div>
+
+        <div class="step-divider"></div>
+
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3 class="step-title">Doe e salve vidas!</h3>
+            <p class="step-description">Compareça no dia agendado e faça a diferença</p>
+            <div class="step-impact">
+              <i class="fa-solid fa-heart-pulse"></i>
+              <span>Cada doação pode salvar até 4 vidas</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-hand-holding-droplet step-icon"></i>
+        </div>
+      </div>
+
+      <div class="step-divider"></div>
+            
+    <div class="step-item">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h3 class="step-title">Acumule pontos!</h3>
+          <p class="step-description">Ganhe recompensas exclusivas a cada doação realizada!</p>
+          <a routerLink="/recompensas" class="step-action">Resgatar recompensas</a>
+        </div>
+        <i class="fa-solid fa-gift step-icon"></i>
+    </div>
+
+      <div class="guide-footer">
+        <div class="motivational-message">
+          <i class="fa-solid fa-star"></i>
+          <p>O processo todo leva cerca de 40 minutos. Você está pronto para ser um herói?</p>
+        </div>
+        <a routerLink="/questionario" class="cta-button">Começar agora<i class="fa-solid fa-rocket"></i></a>
+      </div>
+    </article>
+  </div>
+</section>
+
   <!-- ================= -->
   <!-- CAMPAIGNS SECTION -->
   <!-- ================= -->

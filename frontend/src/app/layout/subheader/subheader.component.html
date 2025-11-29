@@ -9,7 +9,7 @@
                     <span class="subheader-text">Dashboard</span>
                 </a>
             </li>
-            <li routerLinkActive="active" (click)="changeSlogan()">
+            <li routerLinkActive="active" (click)="changeSlogan()" *ngIf="showScheduling">
                 <a [routerLink]="'/' + appRoutesPaths.CALENDAR">
                     <i class="fas fa-calendar-days subheader-icon"></i>
                     <span class="subheader-text">Pré Agendamento</span>
