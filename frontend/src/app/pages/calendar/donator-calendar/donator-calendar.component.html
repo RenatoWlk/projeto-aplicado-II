@@ -6,9 +6,33 @@
             <app-preloader type="spinner" [visible]="true"></app-preloader>
         </ng-container>
 
-        <!-- Active appointment section -->
-        <ng-container *ngIf="!isLoadingAppointment && activeAppointment">
+        <!-- User did not answer the questionnaire -->
+        <ng-container *ngIf="!isLoadingAppointment && canSchedule === null">
+            <div class="eligibility-warning-schedule">
+                <i class="fa-solid fa-exclamation-triangle icon-warning-eligible"></i>
+                <h3 class="section-title">Responda o questionário de elegibilidade!</h3>
+                
+                <p class="warning-eligible-info">
+                    (Você poderá realizar um agendamento após responder)
+                </p>
+                <a class="warning-eligible-route" routerLink="/questionario">Ir para o questionário</a>
+            </div>
+        </ng-container>
 
+        <!-- User not eligible to donate -->
+        <ng-container *ngIf="!isLoadingAppointment && canSchedule === false">
+            <div class="not-eligible-to-schedule">
+                <i class="fa-solid fa-exclamation-circle icon-not-eligible"></i>
+                <h3 class="section-title">Você não está apto para doar no momento!</h3>
+                <p class="not-eligible-info">
+                    Algumas das suas respostas indicam que você não está apto para doação no momento. 
+                    Consulte um profissional de saúde para mais informações.
+                </p>
+            </div>
+        </ng-container>
+
+        <!-- User has active appointment -->
+        <ng-container *ngIf="!isLoadingAppointment && canSchedule === true && activeAppointment">
             <h3 class="section-title">Verifique seu agendamento!</h3>
 
             <div class="appointment-details">
@@ -48,8 +72,9 @@
             </div>
         </ng-container>
 
-        <!-- Rest period notice -->
-        <div *ngIf="!isLoadingAppointment && !activeAppointment && canDonateAgain === false" class="rest-period-notice">
+        <!-- User donate recently -->
+        <div *ngIf="!isLoadingAppointment && canSchedule === true && !activeAppointment && canDonateAgain === false" 
+             class="rest-period-notice">
             <i class="fa-solid fa-clock"></i>
             <h3>Período de Descanso</h3>
 
@@ -65,8 +90,8 @@
             </p>
         </div>
 
-        <!-- Scheduling form -->
-        <div *ngIf="!isLoadingAppointment && !activeAppointment && canDonateAgain === true">
+        <!-- Scheduling forms -->
+        <div *ngIf="!isLoadingAppointment && canSchedule === true && !activeAppointment && canDonateAgain === true">
 
             <div class="app-card-header">
                 <i class="fa-solid fa-calendar-days app-card-icon"></i>
@@ -96,36 +121,37 @@
                 <div *ngIf="selectedBloodBankId" class="date-time-section">
 
                     <mat-form-field appearance="outline" class="custom-form-field full-width">
-                    <mat-label>Data disponível:</mat-label>
-                    <input
-                        matInput
-                        [matDatepicker]="datepicker"
-                        formControlName="selectedDate"
-                        [matDatepickerFilter]="availableDonationDates"
-                        (dateChange)="onDateSelected($event.value)"
-                    >
-                    <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
-                    <mat-datepicker #datepicker [calendarHeaderComponent]="customHeader"></mat-datepicker>
+                        <mat-label>Data disponível:</mat-label>
+                        <input
+                            matInput
+                            [matDatepicker]="datepicker"
+                            formControlName="selectedDate"
+                            [matDatepickerFilter]="availableDonationDates"
+                            (dateChange)="onDateSelected($event.value)"
+                        >
+                        <mat-datepicker-toggle matIconSuffix [for]="datepicker"></mat-datepicker-toggle>
+                        <mat-datepicker #datepicker [calendarHeaderComponent]="customHeader"></mat-datepicker>
                     </mat-form-field>
 
                     <mat-form-field *ngIf="availableDonationHours.length > 0"
                                     appearance="outline"
                                     class="custom-form-field select full-width">
-                    <mat-label>Horário disponível:</mat-label>
-                    <mat-select formControlName="donationTime">
-                        <mat-option *ngFor="let slot of availableDonationHours" [value]="slot.time">
-                        {{ slot.time }} - {{ slot.availableSpots }} vaga(s)
-                        </mat-option>
-                    </mat-select>
+                        <mat-label>Horário disponível:</mat-label>
+                        <mat-select formControlName="donationTime">
+                            <mat-option *ngFor="let slot of availableDonationHours" [value]="slot.time">
+                                {{ slot.time }} - {{ slot.availableSpots }} vaga(s)
+                            </mat-option>
+                        </mat-select>
                     </mat-form-field>
                 </div>
 
                 <!-- Submit -->
                 <div class="schedule-button-container">
-                    <button type="submit" class="schedule-btn">Agendar</button>
+                    <button type="submit" class="schedule-btn" [disabled]="scheduleForm.invalid">
+                        Agendar
+                    </button>
                 </div>
-
             </form>
         </div>
-    </div>
+    </div> 
 </div>

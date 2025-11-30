@@ -13,13 +13,15 @@ import { MatInputModule } from '@angular/material/input';
 import { NotificationBannerService } from '../../../shared/notification-banner/notification-banner.service';
 import { UserAccountService } from '../../account/user-account/user-account.service';
 import { PreloaderComponent } from '../../../shared/preloader/preloader.component';
+import { QuestionnaireService } from '../../questionnaire/questionnaire.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-donator-calendar',
   standalone: true,
   imports: [
     MatDatepickerModule, MatCardModule, CommonModule, MatFormFieldModule,
-    MatSelectModule, MatInputModule, FormsModule, ReactiveFormsModule, PreloaderComponent
+    MatSelectModule, MatInputModule, FormsModule, ReactiveFormsModule, PreloaderComponent, RouterModule,
   ],
   templateUrl: './donator-calendar.component.html',
   styleUrl: './donator-calendar.component.scss',
@@ -36,6 +38,7 @@ export class DonatorCalendarComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private userService: UserAccountService,
     private donationService: DonationService,
+    private questionnaireService: QuestionnaireService,
   ) {}
 
   availableBloodBanks: BloodBank[] = [];
@@ -68,7 +71,11 @@ export class DonatorCalendarComponent implements OnInit {
     status: string;
   } | null = null;
 
+  canSchedule: boolean | null = null;
+
+
   async ngOnInit(): Promise<void> {
+    await this.loadUsereligibility();
     await this.checkActiveAppointment();
     await this.checkIfUserCanDonate();
   }
@@ -359,4 +366,27 @@ export class DonatorCalendarComponent implements OnInit {
     };
     return map[status] || 'status-pending';
   }
+
+  /* -------------------------------------------------------------------------- */
+  /*                                Scheduling Validation                       */
+  /* -------------------------------------------------------------------------- */
+
+
+private async loadUsereligibility(): Promise<void> {
+  this.questionnaireService.getUserQuestionnaires().subscribe({
+    next: (questionnaireAnswer) => {
+      if (questionnaireAnswer && questionnaireAnswer.length > 0) {
+        this.canSchedule = questionnaireAnswer[0].eligible === true;
+      } else {
+        this.canSchedule = null;
+      }
+      this.cdr.markForCheck();
+    },
+    error: () => {
+      this.canSchedule = null;
+      this.notificationService.show('Erro ao verificar elegibilidade', 'error', 1500 );
+      this.cdr.markForCheck();
+    }
+  });
+}
 }

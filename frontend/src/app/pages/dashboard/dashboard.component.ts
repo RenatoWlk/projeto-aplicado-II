@@ -73,22 +73,23 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-private async loadUserQuestionnaire(): Promise<void> {
-  this.questionnaireService.getUserQuestionnaires().subscribe({
-    next: (questionnaireAnswer) => {
-      if (questionnaireAnswer && questionnaireAnswer.length > 0) {
-        console.log(questionnaireAnswer.length);
-        console.log(questionnaireAnswer)
-        this.showTutorial = false;
-      } else {
-        this.showTutorial = true;
+  /**
+   * Validate the user eligibility to donate/schedule.
+   */
+  private async loadUserQuestionnaire(): Promise<void> {
+    this.questionnaireService.getUserQuestionnaires().subscribe({
+      next: (questionnaireAnswer) => {
+        if (questionnaireAnswer && questionnaireAnswer.length > 0) {
+          this.showTutorial = false;
+        } else {
+          this.showTutorial = true;
+        }
+      },
+      error: () => {
+        this.notificationService.show('Erro ao carregar eligibilidade do usuário', 'error', 1500);
       }
-    },
-    error: () => {
-      this.notificationService.show('Erro ao carregar eligibilidade do usuário', 'error', 1500);
-    }
-  });
-}
+    });
+  }
 
 
   /**

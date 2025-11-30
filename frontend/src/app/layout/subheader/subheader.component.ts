@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HeaderService } from '../header/header.service';
@@ -13,7 +13,7 @@ import { NotificationBannerService } from '../../shared/notification-banner/noti
   templateUrl: './subheader.component.html',
   styleUrl: './subheader.component.scss'
 })
-export class SubheaderComponent implements OnInit {
+export class SubheaderComponent {
   constructor(private headerService: HeaderService, private questionnaireService: QuestionnaireService,
     private notificationService: NotificationBannerService,
   ) {}
@@ -27,29 +27,4 @@ export class SubheaderComponent implements OnInit {
   changeSlogan() {
     this.headerService.triggerSloganChange();
   }
-
-  ngOnInit(): void {
-    this.loadUserQuestionnaire();
-  }
-
-
-  private async loadUserQuestionnaire(): Promise<void> {
-    this.questionnaireService.getUserQuestionnaires().subscribe({
-      next: (questionnaireAnswer) => {
-        if (questionnaireAnswer && questionnaireAnswer.length > 0) {
-          this.isEligible = questionnaireAnswer[0].eligible;
-          if (this.isEligible === true) {
-            this.showScheduling = true;
-          } else {
-            this.showScheduling = false;
-          }
-          console.log(this.isEligible);
-        }
-      },
-      error: () => {
-        this.notificationService.show('Erro', 'error', 1500);
-      }
-    });
-}
-
 }

@@ -17,7 +17,6 @@ export class QuestionnaireComponent {
   invalidQuestions: string[] = [];
   submitted = false;
   success = false;
-  showScheduling: boolean = false;
   isEligible: boolean = false
 
   questionLabels: Record<string, string> = {
@@ -168,14 +167,13 @@ export class QuestionnaireComponent {
       userId: this.authService.getCurrentUserId(),
     };
 
-    console.log('--- DEBUG DO ENVIO ---');
-    console.log('Objeto JSON Completo sendo enviado:', JSON.stringify(data, null, 2));
+    // console.log('--- DEBUG DO ENVIO ---');
+    // console.log('Objeto JSON Completo sendo enviado:', JSON.stringify(data, null, 2));
 
     this.questionnaireService.submitQuestionnaire(data)
     .subscribe({
         next: response => {
           this.notificationService.show('Questionário respondido com sucesso!', 'success', 3000)
-          this.loadUserQuestionnaire();
         },
         error: err => this.notificationService.show('Erro ao enviar questionário!', 'error', 3000),
     });
@@ -187,24 +185,5 @@ export class QuestionnaireComponent {
     this.submitted = false;
     this.success = false;
     this.invalidQuestions = [];
-  }
-
-  private async loadUserQuestionnaire(): Promise<void> {
-    this.questionnaireService.getUserQuestionnaires().subscribe({
-      next: (questionnaireAnswer) => {
-        if (questionnaireAnswer && questionnaireAnswer.length > 0) {
-          this.isEligible = questionnaireAnswer[0].eligible;
-          if (this.isEligible === true) {
-            this.showScheduling = true;
-          } else {
-            this.showScheduling = false;
-          }
-          console.log(this.isEligible);
-        }
-      },
-      error: () => {
-        this.notificationService.show('Erro', 'error', 1500);
-      }
-    });
   }
 }
