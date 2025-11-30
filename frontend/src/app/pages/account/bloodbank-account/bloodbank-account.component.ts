@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BloodBank, Campaign, BloodBankAccountService } from './bloodbank-account.service';
+import { BloodBank, BloodBankAccountService } from './bloodbank-account.service';
 import { CommonModule } from '@angular/common';
-import { BloodBankDashboardService } from '../../dashboard/bloodbank-dashboard/bloodbank-dashboard.service'; 
+// IMPORTANTE: Importe a Campaign do Dashboard para manter a tipagem correta
+import { Campaign } from '../../dashboard/dashboard.service'; 
 
 @Component({
   selector: 'app-bloodbank-account',
@@ -28,15 +29,17 @@ export class BloodBankAccountComponent implements OnInit {
   editingCampaignIndex: number | null = null;
 
   priorityOptions = [
-    { value: 'low', label: 'Low' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'high', label: 'High' },
+    { value: 'low', label: 'Baixa' },
+    { value: 'medium', label: 'Média' },
+    { value: 'high', label: 'Alta' },
   ];
-isLoadingBloodbankCampaigns: any;
+  
+  isLoadingBloodbankCampaigns: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private bloodBankService: BloodBankAccountService
+    // REMOVIDO: private bbDashboardService... (Não precisamos mais dele aqui)
   ) {}
 
   ngOnInit(): void {
@@ -45,7 +48,10 @@ isLoadingBloodbankCampaigns: any;
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
       email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
-      address: ['', Validators.required],
+      street: ['', Validators.required],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      zipcode: ['', Validators.required],
       phone: ['', Validators.required],
       cnpj: ['', Validators.required],
       description: [''],
@@ -68,10 +74,13 @@ isLoadingBloodbankCampaigns: any;
       next: (data) => {
         this.bloodBank = data;
         this.fillProfileForm(data);
+        if (!this.bloodBank.campaigns) {
+            this.bloodBank.campaigns = [];
+        }
         this.isLoading = false;
       },
       error: (err) => {
-        this.error = 'Failed to load blood bank data.';
+        this.error = 'Falha ao carregar dados.';
         this.isLoading = false;
       },
     });
@@ -81,13 +90,69 @@ isLoadingBloodbankCampaigns: any;
     this.profileForm.patchValue({
       name: data.name,
       email: data.email,
-      address: data.address?.street || '',
+      street: data.address?.street || '',
+      city: data.address?.city || '',
+      state: data.address?.state || '',
+      zipcode: data.address?.zipCode || '',
       phone: data.phone,
       cnpj: data.cnpj,
       description: data.description || '',
       website: data.website || '',
     });
   }
+
+  getFormattedPhone(phone: string | undefined): string {
+    if (!phone) return 'Não informado';
+    const value = phone.replace(/\D/g, '');
+    if (value.length > 10) return value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
+    else if (value.length > 5) return value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    return value;
+  }
+
+  getFormattedCNPJ(cnpj: string | undefined): string {
+    if (!cnpj) return 'Não informado';
+    const value = cnpj.replace(/\D/g, '');
+    if (value.length <= 14) return value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
+    return value;
+  }
+
+  formatPhone(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 11) value = value.substring(0, 11);
+    if (value.length > 10) value = value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
+    else if (value.length > 5) value = value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    else if (value.length > 2) value = value.replace(/^(\d\d)(\d{0,5}).*/, '($1) $2');
+    input.value = value;
+    this.profileForm.get('phone')?.setValue(value, { emitEvent: false });
+  }
+
+  formatCEP(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 8) value = value.substring(0, 8);
+    if (value.length > 5) value = value.replace(/^(\d{5})(\d{0,3}).*/, '$1-$2');
+    input.value = value;
+    this.profileForm.get('zipcode')?.setValue(value, { emitEvent: false });
+  }
+
+  formatCNPJ(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 14) value = value.substring(0, 14);
+    if (value.length > 12) value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2}).*/, '$1.$2.$3/$4-$5');
+    else if (value.length > 8) value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4}).*/, '$1.$2.$3/$4');
+    else if (value.length > 5) value = value.replace(/^(\d{2})(\d{3})(\d{0,3}).*/, '$1.$2.$3');
+    else if (value.length > 2) value = value.replace(/^(\d{2})(\d{0,3}).*/, '$1.$2');
+    input.value = value;
+    this.profileForm.get('cnpj')?.setValue(value, { emitEvent: false });
+  }
+
+  private clean(value: string | null | undefined): string {
+    if (!value) return '';
+    return value.replace(/\D/g, '');
+  }
+
 
   onEditProfile(): void {
     this.editProfileMode = true;
@@ -108,8 +173,19 @@ isLoadingBloodbankCampaigns: any;
     this.error = null;
     this.successMessage = null;
 
+    const formValues = this.profileForm.getRawValue();
+
     const updatedProfile: Partial<BloodBank> = {
-      ...this.profileForm.getRawValue(),
+      ...this.bloodBank,
+      ...formValues,
+      phone: this.clean(formValues.phone),
+      cnpj: this.clean(formValues.cnpj),
+      address: {
+        street: formValues.street,
+        city: formValues.city,
+        state: formValues.state,
+        zipCode: this.clean(formValues.zipcode)
+      }
     };
 
     this.bloodBankService.updateBloodBank(updatedProfile).subscribe({
@@ -117,14 +193,15 @@ isLoadingBloodbankCampaigns: any;
         this.bloodBank = updated;
         this.editProfileMode = false;
         this.isLoading = false;
-        this.successMessage = 'Profile updated successfully.';
+        this.successMessage = 'Perfil atualizado com sucesso.';
       },
-      error: () => {
-        this.error = 'Failed to update profile.';
+      error: (err) => {
+        this.error = 'Falha ao atualizar perfil.';
         this.isLoading = false;
       },
     });
   }
+
 
   addCampaign(): void {
     this.addCampaignMode = true;
@@ -145,76 +222,68 @@ isLoadingBloodbankCampaigns: any;
     this.addCampaignMode = false;
     this.editCampaignMode = false;
     this.editingCampaignIndex = null;
+    this.campaignForm.reset();
   }
 
   saveCampaign(): void {
-    if (this.campaignForm.invalid) return;
+    if (this.campaignForm.invalid || !this.bloodBank) return;
 
     this.isLoading = true;
     this.error = null;
     this.successMessage = null;
 
     const campaignData: Campaign = this.campaignForm.value;
+    let currentCampaigns = this.bloodBank.campaigns ? [...this.bloodBank.campaigns] : [];
 
-    if (this.editCampaignMode && this.editingCampaignIndex !== null && this.bloodBank?.campaigns) {
-      // Editing existing campaign
-      const editingCampaign = this.bloodBank.campaigns[this.editingCampaignIndex];
-      if (!editingCampaign.id) {
-        this.error = 'Invalid campaign ID.';
-        this.isLoading = false;
-        return;
-      }
-      const updatedCampaign: Campaign = { ...campaignData, id: editingCampaign.id };
-
-      this.bloodBankService.updateCampaign(updatedCampaign).subscribe({
-        next: (updated) => {
-          this.bloodBank!.campaigns![this.editingCampaignIndex!] = updated;
-          this.isLoading = false;
-          this.successMessage = 'Campaign updated successfully.';
-          this.cancelCampaignForm();
-        },
-        error: () => {
-          this.error = 'Failed to update campaign.';
-          this.isLoading = false;
-        },
-      });
+    if (this.editCampaignMode && this.editingCampaignIndex !== null) {
+      const original = currentCampaigns[this.editingCampaignIndex];
+      currentCampaigns[this.editingCampaignIndex] = { ...original, ...campaignData };
     } else {
-      // Adding new campaign
-      this.bloodBankService.addCampaign(campaignData).subscribe({
-        next: (created) => {
-          if (this.bloodBank) {
-            if (!this.bloodBank.campaigns) this.bloodBank.campaigns = [];
-            this.bloodBank.campaigns.push(created);
-          }
-          this.isLoading = false;
-          this.successMessage = 'Campaign created successfully.';
-          this.cancelCampaignForm();
-        },
-        error: () => {
-          this.error = 'Failed to create campaign.';
-          this.isLoading = false;
-        },
-      });
+      currentCampaigns.push(campaignData);
     }
+
+    const updatedBloodBank: Partial<BloodBank> = {
+        ...this.bloodBank,
+        campaigns: currentCampaigns
+    };
+
+    this.bloodBankService.updateBloodBank(updatedBloodBank).subscribe({
+        next: (updated) => {
+            this.bloodBank = updated;
+            this.isLoading = false;
+            this.successMessage = this.editCampaignMode ? 'Campanha atualizada!' : 'Campanha criada!';
+            this.cancelCampaignForm();
+        },
+        error: (err) => {
+            this.error = 'Erro ao salvar campanha.';
+            this.isLoading = false;
+        }
+    });
   }
 
   removeCampaign(campaign: Campaign): void {
-    if (!campaign.id || !this.bloodBank) return;
+    if (!this.bloodBank || !this.bloodBank.campaigns) return;
+    
+    if(!confirm(`Deseja excluir a campanha "${campaign.title}"?`)) return;
 
     this.isLoading = true;
-    this.error = null;
-    this.successMessage = null;
+    const updatedCampaigns = this.bloodBank.campaigns.filter(c => c !== campaign);
 
-    this.bloodBankService.removeCampaign(campaign.id).subscribe({
-      next: () => {
-        this.bloodBank!.campaigns = this.bloodBank!.campaigns!.filter((c) => c.id !== campaign.id);
-        this.isLoading = false;
-        this.successMessage = 'Campaign removed successfully.';
-      },
-      error: () => {
-        this.error = 'Failed to remove campaign.';
-        this.isLoading = false;
-      },
+    const updatedBloodBank: Partial<BloodBank> = {
+        ...this.bloodBank,
+        campaigns: updatedCampaigns
+    };
+
+    this.bloodBankService.updateBloodBank(updatedBloodBank).subscribe({
+        next: (updated) => {
+            this.bloodBank = updated;
+            this.isLoading = false;
+            this.successMessage = 'Campanha removida com sucesso.';
+        },
+        error: (err) => {
+            this.error = 'Erro ao remover campanha.';
+            this.isLoading = false;
+        }
     });
   }
 
@@ -229,26 +298,19 @@ isLoadingBloodbankCampaigns: any;
   }
 
   getFieldError(form: FormGroup, field: string): string | null {
-    const control = form.get(field);
-    if (!control || !control.errors) return null;
-    if (control.errors['required']) return 'This field is required.';
-    if (control.errors['email']) return 'Invalid email format.';
     return null;
   }
 
   onPhotoSelected(event: Event): void {
-  const file = (event.target as HTMLInputElement).files?.[0];
-
-  if (file) {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      if (this.bloodBank) {
-        this.bloodBank.photoUrl = reader.result as string;
-      }
-    };
-
-    reader.readAsDataURL(file); // Lê a imagem como Base64
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (this.bloodBank) {
+          this.bloodBank.photoUrl = reader.result as string;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   }
-}
 }

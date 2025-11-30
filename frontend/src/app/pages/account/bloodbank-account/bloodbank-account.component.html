@@ -13,10 +13,9 @@
   <i class="fa-solid fa-check-circle"></i>
   {{ successMessage }}
 </div>
-
 <!-- Modo Visualização -->
 <div *ngIf="!editProfileMode">
-  <!-- Card do Perfil -->
+  
   <div class="app-card">
     <div class="app-card-header">
       <i class="fa-solid fa-hospital app-card-icon"></i>
@@ -46,22 +45,22 @@
         <p><strong>Nome:</strong> {{ bloodBank?.name }}</p>
         <p><strong>Email:</strong> {{ bloodBank?.email }}</p>
         <p><strong>Endereço:</strong> {{ bloodBank?.address?.street }} - {{ bloodBank?.address?.city }}-{{ bloodBank?.address?.state }}</p>
-        <p><strong>Telefone:</strong> {{ bloodBank?.phone }}</p>
-        <p><strong>CNPJ:</strong> {{ bloodBank?.cnpj }}</p>
+        <p><strong>Telefone:</strong> {{ getFormattedPhone(bloodBank?.phone) }}</p>
+        <p><strong>CNPJ:</strong> {{ getFormattedCNPJ(bloodBank?.cnpj) }}</p>
         <p *ngIf="bloodBank?.description"><strong>Descrição:</strong> {{ bloodBank?.description }}</p>
         <p *ngIf="bloodBank?.website"><strong>Website:</strong> {{ bloodBank?.website }}</p>
         <button type="button"
                 (click)="onEditProfile()"
-                [disabled]="isLoading">
+                [disabled]="isLoading || addCampaignMode || editCampaignMode">
           <i class="fa-solid fa-edit"></i>
           Editar Perfil
         </button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Formulário de Edição do Perfil usando ReactiveFormsModule -->
+</div>
+<!-- Formulário de Edição do Perfil -->
 <div *ngIf="editProfileMode" class="app-card">
   <div class="app-card-header">
     <i class="fa-solid fa-user-edit app-card-icon"></i>
@@ -69,91 +68,63 @@
   </div>
 
   <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+    
     <label>
       <span>Nome do Banco</span>
-      <input type="text"
-             formControlName="name"
-             placeholder="Nome completo do banco de sangue"
-             [class.invalid]="isFieldInvalid(profileForm, 'name')" />
-      <div *ngIf="getFieldError(profileForm, 'name')" class="error-text">
-        {{ getFieldError(profileForm, 'name') }}
-      </div>
+      <input type="text" formControlName="name" placeholder="Nome completo" [class.invalid]="isFieldInvalid(profileForm, 'name')" />
     </label>
 
     <label>
       <span>Email</span>
-      <input type="email"
-             formControlName="email"
-             placeholder="email@exemplo.com"
-             [class.invalid]="isFieldInvalid(profileForm, 'email')" />
-      <div *ngIf="getFieldError(profileForm, 'email')" class="error-text">
-        {{ getFieldError(profileForm, 'email') }}
-      </div>
+      <input type="email" formControlName="email" [class.invalid]="isFieldInvalid(profileForm, 'email')" />
+      </label>
+        <label>
+            <span>UF</span>
+            <input type="text" 
+                   formControlName="state" 
+                   placeholder="SP"
+                   maxlength="2"
+                   style="text-align: center; text-transform: uppercase;"
+                   [class.invalid]="isFieldInvalid(profileForm, 'state')" />
+        </label>
+
+    <label>
+        <span>Cidade</span>
+        <input type="text" formControlName="city" placeholder="Cidade" [class.invalid]="isFieldInvalid(profileForm, 'city')" />
     </label>
 
     <label>
-      <span>Endereço</span>
-      <input type="text"
-             formControlName="address"
-             placeholder="Endereço completo"
-             [class.invalid]="isFieldInvalid(profileForm, 'address')" />
-      <div *ngIf="getFieldError(profileForm, 'address')" class="error-text">
-        {{ getFieldError(profileForm, 'address') }}
-      </div>
+        <span>Rua / Número</span>
+        <input type="text" formControlName="street" placeholder="Rua, Número, Bairro" [class.invalid]="isFieldInvalid(profileForm, 'street')" />
     </label>
 
     <label>
       <span>Telefone</span>
-      <input type="tel"
-             formControlName="phone"
-             placeholder="(11) 99999-9999"
+      <input type="tel" 
+             formControlName="phone" 
+             placeholder="(00) 00000-0000"
+             (input)="formatPhone($event)"
+             maxlength="16"
              [class.invalid]="isFieldInvalid(profileForm, 'phone')" />
-      <div *ngIf="getFieldError(profileForm, 'phone')" class="error-text">
-        {{ getFieldError(profileForm, 'phone') }}
-      </div>
     </label>
 
     <label>
       <span>CNPJ</span>
-      <input type="text"
-             formControlName="cnpj"
+      <input type="text" 
+             formControlName="cnpj" 
              placeholder="00.000.000/0000-00"
+             (input)="formatCNPJ($event)"
+             maxlength="18"
              [class.invalid]="isFieldInvalid(profileForm, 'cnpj')" />
-      <div *ngIf="getFieldError(profileForm, 'cnpj')" class="error-text">
-        {{ getFieldError(profileForm, 'cnpj') }}
-      </div>
-    </label>
-
-    <label>
-      <span>Descrição (Opcional)</span>
-      <textarea formControlName="description"
-                placeholder="Descreva o banco de sangue..."
-                rows="3"></textarea>
-    </label>
-
-    <label>
-      <span>Website (Opcional)</span>
-      <input type="url"
-             formControlName="website"
-             placeholder="https://exemplo.com" />
     </label>
 
     <div class="form-actions">
-      <button type="submit"
-              class="primary"
-              [disabled]="isLoading || profileForm.invalid">
-        <i class="fa-solid fa-save"></i>
-        Salvar Alterações
+      <button type="submit" class="primary" [disabled]="isLoading || profileForm.invalid">
+        <i class="fa-solid fa-save"></i> Salvar Alterações
       </button>
-      <button type="button"
-              class="secondary"
-              (click)="cancelEdit()"
-              [disabled]="isLoading">
-        <i class="fa-solid fa-times"></i>
-        Cancelar
+      <button type="button" class="secondary" (click)="cancelEdit()" [disabled]="isLoading">
+        <i class="fa-solid fa-times"></i> Cancelar
       </button>
     </div>
   </form>
 </div>
-
-

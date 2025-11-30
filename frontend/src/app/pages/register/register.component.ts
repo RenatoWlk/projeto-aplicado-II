@@ -44,7 +44,7 @@ export class RegisterComponent {
       /** USER */
       personalInfo: this.fb.group({
         name: ['', Validators.required],
-        cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+        cpf: ['', [Validators.required, Validators.pattern(/^[\d\.\-]{11,14}$/)]],
         gender: ['', Validators.required],
         bloodtype: ['', Validators.required],
         telephone: ['', Validators.required],
@@ -96,6 +96,82 @@ export class RegisterComponent {
   get partnerInfoFormGroup() {
     return this.userForm.get('partnerInfo') as FormGroup;
   }
+
+  formatPhone(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    
+    if (value.length > 11) value = value.substring(0, 11);
+
+    // Máscara (XX) X XXXX-XXXX
+    if (value.length > 10) {
+      value = value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
+    } else if (value.length > 5) {
+      value = value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    } else if (value.length > 2) {
+      value = value.replace(/^(\d\d)(\d{0,5}).*/, '($1) $2');
+    }
+
+    input.value = value;
+    this.personalInfoGroup.get('telephone')?.setValue(value, { emitEvent: false });
+  }
+
+  formatCPF(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, ''); 
+    
+    if (value.length > 11) value = value.substring(0, 11);
+
+    // Máscara 000.000.000-00
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+
+    input.value = value;
+    this.personalInfoGroup.get('cpf')?.setValue(value, { emitEvent: false });
+  }
+
+  formatCEP(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    
+    if (value.length > 8) value = value.substring(0, 8);
+
+    // Máscara 00000-000
+    if (value.length > 5) {
+      value = value.replace(/^(\d{5})(\d{0,3}).*/, '$1-$2');
+    }
+
+    input.value = value;
+    this.personalInfoGroup.get('zipcode')?.setValue(value, { emitEvent: false });
+  }
+
+  formatCNPJ(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+
+    if (value.length > 14) value = value.substring(0, 14);
+
+    if (value.length > 12) {
+      value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2}).*/, '$1.$2.$3/$4-$5');
+    } else if (value.length > 8) {
+      value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4}).*/, '$1.$2.$3/$4');
+    } else if (value.length > 5) {
+      value = value.replace(/^(\d{2})(\d{3})(\d{0,3}).*/, '$1.$2.$3');
+    } else if (value.length > 2) {
+      value = value.replace(/^(\d{2})(\d{0,3}).*/, '$1.$2');
+    }
+
+    input.value = value;
+
+    this.personalInfoGroup.get('cnpj')?.setValue(value, { emitEvent: false });
+
+  }
+
+  private clean(value: string | null | undefined): string {
+    if (!value) return '';
+    return value.replace(/\D/g, '');
+  }
   
   submit() {
     const email = this.credentialsGroup.get('email')?.value;
@@ -109,15 +185,15 @@ export class RegisterComponent {
         name: this.personalInfoGroup.get('name')?.value,
         email: email,
         password: password,
-        cpf: this.personalInfoGroup.get('cpf')?.value,
+        cpf: this.clean(this.personalInfoGroup.get('cpf')?.value),
         gender: this.personalInfoGroup.get('gender')?.value,
         bloodType: this.personalInfoGroup.get('bloodtype')?.value,
-        phone: this.personalInfoGroup.get('telephone')?.value,
+        phone: this.clean(this.personalInfoGroup.get('telephone')?.value),
         address: {
           city: this.personalInfoGroup.get('city')?.value,
           state: this.personalInfoGroup.get('state')?.value,
           street: this.personalInfoGroup.get('street')?.value,
-          zipCode: this.personalInfoGroup.get('zipcode')?.value,
+          zipCode: this.clean(this.personalInfoGroup.get('zipcode')?.value),
         },
       };
 
@@ -138,15 +214,15 @@ export class RegisterComponent {
         name: this.bloodbankInfoFormGroup.get('instituitonName')?.value,
         email: email,
         password: password,
-        cnpj: this.bloodbankInfoFormGroup.get('cnpj')?.value,
+        cnpj: this.clean(this.bloodbankInfoFormGroup.get('cnpj')?.value),
         address: {
           city: this.bloodbankInfoFormGroup.get('city')?.value,
           state: this.bloodbankInfoFormGroup.get('state')?.value,
           street: this.bloodbankInfoFormGroup.get('street')?.value,
-          zipCode: this.bloodbankInfoFormGroup.get('zipcode')?.value,
+          zipCode: this.clean(this.bloodbankInfoFormGroup.get('zipcode')?.value),
         },
         campaigns: [],
-        phone: this.bloodbankInfoFormGroup.get('telephone')?.value,
+        phone: this.clean(this.bloodbankInfoFormGroup.get('telephone')?.value),
       };
 
       this.registerService.registerBloodBank(payload).subscribe({
@@ -166,15 +242,15 @@ export class RegisterComponent {
         name: this.partnerInfoFormGroup.get('partnerName')?.value,
         email: email,
         password: password,
-        cnpj: this.partnerInfoFormGroup.get('cnpj')?.value,
+        cnpj: this.clean(this.partnerInfoFormGroup.get('cnpj')?.value),
         address: {
           city: this.partnerInfoFormGroup.get('city')?.value,
           state: this.partnerInfoFormGroup.get('state')?.value,
           street: this.partnerInfoFormGroup.get('street')?.value,
-          zipCode: this.partnerInfoFormGroup.get('zipcode')?.value
+          zipCode: this.clean(this.partnerInfoFormGroup.get('zipcode')?.value)
         },
         offers: [],
-        phone: this.partnerInfoFormGroup.get('telephone')?.value,
+        phone: this.clean(this.partnerInfoFormGroup.get('telephone')?.value),
       };
 
       this.registerService.registerPartner(payload).subscribe({

@@ -495,10 +495,14 @@ export class UserAccountComponent implements OnInit {
 
   return answer === expected ? 'yes' : 'no';
 }
-  getAnswerIcon(answer: boolean | null): string {
-  if (answer === null) return 'fa-question';
-  return answer ? 'fa-check' : 'fa-xmark';
-}
+  getAnswerIcon(field: string, answer: boolean | null | undefined): string {
+    if (answer === null || answer === undefined) return 'fa-question';
+
+    const expected = this.expectedAnswers[field];
+
+    if (expected === undefined) return 'fa-circle';
+    return answer === expected ? 'fa-check' : 'fa-xmark';
+  }
 
 getFormattedAnswer(answer: boolean | null): string {
   if (answer === null) return '-';
