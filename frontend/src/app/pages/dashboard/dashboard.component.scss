@@ -452,3 +452,307 @@
     max-width: 160px;
   }
 }
+
+
+/* ---------- DONATOR GUIDE ---------- */
+
+.guide-app-card {
+  padding: 32px;
+}
+
+/* Guide header */
+.guide-card-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.app-card-icon-tutorial {
+  font-size: 48px;
+  color: #e63946;
+  margin-bottom: 16px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.donator-tutorial-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guide-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2b2d42;
+  margin: 0;
+}
+
+.guide-subtitle {
+  font-size: 16px;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* GUIDE CARD */
+.card.guide.donator {
+  border: none;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  border-radius: 12px;
+  padding: 32px;
+}
+
+/* GUIDE CONTAINER */
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* GUIDE ITEM */
+.step-item {
+  display: grid;
+  grid-template-columns: 60px 1fr 60px;
+  gap: 20px;
+  align-items: center;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.step-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 16px rgba(230, 57, 70, 0.15);
+}
+
+/* GUIDE NUMBER STEP */
+.step-number {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: 0 4px 8px rgba(230, 57, 70, 0.3);
+  flex-shrink: 0;
+}
+
+/* Step content */
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2b2d42;
+  margin: 0;
+}
+
+.step-description {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.step-action {
+  background: #e63946;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: fit-content;
+  text-decoration: none;
+}
+
+.step-action:hover {
+  background: #d62828;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(230, 57, 70, 0.3);
+}
+
+/* Step icon */
+.step-icon {
+  font-size: 32px;
+  color: #e63946;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+/* Divider */
+.step-divider {
+  width: 3px;
+  height: 40px;
+  background: linear-gradient(180deg, #e63946 0%, #fca5a5 100%);
+  margin: 0 auto;
+  border-radius: 2px;
+}
+
+/* Impact */
+.step-impact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff5f5;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 4px solid #e63946;
+  margin-top: 8px;
+}
+
+.step-impact i {
+  color: #e63946;
+  font-size: 20px;
+}
+
+.step-impact span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2b2d42;
+}
+
+/* Footer */
+.guide-footer {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 2px dashed #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.motivational-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 2px solid #ffd60a;
+}
+
+.motivational-message i {
+  color: #ffd60a;
+  font-size: 24px;
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  0%, 90% {
+    transform: rotate(0deg);
+  }
+  95% {
+    transform: rotate(15deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.motivational-message p {
+  margin: 0;
+  font-size: 15px;
+  color: #2b2d42;
+  font-weight: 500;
+}
+
+/* button */
+.cta-button {
+  background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
+  color: #ffffff;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+  text-decoration: none;
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(230, 57, 70, 0.4);
+}
+
+.cta-button i {
+  font-size: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .guide-app-card {
+    padding: 20px;
+  }
+
+  .card.guide.donator {
+    padding: 20px;
+  }
+
+  .step-item {
+    grid-template-columns: 50px 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .step-icon {
+    display: none;
+  }
+
+  .step-number {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .step-title {
+    font-size: 18px;
+  }
+
+  .step-description {
+    font-size: 13px;
+  }
+
+  .guide-title {
+    font-size: 26px;
+  }
+
+  .app-card-icon-tutorial {
+    font-size: 40px;
+  }
+
+  .motivational-message {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cta-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

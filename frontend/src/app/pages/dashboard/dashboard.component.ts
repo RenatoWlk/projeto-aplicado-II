@@ -10,6 +10,8 @@ import { LeaderboardsComponent } from "./leaderboards/leaderboards.component";
 import { PreloaderComponent } from "../../shared/preloader/preloader.component";
 import { AppRoutesPaths } from '../../shared/app.constants';
 import { PartnerDashboardComponent } from "./partner-dashboard/partner-dashboard.component";
+import { QuestionnaireService } from '../questionnaire/questionnaire.service';
+import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,6 +36,8 @@ export class DashboardComponent implements OnInit {
   isLoggedIn: boolean = false;
   userRole: UserRole | null = null;
   private userId: string = "";
+  isEligible: boolean = false;
+  showTutorial: boolean = false;
   
   // Dashboard data
   posts: Campaign[] = [];
@@ -51,7 +55,10 @@ export class DashboardComponent implements OnInit {
   constructor(
     private dashboardService: DashboardService, 
     private authService: AuthService,
+    private questionnaireService: QuestionnaireService,
+    private notificationService: NotificationBannerService,
   ) {}
+  
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isAuthenticated();
@@ -60,10 +67,30 @@ export class DashboardComponent implements OnInit {
     if (this.isLoggedIn && this.userRole === this.roles.User) {
       this.userId = this.authService.getCurrentUserId();
       this.loadAllDashboardData();
+      this.loadUserQuestionnaire();
     } else {
       this.loadDashboardDataForPublicUsers();
     }
   }
+
+  /**
+   * Validate the user eligibility to donate/schedule.
+   */
+  private async loadUserQuestionnaire(): Promise<void> {
+    this.questionnaireService.getUserQuestionnaires().subscribe({
+      next: (questionnaireAnswer) => {
+        if (questionnaireAnswer && questionnaireAnswer.length > 0) {
+          this.showTutorial = false;
+        } else {
+          this.showTutorial = true;
+        }
+      },
+      error: () => {
+        this.notificationService.show('Erro ao carregar eligibilidade do usuário', 'error', 1500);
+      }
+    });
+  }
+
 
   /**
    * Loads all required dashboard data for logged users.

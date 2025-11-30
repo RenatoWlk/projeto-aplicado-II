@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { HeaderService } from '../header/header.service';
 import { UserRole } from '../../shared/app.enums';
 import { AppRoutesPaths } from '../../shared/app.constants';
+import { QuestionnaireService } from '../../pages/questionnaire/questionnaire.service';
+import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 @Component({
   selector: 'app-subheader',
@@ -12,11 +14,15 @@ import { AppRoutesPaths } from '../../shared/app.constants';
   styleUrl: './subheader.component.scss'
 })
 export class SubheaderComponent {
-  constructor(private headerService: HeaderService) {}
+  constructor(private headerService: HeaderService, private questionnaireService: QuestionnaireService,
+    private notificationService: NotificationBannerService,
+  ) {}
 
   readonly roles = UserRole;
   readonly appRoutesPaths = AppRoutesPaths;
   @Input() userRole: UserRole | null = null;
+  isEligible: boolean = false;
+  showScheduling: boolean = false;
 
   changeSlogan() {
     this.headerService.triggerSloganChange();
