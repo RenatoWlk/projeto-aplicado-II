@@ -29,8 +29,8 @@
       </div>
 
       <!-- IS LOGGED IN -->
-      <div class="logged-in-container">
-        <button class="header-btn notification-btn" (click)="toggleNotifications($event)">
+      <div *ngIf="isLoggedIn" class="logged-in-container">
+        <button *ngIf="userRole === roles.User" class="header-btn notification-btn" (click)="toggleNotifications($event)">
           <mat-icon>notifications</mat-icon>
           <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
         </button>

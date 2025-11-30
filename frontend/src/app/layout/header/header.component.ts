@@ -7,6 +7,7 @@ import { HeaderService } from './header.service';
 import { AppRoutesPaths } from '../../shared/app.constants';
 import { NotificationModalComponent } from '../../shared/notifications/notification-modal/notification-modal.component';
 import { NotificationEventService } from '../../shared/notifications/notification-event.service';
+import { UserRole } from '../../shared/app.enums';
 
 @Component({
   selector: 'app-header',
@@ -16,10 +17,12 @@ import { NotificationEventService } from '../../shared/notifications/notificatio
 })
 export class HeaderComponent implements OnInit {
   readonly appRoutesPaths = AppRoutesPaths;
+  readonly roles = UserRole;
   isMenuOpen: boolean = false;
   isLoggedIn: boolean = false;
   userName: string = '';
   userEmail: string = '';
+  userRole: UserRole | null = null;
   slogan: string = '';
   currentUserId: string = '';
 
@@ -60,6 +63,7 @@ export class HeaderComponent implements OnInit {
 
     this.userName = this.authService.getCurrentUserName();
     this.userEmail = this.authService.getCurrentUserEmail();
+    this.userRole = this.authService.getCurrentUserRole();
     this.currentUserId = this.authService.getCurrentUserId();
 
     this.loadHeaderUnreadCount();

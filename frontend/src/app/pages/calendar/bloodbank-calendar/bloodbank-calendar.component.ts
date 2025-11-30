@@ -45,8 +45,6 @@ export class BloodbankCalendarComponent {
     availableSpots: new FormControl<number>(0, {nonNullable: true}),
   });
 
-
-
   constructor(
     private bloodbankService: BloodbankService,
     private authService: AuthService,
@@ -125,27 +123,4 @@ export class BloodbankCalendarComponent {
     }
     return result;
   }
-
-  // // Filtro do calendário: habilita apenas datas a partir de amanhã
-  // availableSchedulingDates = new FormControl<d: Date | null>(boolean) => {
-  //   if (!d) return false;
-    
-  //   const tomorrow = new Date();
-  //   tomorrow.setDate(tomorrow.getDate() + 1);
-  //   tomorrow.setHours(0, 0, 0, 0); // Zera as horas
-    
-  //   const selectedDate = new Date(d);
-  //   selectedDate.setHours(0, 0, 0, 0);
-    
-  //   if (selectedDate < tomorrow) return false;
-    
-  //   return true;
-  // };
-
-  // private formatDateToString(date: Date): string {
-  //   const year = date.getFullYear();
-  //   const month = String(date.getMonth() + 1).padStart(2, '0');
-  //   const day = String(date.getDate()).padStart(2, '0');
-  //   return `${year}-${month}-${day}`;
-  // }
 }
