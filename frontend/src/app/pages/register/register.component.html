@@ -77,9 +77,9 @@
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CPF</mat-label>
-              <input matInput formControlName="cpf" required />
+              <input matInput formControlName="cpf" required (input)="formatCPF($event)" maxlength="15" />
               <mat-error *ngIf="personalInfoGroup.get('cpf')?.hasError('pattern')">
-                CPF deve conter 11 dígitos
+                CPF inválido
               </mat-error>
             </mat-form-field>
 
@@ -107,10 +107,10 @@
               </mat-select>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="custom-form-field">
-              <mat-label class="input-label">Telefone</mat-label>
-              <input matInput formControlName="telephone" required />
-            </mat-form-field>
+          <mat-form-field appearance="outline" class="custom-form-field">
+            <mat-label class="input-label">Telefone</mat-label>
+            <input matInput formControlName="telephone" required (input)="formatPhone($event)" maxlength="16" />
+          </mat-form-field>
           </div>
           <div class="column">
             <mat-form-field appearance="outline" class="custom-form-field">
@@ -130,7 +130,7 @@
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CEP</mat-label>
-              <input matInput formControlName="zipcode" required />
+              <input matInput formControlName="zipcode" required (input)="formatCEP($event)" maxlength="9" />
             </mat-form-field>
           </div>
         </div>
@@ -167,7 +167,7 @@
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CEP</mat-label>
-              <input matInput formControlName="zipcode" required />
+              <input matInput formControlName="zipcode" required (input)="formatCEP($event)" maxlength="9" />
             </mat-form-field>
           </div>
 
@@ -175,7 +175,7 @@
           <div class="column">
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CNPJ</mat-label>
-              <input matInput formControlName="cnpj" required />
+              <input matInput formControlName="cnpj" required (input)="formatCNPJ($event)" maxlength="18" />
               <mat-error *ngIf="bloodbankInfoFormGroup.get('cnpj')?.hasError('pattern')">
                 CNPJ deve conter 11 dígitos
               </mat-error>
@@ -193,7 +193,7 @@
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Telefone</mat-label>
-              <input matInput formControlName="telephone" required />
+              <input matInput formControlName="telephone" required  (input)="formatPhone($event)" maxlength="15" />
             </mat-form-field>
           </div>
         </div>

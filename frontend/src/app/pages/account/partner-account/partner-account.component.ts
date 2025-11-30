@@ -66,25 +66,32 @@ export class PartnerAccountComponent implements OnInit {
   }
 
   private initProfileForm(): void {
+    const phonePattern = /^[\d\(\)\-\s]*$/;
+    const docPattern = /^[\d\.\-\/]*$/;
+
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      address: ['', Validators.required],
-      phone: ['', Validators.required],
-      cnpj: ['', Validators.required],
-      description: [''],
-      website: ['']
+      street: ['', Validators.required],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+
+      phone: ['', [Validators.required, Validators.pattern(phonePattern)]],
+      cnpj: ['', [Validators.required, Validators.pattern(docPattern)]],
     });
   }
-
+  
   private patchProfileForm(): void {
     if (!this.partnerUser) return;
     this.profileForm.patchValue({
       name: this.partnerUser.name,
       email: this.partnerUser.email,
-      address: this.partnerUser.address?.street || '',
+      street: this.partnerUser.address?.street || '',
+      city: this.partnerUser.address?.city || '',
+      state: this.partnerUser.address?.state || '',
+      zipcode: this.partnerUser.address?.zipCode || '',
       phone: this.partnerUser.phone,
-      cnpj: this.partnerUser.cnpj
+      cnpj: this.partnerUser.cnpj,
     });
   }
 
@@ -105,14 +112,63 @@ export class PartnerAccountComponent implements OnInit {
   }
 
   getFieldError(form: FormGroup, fieldName: string): string | null {
-    const control = form.get(fieldName);
-    if (!control || !control.errors) return null;
-
-    if (control.errors['required']) return 'This field is required.';
-    if (control.errors['email']) return 'Invalid email format.';
-    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}.`;
-    if (control.errors['max']) return `Maximum value is ${control.errors['max'].max}.`;
     return null;
+  }
+  private clean(value: string | null | undefined): string {
+    if (!value) return '';
+    return value.replace(/\D/g, '');
+  }
+
+  getFormattedPhone(phone: string | undefined): string {
+    if (!phone) return 'Não informado';
+    const value = phone.replace(/\D/g, '');
+    if (value.length > 10) return value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
+    else if (value.length > 5) return value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    return value;
+  }
+
+  getFormattedCNPJ(cnpj: string | undefined): string {
+    if (!cnpj) return '';
+        let value = cnpj.replace(/\D/g, '');
+    if (value.length > 14) {
+      value = value.substring(0, 14);
+    }
+    if (value.length > 0) {
+      return value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
+    }
+    return value;
+  }
+
+  formatPhone(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 11) value = value.substring(0, 11);
+    if (value.length > 10) value = value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
+    else if (value.length > 5) value = value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    else if (value.length > 2) value = value.replace(/^(\d\d)(\d{0,5}).*/, '($1) $2');
+    input.value = value;
+    this.profileForm.get('phone')?.setValue(value, { emitEvent: false });
+  }
+
+  formatCEP(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 8) value = value.substring(0, 8);
+    if (value.length > 5) value = value.replace(/^(\d{5})(\d{0,3}).*/, '$1-$2');
+    input.value = value;
+    this.profileForm.get('zipcode')?.setValue(value, { emitEvent: false });
+  }
+
+  formatCNPJ(event: any): void {
+    let input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 14) value = value.substring(0, 14);
+    if (value.length > 12) value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2}).*/, '$1.$2.$3/$4-$5');
+    else if (value.length > 8) value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4}).*/, '$1.$2.$3/$4');
+    else if (value.length > 5) value = value.replace(/^(\d{2})(\d{3})(\d{0,3}).*/, '$1.$2.$3');
+    else if (value.length > 2) value = value.replace(/^(\d{2})(\d{0,3}).*/, '$1.$2');
+    input.value = value;
+    this.profileForm.get('cnpj')?.setValue(value, { emitEvent: false });
   }
 
   onEditProfile(): void {
@@ -125,14 +181,28 @@ export class PartnerAccountComponent implements OnInit {
     if (this.profileForm.invalid) return;
 
     this.isLoading = true;
-    const updatedProfile = this.profileForm.value;
+    const formValues = this.profileForm.getRawValue();
+
+    const updatedProfile: Partial<Partner> = {
+      ...this.partnerUser,
+      ...formValues,
+
+      phone: this.clean(formValues.phone),
+      cnpj: this.clean(formValues.cnpj),
+
+      address: {
+        street: formValues.street,
+        city: formValues.city,
+        state: formValues.state,
+      }
+    };
 
     this.partnerService.updatePartner(updatedProfile).subscribe({
       next: (updated) => {
         this.partnerUser = updated;
         this.patchProfileForm();
         this.editProfileMode = false;
-        this.successMessage = 'Profile updated successfully.';
+        this.successMessage = 'Perfil atualizado com sucesso.';
         this.error = null;
         this.isLoading = false;
       },

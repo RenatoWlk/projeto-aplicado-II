@@ -3,14 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { Address } from '../../dashboard/dashboard.service';
+import { Campaign } from '../../dashboard/dashboard.service';
 
-export interface Campaign {
-  id?: string;
-  title: string;
-  description: string;
-  priority: string;
-  active: boolean;
-}
 
 export interface BloodBank {
   id: string;
@@ -46,12 +40,6 @@ export class BloodBankAccountService {
   addCampaign(campaign: Campaign): Observable<Campaign> {
     const id = this.authService.getCurrentUserId();
     return this.http.post<Campaign>(`${this.API}/${id}/campaigns`, campaign);
-  }
-
-  updateCampaign(campaign: Campaign): Observable<Campaign> {
-    const id = this.authService.getCurrentUserId();
-    if (!campaign.id) throw new Error('Campaign ID is required');
-    return this.http.put<Campaign>(`${this.API}/${id}/campaigns/${campaign.id}`, campaign);
   }
 
   removeCampaign(campaignId: string): Observable<void> {

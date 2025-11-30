@@ -457,7 +457,7 @@
              [ngClass]="getAnswerClass('healthy', lastQuestionnaire.healthy)">
           <div class="question-text">Está se sentindo bem de saúde?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.healthy)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('healthy', lastQuestionnaire.healthy)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.healthy) }}
           </div>
         </div>
@@ -466,7 +466,7 @@
              [ngClass]="getAnswerClass('symptoms', lastQuestionnaire.symptoms)">
           <div class="question-text">Apresenta sintomas como febre, gripe, resfriado?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.symptoms)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('symptoms', lastQuestionnaire.symptoms)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.symptoms) }}
           </div>
         </div>
@@ -475,7 +475,7 @@
              [ngClass]="getAnswerClass('diseases',  lastQuestionnaire.diseases)">
           <div class="question-text">Possui doenças cardíacas, diabetes, ou outras condições crônicas?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.diseases)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('diseases', lastQuestionnaire.diseases)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.diseases) }}
           </div>
         </div>
@@ -484,7 +484,7 @@
              [ngClass]="getAnswerClass('medications', lastQuestionnaire.medications)">
           <div class="question-text">Está tomando medicamentos?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.medications)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('medications',lastQuestionnaire.medications)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.medications) }}
           </div>
         </div>
@@ -500,7 +500,7 @@
              [ngClass]="getAnswerClass('pregnant', lastQuestionnaire.pregnant)">
           <div class="question-text">Está grávida?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.pregnant)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('pregnant', lastQuestionnaire.pregnant)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.pregnant) }}
           </div>
         </div>
@@ -510,7 +510,7 @@
              [ngClass]="getAnswerClass('recentChildbirth',lastQuestionnaire.recentChildbirth)">
           <div class="question-text">Teve parto ou aborto nos últimos 12 meses?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.recentChildbirth)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('recentChildbirth', lastQuestionnaire.recentChildbirth)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.recentChildbirth) }}
           </div>
         </div>
@@ -520,7 +520,7 @@
              [ngClass]="getAnswerClass('lastDonationFemale',lastQuestionnaire.lastDonationFemale)">
           <div class="question-text">Última doação foi há menos de 90 dias?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.lastDonationFemale)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('lastDonationFemale', lastQuestionnaire.lastDonationFemale)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.lastDonationFemale) }}
           </div>
         </div>
@@ -536,7 +536,7 @@
              [ngClass]="getAnswerClass('lastDonationMale', lastQuestionnaire.lastDonationMale)">
           <div class="question-text">Última doação foi há menos de 60 dias?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.lastDonationMale)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('lastDonationMale', lastQuestionnaire.lastDonationMale)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.lastDonationMale) }}
           </div>
         </div>
@@ -551,7 +551,7 @@
              [ngClass]="getAnswerClass('drugs', lastQuestionnaire.drugs)">
           <div class="question-text">Fez uso de drogas injetáveis?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.drugs)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('drugs', lastQuestionnaire.drugs)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.drugs) }}
           </div>
         </div>
@@ -560,7 +560,7 @@
              [ngClass]="getAnswerClass('partners', lastQuestionnaire.partners)">
           <div class="question-text">Teve múltiplos parceiros sexuais ou relações de risco?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.partners)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('partners', lastQuestionnaire.partners)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.partners) }}
           </div>
         </div>
@@ -569,7 +569,7 @@
              [ngClass]="getAnswerClass('tattooOrPiercing', lastQuestionnaire.tattooOrPiercing)">
           <div class="question-text">Fez tatuagem, piercing ou acupuntura nos últimos 12 meses?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.tattooOrPiercing)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('tattooOrPiercing', lastQuestionnaire.tattooOrPiercing)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.tattooOrPiercing) }}
           </div>
         </div>
@@ -584,7 +584,7 @@
              [ngClass]="getAnswerClass('procedures', lastQuestionnaire.procedures)">
           <div class="question-text">Realizou cirurgias ou procedimentos médicos recentes?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.procedures)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('procedures', lastQuestionnaire.procedures)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.procedures) }}
           </div>
         </div>
@@ -593,7 +593,7 @@
              [ngClass]="getAnswerClass('covidVaccine', lastQuestionnaire.covidVaccine)">
           <div class="question-text">Tomou vacina COVID-19 nas últimas 48h?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.covidVaccine)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('covidVaccine', lastQuestionnaire.covidVaccine)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.covidVaccine) }}
           </div>
         </div>
@@ -602,7 +602,7 @@
              [ngClass]="getAnswerClass('yellowFeverVaccine', lastQuestionnaire.yellowFeverVaccine)">
           <div class="question-text">Tomou vacina da febre amarela nos últimos 30 dias?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.yellowFeverVaccine)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('yellowFeverVaccine', lastQuestionnaire.yellowFeverVaccine)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.yellowFeverVaccine) }}
           </div>
         </div>
@@ -617,7 +617,7 @@
              [ngClass]="getAnswerClass('travelRiskArea', lastQuestionnaire.travelRiskArea)">
           <div class="question-text">Viajou para áreas de risco (malária, febre amarela) recentemente?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.travelRiskArea)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('travelRiskArea', lastQuestionnaire.travelRiskArea)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.travelRiskArea) }}
           </div>
         </div>
@@ -632,7 +632,7 @@
              [ngClass]="getAnswerClass('donationBefore60', lastQuestionnaire.donationBefore60)">
           <div class="question-text">Já doou sangue antes dos 60 anos?</div>
           <div class="answer-badge">
-            <i class="fa-solid" [ngClass]="getAnswerIcon(lastQuestionnaire.donationBefore60)"></i>
+            <i class="fa-solid" [ngClass]="getAnswerIcon('donationBefore60', lastQuestionnaire.donationBefore60)"></i>
             {{ getFormattedAnswer(lastQuestionnaire.donationBefore60) }}
           </div>
         </div>
@@ -689,7 +689,7 @@
       <i class="fa-solid fa-clipboard-question" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
       <p>Nenhum questionário encontrado</p>
       <p style="color: #666; font-size: 0.9rem;">Seus questionários de elegibilidade aparecerão aqui</p>
-      <button class="action-button primary" style="margin-top: 1rem;" (click)="onNewQuestionnaire()">
+      <button class="secondary back-button" style="margin-top: 1rem;" (click)="onNewQuestionnaire()">
         <i class="fa-solid fa-plus"></i>
         Fazer Primeiro Questionário
       </button>

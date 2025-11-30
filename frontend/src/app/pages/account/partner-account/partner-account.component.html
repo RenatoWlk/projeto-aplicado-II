@@ -46,8 +46,8 @@
         <p><strong>Nome:</strong> {{ partnerUser?.name }}</p>
         <p><strong>Email:</strong> {{ partnerUser?.email }}</p>
         <p><strong>Endereço:</strong> {{ partnerUser?.address?.street }} - {{ partnerUser?.address?.city }}-{{ partnerUser?.address?.state}}</p>
-        <p><strong>Telefone:</strong> {{ partnerUser?.phone }}</p>
-        <p><strong>CNPJ:</strong> {{ partnerUser?.cnpj }}</p>
+        <p><strong>Telefone:</strong> {{ getFormattedPhone(partnerUser?.phone) }}</p>
+        <p><strong>CNPJ:</strong> {{ getFormattedCNPJ(partnerUser?.cnpj) }}</p>
 
         <button type="button" 
                 (click)="onEditProfile()"
@@ -72,12 +72,8 @@
         <div class="stat-label">Total de Ofertas</div>
       </div>
       <div class="stat-item">
-        <div class="stat-number">{{ activeOffersCount }}</div>
+        <div class="stat-number">{{ offersCount }}</div>
         <div class="stat-label">Ofertas Ativas</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">{{ offersCount - activeOffersCount }}</div>
-        <div class="stat-label">Ofertas Inativas</div>
       </div>
     </div>
   </div>
@@ -111,25 +107,35 @@
       <div *ngIf="getFieldError(profileForm, 'email')" class="error-text">
         {{ getFieldError(profileForm, 'email') }}
       </div>
-    </label>
+    </label>        
+        <label style="flex: 0 0 80px;">
+            <span>UF</span>
+            <input type="text"
+                   formControlName="state"
+                   placeholder="SP"
+                   maxlength="2"
+                   style="text-align: center; text-transform: uppercase;"
+                   [class.invalid]="isFieldInvalid(profileForm, 'state')" />
+        </label>
     
     <label>
-      <span>Endereço</span>
-      <input type="text" 
-              formControlName="street"
-              placeholder="Endereço completo da empresa"
-              [class.invalid]="isFieldInvalid(profileForm, 'address.street')" />
-      <div *ngIf="getFieldError(profileForm, 'address')" class="error-text">
-        {{ getFieldError(profileForm, 'address') }}
-      </div>
+        <span>Cidade</span>
+        <input type="text" formControlName="city" placeholder="Cidade" [class.invalid]="isFieldInvalid(profileForm, 'city')" />
+    </label>
+
+    <label>
+        <span>Rua / Número</span>
+        <input type="text" formControlName="street" placeholder="Rua, Número, Bairro" [class.invalid]="isFieldInvalid(profileForm, 'street')" />
     </label>
     
     <label>
       <span>Telefone</span>
       <input type="tel" 
-              formControlName="phone"
-              placeholder="(11) 99999-9999"
-              [class.invalid]="isFieldInvalid(profileForm, 'phone')" />
+             formControlName="phone"
+             placeholder="(11) 99999-9999"
+             (input)="formatPhone($event)"
+             maxlength="16"
+             [class.invalid]="isFieldInvalid(profileForm, 'phone')" />
       <div *ngIf="getFieldError(profileForm, 'phone')" class="error-text">
         {{ getFieldError(profileForm, 'phone') }}
       </div>
@@ -138,26 +144,14 @@
     <label>
       <span>CNPJ</span>
       <input type="text" 
-              formControlName="cnpj"
-              placeholder="00.000.000/0000-00"
-              [class.invalid]="isFieldInvalid(profileForm, 'cnpj')" />
+             formControlName="cnpj"
+             placeholder="00.000.000/0000-00"
+             (input)="formatCNPJ($event)"
+             maxlength="18"
+             [class.invalid]="isFieldInvalid(profileForm, 'cnpj')" />
       <div *ngIf="getFieldError(profileForm, 'cnpj')" class="error-text">
         {{ getFieldError(profileForm, 'cnpj') }}
       </div>
-    </label>
-
-    <label>
-      <span>Descrição da Empresa (Opcional)</span>
-      <textarea formControlName="description"
-                placeholder="Descreva sua empresa e seus valores..."
-                rows="3"></textarea>
-    </label>
-
-    <label>
-      <span>Website (Opcional)</span>
-      <input type="url" 
-              formControlName="website"
-              placeholder="https://suaempresa.com" />
     </label>
 
     <div class="form-actions">
