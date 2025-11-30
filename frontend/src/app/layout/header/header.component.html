@@ -29,28 +29,35 @@
       </div>
 
       <!-- IS LOGGED IN -->
-      <div *ngIf="isLoggedIn">
-        <div class="logged-in-container">
-          <button class="header-btn">
-            <mat-icon>notifications</mat-icon>
-          </button>
-          <button class="header-btn" (click)="toggleMenu()">
-            <mat-icon>account_circle</mat-icon>
-          </button>
-          <div class="dropdown-menu" *ngIf="isMenuOpen">
-            <ul>
-              <p class="menu-name">{{ userName }}</p>
-              <p class="menu-email">{{ userEmail }}</p>
-              <li class="list-button" (click)="navigateTo('/' + appRoutesPaths.ACCOUNT)">
-                <a>Conta</a>
-              </li>
-              <li class="list-button" (click)="logout()">
-                <a>Sair</a>
-              </li>
-            </ul>
-          </div>
+      <div class="logged-in-container">
+        <button class="header-btn notification-btn" (click)="toggleNotifications($event)">
+          <mat-icon>notifications</mat-icon>
+          <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        </button>
+
+        <button class="header-btn" (click)="toggleMenu()">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+
+        <div class="dropdown-menu" *ngIf="isMenuOpen">
+          <ul>
+            <p class="menu-name">{{ userName }}</p>
+            <p class="menu-email">{{ userEmail }}</p>
+            <li class="list-button" (click)="navigateTo('/' + appRoutesPaths.ACCOUNT)">
+              <a>Conta</a>
+            </li>
+            <li class="list-button" (click)="logout()">
+              <a>Sair</a>
+            </li>
+          </ul>
         </div>
       </div>
+
+      <notification-modal
+        [visible]="isNotificationsOpen"
+        [userId]="currentUserId"
+        (close)="isNotificationsOpen = false">
+      </notification-modal>
       
     </div>
 </div>

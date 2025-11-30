@@ -51,7 +51,13 @@ public class OfferService {
         Partner partner = partnerRepository.findById(partnerId)
                 .orElseThrow(() -> new UserNotFoundException(Role.PARTNER, "Partner not found"));
 
-        boolean removed = partner.getOffers().removeIf(o -> o.getId().equals(offerId));
+        boolean removed = partner.getOffers().removeIf(o -> {
+            String ofId = o.getId();
+            if (ofId != null) {
+                return o.getId().equals(offerId);
+            }
+            return false;
+        });
 
         if (!removed) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Offer not found");

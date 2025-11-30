@@ -8,6 +8,7 @@ import { PartnerDashboardService } from './partner-dashboard.service';
 import { Offer } from '../dashboard.service';
 import { Reward } from '../../rewards/rewards.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { NotificationService } from '../../../shared/notifications/notifications.service';
 
 @Component({
   selector: 'partner-dashboard',
@@ -39,7 +40,8 @@ export class PartnerDashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private partnerDashboardService: PartnerDashboardService,
-    private notificationService: NotificationBannerService,
+    private notificationBannerService: NotificationBannerService,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -67,18 +69,30 @@ export class PartnerDashboardComponent implements OnInit {
   createNewOffer(data: any): void {
     this.isOfferModalOpen = false;
 
-    this.partnerDashboardService.createOffer(data).subscribe(() => {
-      this.notificationService.show('Oferta criada com sucesso!', 'success', 1500);
-      this.loadOffers();
+    this.partnerDashboardService.createOffer(data).subscribe({
+      next: () => {
+        this.notificationBannerService.show('Oferta criada com sucesso!', 'success', 1500);
+        this.loadOffers();
+        this.notificationService.activateForAll('new_offers', 24).subscribe();
+      },
+      error: () => {
+        this.notificationBannerService.show('Erro ao criar oferta.', 'error', 1500);
+      }
     });
   }
 
   createNewReward(data: any): void {
     this.isRewardModalOpen = false;
 
-    this.partnerDashboardService.createReward(data).subscribe(() => {
-      this.notificationService.show('Recompensa criada com sucesso!', 'success', 1500);
-      this.loadRewards();
+    this.partnerDashboardService.createReward(data).subscribe({
+      next: () => {
+        this.notificationBannerService.show('Recompensa criada com sucesso!', 'success', 1500);
+        this.loadRewards();
+        this.notificationService.activateForAll('new_rewards', 24).subscribe();
+      },
+      error: () => {
+        this.notificationBannerService.show('Erro ao criar recompensa.', 'error', 1500);
+      },
     });
   }
 
@@ -95,22 +109,22 @@ export class PartnerDashboardComponent implements OnInit {
       this.partnerDashboardService.deleteOffer(this.itemToDelete.id)
       .subscribe({
           next: () => {
-            this.notificationService.show('Oferta excluída!', 'success', 1500);
+            this.notificationBannerService.show('Oferta excluída!', 'success', 1500);
             this.loadOffers();
           },
           error: () => {
-            this.notificationService.show('Erro ao excluir oferta.', 'error', 1500);
+            this.notificationBannerService.show('Erro ao excluir oferta.', 'error', 1500);
           }
         });
     } else {
       this.partnerDashboardService.deleteReward(this.itemToDelete.id)
         .subscribe({
           next: () => {
-            this.notificationService.show('Recompensa excluída!', 'success', 1500);
+            this.notificationBannerService.show('Recompensa excluída!', 'success', 1500);
             this.loadRewards();
           },
           error: () => {
-            this.notificationService.show('Erro ao excluir recompensa.', 'error', 1500);
+            this.notificationBannerService.show('Erro ao excluir recompensa.', 'error', 1500);
           }
         });
     }

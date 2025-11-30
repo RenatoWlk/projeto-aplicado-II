@@ -10,6 +10,7 @@ import { PreloaderComponent } from "../../../shared/preloader/preloader.componen
 import { DonationService } from '../../calendar/donator-calendar/donator-calendar.service';
 import { NotificationBannerService } from '../../../shared/notification-banner/notification-banner.service';
 import { BloodBankDashboardService, BloodBankStats, DonationsOverTime } from './bloodbank-dashboard.service';
+import { NotificationService } from '../../../shared/notifications/notifications.service';
 
 const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'] as const;
 type MonthType = typeof MONTHS[number];
@@ -21,14 +22,15 @@ type MonthType = typeof MONTHS[number];
   styleUrl: './bloodbank-dashboard.component.scss'
 })
 export class BloodbankDashboardComponent implements OnInit {
-  // Dados do dashboard
+
+  // Dashboard data
   bloodbankStats: BloodBankStats = {
     totalDonations: 0,
     scheduledDonations: 0,
     donationsOverTime: [],
     bloodTypeBloodBags: {}
   } as any;
-  
+
   bloodbankCampaigns: Campaign[] = [];
   private bloodbankId: string = "";
   isCampaignModalOpen: boolean = false;
@@ -39,28 +41,26 @@ export class BloodbankDashboardComponent implements OnInit {
   isLoadingBloodbankCampaigns: boolean = true;
 
   // ==========================================
-  // CONFIGURAÇÃO DO GRÁFICO DE DOAÇÕES
+  // DONATIONS OVER TIME CHART CONFIG
   // ==========================================
- // donationsOverTimeChartData = [{ data: [] as number[], label: 'Doações Completadas' }];
-
-  donationsOverTimeChartData = [{ 
+  donationsOverTimeChartData = [{
     data: [] as number[],
-    label: '',
-    borderColor: '',    
-    backgroundColor: '',           
-    tension: 0,                            
-    fill: true,                               
-    pointBackgroundColor: '',         
-    pointBorderColor: '',                  
-    pointHoverBackgroundColor: '',        
-    pointHoverBorderColor: '',      
-    pointRadius: 0,                            
-    pointHoverRadius: 0                        
+    label: 'Doações Completadas',
+    borderColor: '',
+    backgroundColor: '',
+    tension: 0,
+    fill: true,
+    pointBackgroundColor: '',
+    pointBorderColor: '',
+    pointHoverBackgroundColor: '',
+    pointHoverBorderColor: '',
+    pointRadius: 0,
+    pointHoverRadius: 0
   }];
 
   donationsOverTimeChartLabels: string[] = [];
   donationsOverTimeChartType = 'line' as keyof ChartTypeRegistry;
-  
+
   public donationsOverTimeChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -92,14 +92,15 @@ export class BloodbankDashboardComponent implements OnInit {
   };
 
   // ==========================================
-  // CONFIGURAÇÃO DO GRÁFICO DE TIPOS SANGUÍNEOS
+  // BLOOD TYPE CHART CONFIG
   // ==========================================
   bloodTypeChartType = 'doughnut' as keyof ChartTypeRegistry;
+
   bloodColors: Record<string, string> = {
-    'A+': '#75ee75',   'A-': '#1b6e1b',
-    'B+': '#5dc2e4',   'B-': '#1a81e9',
-    'AB+': '#fff599',  'AB-': '#ffe139',
-    'O+': '#ff6262',   'O-': '#ff2929'
+    'A+': '#75ee75', 'A-': '#1b6e1b',
+    'B+': '#5dc2e4', 'B-': '#1a81e9',
+    'AB+': '#fff599', 'AB-': '#ffe139',
+    'O+': '#ff6262', 'O-': '#ff2929'
   };
 
   bloodTypeChartData = {
@@ -115,7 +116,7 @@ export class BloodbankDashboardComponent implements OnInit {
       ]
     }]
   };
-  
+
   public bloodTypeChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -134,93 +135,80 @@ export class BloodbankDashboardComponent implements OnInit {
   };
 
   constructor(
-    private bbDashboardService: BloodBankDashboardService, 
-    private authService: AuthService, 
+    private bbDashboardService: BloodBankDashboardService,
+    private authService: AuthService,
     private donationService: DonationService,
-    private notificationService: NotificationBannerService,
+    private notificationBannerService: NotificationBannerService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.bloodbankId = this.authService.getCurrentUserId();
-    this.getBloodBankCampaigns();
+    this.loadCampaigns();
     this.loadDonations();
   }
 
-  /**
-   * Carrega e processa todas as doações do banco de sangue
-   */
+  // ==========================================
+  // LOAD DONATIONS
+  // ==========================================
   async loadDonations(): Promise<void> {
     this.donationService.getBloodBankDonations(this.bloodbankId).subscribe({
       next: (donations: any[]) => {
-        console.log('Doações carregadas:', donations);
-        
-        // Processa as estatísticas
-        this.processAllStatistics(donations);
-        
-        // Atualiza os gráficos
-        this.updateAllCharts();
-        
+        this.processStats(donations);
+        this.updateCharts();
         this.isLoadingBloodbankStats = false;
       },
       error: (error) => {
-        console.error('Erro ao carregar doações:', error);
-        this.notificationService.show('Erro ao carregar doações', 'error');
+        console.error('Failed to load donations:', error);
+        this.notificationBannerService.show('Erro ao carregar doações', 'error');
         this.isLoadingBloodbankStats = false;
       }
     });
   }
 
-  /**
-   * Processa todas as estatísticas a partir dos dados brutos
-   */
-  private processAllStatistics(donations: any[]): void {
-    // 1. Contadores básicos
-    const completedDonations = donations.filter(d => d.status === 'COMPLETED');
-    const scheduledDonations = donations.filter(d => 
+  // ==========================================
+  // PROCESS STATISTICS
+  // ==========================================
+  private processStats(donations: any[]): void {
+    const completed = donations.filter(d => d.status === 'COMPLETED');
+    const scheduled = donations.filter(d =>
       d.status === 'PENDING' || d.status === 'CONFIRMED'
     );
 
-    // 2. Doações ao longo do tempo (últimos 8 meses)
-    const donationsOverTime = this.processDonationsOverTime(completedDonations);
+    const donationsOverTime = this.processDonationsOverTime(completed);
+    const bloodTypeDistribution = this.processBloodTypeDistribution(completed);
 
-    // 3. Distribuição de tipos sanguíneos
-    const bloodTypeDistribution = this.processBloodTypeDistribution(completedDonations);
-
-    // 4. Atualiza o objeto de estatísticas
     this.bloodbankStats = {
-      totalDonations: completedDonations.length,
-      scheduledDonations: scheduledDonations.length,
-      donationsOverTime: donationsOverTime,
+      totalDonations: completed.length,
+      scheduledDonations: scheduled.length,
+      donationsOverTime,
       bloodTypeBloodBags: bloodTypeDistribution as any
     };
 
-    // 5. Calcula média
     this.averageDonation = this.calculateAverage(donationsOverTime);
   }
 
-  /**
-   * Processa doações ao longo dos últimos 8 meses
-   */
-  private processDonationsOverTime(completedDonations: any[]): DonationsOverTime[] {
+  private processDonationsOverTime(completed: any[]): DonationsOverTime[] {
     const now = new Date();
     const result: DonationsOverTime[] = [];
 
-    // Cria estrutura para os últimos 8 meses
     for (let i = 7; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const monthIndex = date.getMonth();
-      
+
       const monthData: DonationsOverTime = {
         month: MONTHS[monthIndex],
         year: date.getFullYear(),
         donations: 0
       };
 
-      // Conta doações deste mês
-      completedDonations.forEach(donation => {
+      completed.forEach(donation => {
         const donationDate = new Date(donation.date);
-        if (donationDate.getFullYear() === date.getFullYear() && 
-            donationDate.getMonth() === date.getMonth()) {
+
+        if (
+          donationDate.getFullYear() === date.getFullYear() &&
+          donationDate.getMonth() === date.getMonth()
+        ) {
           monthData.donations++;
         }
       });
@@ -231,19 +219,14 @@ export class BloodbankDashboardComponent implements OnInit {
     return result;
   }
 
-  /**
-   * Processa distribuição de tipos sanguíneos
-   */
-  private processBloodTypeDistribution(completedDonations: any[]): Record<string, number> {
+  private processBloodTypeDistribution(completed: any[]): Record<string, number> {
     const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
     const distribution: Record<string, number> = {};
 
-    // Inicializa todos com zero
-    bloodTypes.forEach(type => distribution[type] = 0);
+    bloodTypes.forEach(t => distribution[t] = 0);
 
-    // Conta cada tipo
-    completedDonations.forEach(donation => {
-      if (donation.bloodType && bloodTypes.includes(donation.bloodType)) {
+    completed.forEach(donation => {
+      if (donation.bloodType && distribution.hasOwnProperty(donation.bloodType)) {
         distribution[donation.bloodType]++;
       }
     });
@@ -251,102 +234,87 @@ export class BloodbankDashboardComponent implements OnInit {
     return distribution;
   }
 
-  /**
-   * Calcula média de doações mensais
-   */
-  private calculateAverage(donationsOverTime: DonationsOverTime[]): number {
-    if (!donationsOverTime || donationsOverTime.length === 0) return 0;
-    
-    const total = donationsOverTime.reduce((sum, d) => sum + d.donations, 0);
-    return Math.round(total / donationsOverTime.length);
+  private calculateAverage(data: DonationsOverTime[]): number {
+    if (!data || data.length === 0) return 0;
+
+    const total = data.reduce((sum, d) => sum + d.donations, 0);
+    return Math.round(total / data.length);
   }
 
-  /**
-   * Atualiza todos os gráficos
-   */
-  private updateAllCharts(): void {
+  private updateCharts(): void {
     this.updateDonationsOverTimeChart();
     this.updateBloodTypeChart();
   }
 
-  /**
-   * Atualiza gráfico de doações ao longo do tempo
-   */
   private updateDonationsOverTimeChart(): void {
     const data = this.bloodbankStats.donationsOverTime || [];
-    
+
     this.donationsOverTimeChartLabels = data.map(
       item => `${item.month} de ${item.year}`
     );
-    
+
     this.donationsOverTimeChartData = [{
       data: data.map(item => item.donations),
       label: 'Doações Completadas',
-      borderColor: '#28a745',                    
-      backgroundColor: '#68af79ff',      
-      tension: 0.4,                              
-      fill: true,                               
-      pointBackgroundColor: '#28a745',           
-      pointBorderColor: '#fff',                  
-      pointHoverBackgroundColor: '#fff',        
-      pointHoverBorderColor: '#28a745',          
-      pointRadius: 4,                            
-      pointHoverRadius: 6                      
+      borderColor: '#28a745',
+      backgroundColor: '#68af79ff',
+      tension: 0.4,
+      fill: true,
+      pointBackgroundColor: '#28a745',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: '#28a745',
+      pointRadius: 4,
+      pointHoverRadius: 6
     }];
-
   }
 
-  /**
-   * Atualiza gráfico de tipos sanguíneos
-   */
   private updateBloodTypeChart(): void {
     const distribution = this.bloodbankStats.bloodTypeBloodBags || {};
     const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-    
+
     const data = bloodTypes.map(type => distribution[type] || 0);
-    const hasData = data.some(value => value > 0);
+    const hasData = data.some(v => v > 0);
 
     this.bloodTypeChartData = {
       labels: hasData ? bloodTypes : ['Sem dados'],
       datasets: [{
         label: 'Doações por tipo sanguíneo',
         data: hasData ? data : [1],
-        backgroundColor: hasData ? 
-          bloodTypes.map(type => this.bloodColors[type]) : 
-          ['#cccccc']
+        backgroundColor: hasData
+          ? bloodTypes.map(type => this.bloodColors[type])
+          : ['#cccccc']
       }]
     };
   }
 
-  /**
-   * Carrega campanhas do banco de sangue
-   */
-  private getBloodBankCampaigns(): void {
+  // ==========================================
+  // CAMPAIGNS
+  // ==========================================
+  private loadCampaigns(): void {
     this.bbDashboardService.getBloodbankCampaigns(this.bloodbankId).subscribe({
       next: (campaigns: Campaign[]) => {
         this.bloodbankCampaigns = campaigns;
         this.isLoadingBloodbankCampaigns = false;
       },
       error: () => {
-        this.notificationService.show('Erro ao carregar campanhas', 'error');
+        this.notificationBannerService.show('Erro ao carregar campanhas', 'error');
         this.isLoadingBloodbankCampaigns = false;
       }
     });
   }
 
-  /**
-   * Cria nova campanha
-   */
   createNewCampaign(data: any): void {
     this.isCampaignModalOpen = false;
 
     this.bbDashboardService.createCampaign(data).subscribe({
       next: () => {
-        this.getBloodBankCampaigns();
-        this.notificationService.show('Campanha criada com sucesso!', 'success');
+        this.loadCampaigns();
+        this.notificationService.activateForAll('new_campaigns', 24).subscribe();
+        this.notificationBannerService.show('Campanha criada com sucesso!', 'success');
       },
       error: () => {
-        this.notificationService.show('Erro ao criar campanha', 'error');
+        this.notificationBannerService.show('Erro ao criar campanha', 'error');
       }
     });
   }

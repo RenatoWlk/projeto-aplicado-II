@@ -1,0 +1,82 @@
+<modal [title]="'Notificações'" [visible]="visible" (close)="onClose()">
+  <div class="notifications-root">
+
+    <!-- Tabs + mark all -->
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab === 'unread'" (click)="selectTab('unread')">
+        Novas <span *ngIf="unreadCount > 0" class="badge">{{ unreadCount }}</span>
+      </button>
+
+      <button class="tab" [class.active]="activeTab === 'all'" (click)="selectTab('all')">
+        Todas
+      </button>
+
+      <div class="spacer"></div>
+
+      <button class="app-button mark-all" (click)="markAllRead()">
+        Marcar todas como lidas
+      </button>
+    </div>
+
+    <!-- Top filters -->
+    <div class="filters">
+      <input
+        type="text"
+        placeholder="Buscar..."
+        (input)="onSearch($any($event.target).value)"
+      />
+
+      <select (change)="onSelectType($any($event.target).value)">
+        <option value="all">Todos os tipos</option>
+        <option *ngFor="let t of getAvailableTypes()" [value]="t">{{ getTypeLabel(t) }}</option>
+      </select>
+    </div>
+
+    <!-- Loading -->
+    <app-preloader *ngIf="isLoading" type="spinner" [visible]="true"></app-preloader>
+
+    <!-- Content -->
+    <div class="content" *ngIf="!isLoading">
+
+      <!-- List -->
+      <div class="list">
+        <div
+          class="item"
+          *ngFor="let n of filtered; trackBy: trackById"
+          [class.selected]="selected?.notificationBaseId === n.notificationBaseId"
+          (click)="openNotification(n)"
+        >
+          <div class="item-header">
+            <h4>{{ n.title || 'Sem título' }}</h4>
+            <span class="time">{{ timeAgo(n.createdAt) }}</span>
+          </div>
+
+          <div class="meta-row">
+            <span class="type" *ngIf="n.type">{{ getTypeLabel(n.type) }}</span>
+            <span class="expired" *ngIf="isExpired(n)">Expirado</span>
+          </div>
+        </div>
+
+        <p class="empty" *ngIf="filtered.length === 0">Sem novas notificações.</p>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview" *ngIf="selected">
+        <h3 class="preview-title">{{ selected.title }}</h3>
+        <p class="preview-body">{{ selected.body }}</p>
+
+        <div class="preview-info">
+          <p>Tipo: {{ getTypeLabel(selected.type) }}</p>
+          <p>Criado: {{ selected.createdAt | date:'short' }}</p>
+          <p *ngIf="selected.expireAt">Expira: {{ selected.expireAt | date:'short' }}</p>
+        </div>
+
+        <button class="app-button redirect-button" (click)="redirectSelected()" *ngIf="selected.redirectTo">
+          Ir para página
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</modal>

@@ -22,13 +22,11 @@ public class EligibilityQuestionnaireController {
 
     @PostMapping
     public EligibilityQuestionnaire submitQuestionnaire(@RequestBody EligibilityQuestionnaireDTO dto) {
-        System.out.println("📥 Dados recebidos no backend: " + dto);
         return questionnaireService.saveQuestionnaire(dto);
     }
 
     @GetMapping("/{id}")
     public List<EligibilityQuestionnaire> getUserQuestionnairesById(@PathVariable String id) {
-        System.out.println("📤 Buscando questionários para userId=" + id);
         return questionnaireService.getAllByUser(id);
     }
 }

@@ -15,7 +15,7 @@ export class NotificationBannerService {
 
   notification$ = this.notificationSubject.asObservable();
 
-  show(message: string, type: 'success' | 'warning' | 'error' = 'success', duration: number = 3000) {
+  show(message: string, type: 'success' | 'warning' | 'error' = 'success', duration: number = 1500): void {
     this.notificationSubject.next({ message, type, duration });
   }
 }

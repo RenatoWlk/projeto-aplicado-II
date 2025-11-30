@@ -53,6 +53,8 @@ public class UserService {
         user.setUnlockedAchievements(List.of());
         user.setScheduledDonations(List.of());
         user.setTotalPoints(0);
+        user.setRedeemedRewardsIds(null);
+        user.setActiveNotifications(List.of());
 
         user = userRepository.save(user);
         return toResponseDTO(user);

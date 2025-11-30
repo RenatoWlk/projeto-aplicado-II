@@ -5,12 +5,14 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { HeaderService } from './header.service';
 import { AppRoutesPaths } from '../../shared/app.constants';
+import { NotificationModalComponent } from '../../shared/notifications/notification-modal/notification-modal.component';
+import { NotificationEventService } from '../../shared/notifications/notification-event.service';
 
 @Component({
   selector: 'app-header',
-  imports: [MatIconModule, CommonModule, RouterModule],
+  imports: [MatIconModule, CommonModule, RouterModule, NotificationModalComponent],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss',]
+  styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
   readonly appRoutesPaths = AppRoutesPaths;
@@ -19,6 +21,10 @@ export class HeaderComponent implements OnInit {
   userName: string = '';
   userEmail: string = '';
   slogan: string = '';
+  currentUserId: string = '';
+
+  isNotificationsOpen = false;
+  unreadCount = 0;
 
   private slogans: string[] = [
     'Uma doação pode salvar até 4 vidas!',
@@ -37,25 +43,45 @@ export class HeaderComponent implements OnInit {
     'Um pequeno ato, um grande impacto!'
   ];
 
-  constructor(private authService: AuthService, private headerService: HeaderService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private headerService: HeaderService,
+    private router: Router,
+    private notificationEventService: NotificationEventService,
+  ) {}
 
   ngOnInit(): void {
     this.setRandomSlogan();
 
-    this.headerService.sloganTrigger.subscribe(() => {
-      this.setRandomSlogan();
-    });
+    this.headerService.sloganTrigger.subscribe(() => this.setRandomSlogan());
 
     this.isLoggedIn = this.authService.isAuthenticated();
+    if (!this.isLoggedIn) return;
 
-    if (this.isLoggedIn) {
-      this.userName = this.authService.getCurrentUserName();
-      this.userEmail = this.authService.getCurrentUserEmail();
-    }
+    this.userName = this.authService.getCurrentUserName();
+    this.userEmail = this.authService.getCurrentUserEmail();
+    this.currentUserId = this.authService.getCurrentUserId();
+
+    this.loadHeaderUnreadCount();
+
+    this.notificationEventService.refresh$.subscribe(() => {
+      this.loadHeaderUnreadCount();
+    });
   }
-  
+
+  private loadHeaderUnreadCount() {
+    this.headerService.getNotificationsUnreadCount(this.currentUserId).subscribe(count => {
+      this.unreadCount = count;
+    });
+  }
+
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  toggleNotifications(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.isNotificationsOpen = !this.isNotificationsOpen;
   }
 
   navigateTo(path: string) {
@@ -69,6 +95,11 @@ export class HeaderComponent implements OnInit {
 
     if (!target.closest('.left')) {
       this.isMenuOpen = false;
+    }
+
+    // close notifications if click outside and modal isn't open
+    if (!target.closest('.notification-btn') && !target.closest('notification-modal')) {
+      this.isNotificationsOpen = false;
     }
   }
 

@@ -2,6 +2,7 @@ package com.projeto.aplicado.backend.model.users;
 
 import com.projeto.aplicado.backend.model.DonationAppointment;
 import com.projeto.aplicado.backend.model.ScheduledDonation;
+import com.projeto.aplicado.backend.model.UserNotification;
 import com.projeto.aplicado.backend.model.achievement.UnlockedAchievement;
 import com.projeto.aplicado.backend.model.enums.BloodType;
 import lombok.AllArgsConstructor;
@@ -31,4 +32,5 @@ public class User extends UserBase {
     private int totalPoints;
     private List<ScheduledDonation> scheduledDonations = new ArrayList<>();
     private List<String> redeemedRewardsIds = new ArrayList<>();
+    private List<UserNotification> activeNotifications = new ArrayList<>();
 }

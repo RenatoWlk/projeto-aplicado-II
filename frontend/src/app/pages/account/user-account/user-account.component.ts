@@ -168,9 +168,6 @@ export class UserAccountComponent implements OnInit {
             this.user.nextEligibleDonation = new Date().toISOString(); // Pode hoje
           }
         }
-
-        console.log('Histórico:', this.donationHistory);
-        console.log('Agendamento Ativo:', this.activeAppointment);
       },
       error: () => {
         this.error = 'Failed to load donation history';
