@@ -1,6 +1,6 @@
 package com.projeto.aplicado.backend.repository;
 
-import com.projeto.aplicado.backend.model.users.Donation;
+import com.projeto.aplicado.backend.model.Donation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

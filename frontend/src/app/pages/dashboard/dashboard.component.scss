@@ -260,7 +260,7 @@
 
 .guide-info-donator p {
   margin: 0;
-  font-size: 1.20rem;
+  font-size: 1.15rem;
 }
 
 .card-header.donator i {
@@ -453,12 +453,7 @@
   }
 }
 
-
 /* ---------- DONATOR GUIDE ---------- */
-
-.guide-app-card {
-  padding: 32px;
-}
 
 /* Guide header */
 .guide-card-header {
@@ -565,7 +560,7 @@
 }
 
 .step-description {
-  font-size: 14px;
+  font-size: 16px;
   color: #6c757d;
   margin: 0 0 12px 0;
   line-height: 1.5;
@@ -601,7 +596,7 @@
 
 /* Divider */
 .step-divider {
-  width: 3px;
+  width: 5px;
   height: 40px;
   background: linear-gradient(180deg, #e63946 0%, #fca5a5 100%);
   margin: 0 auto;

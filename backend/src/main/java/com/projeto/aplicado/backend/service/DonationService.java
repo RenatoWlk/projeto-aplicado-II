@@ -1,7 +1,7 @@
 package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.dto.donation.*;
-import com.projeto.aplicado.backend.model.users.Donation;
+import com.projeto.aplicado.backend.model.Donation;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.DonationRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +21,7 @@ public class DonationService {
 
     private final DonationRepository donationRepository;
     private final UserRepository userRepository;
+    private final AchievementService achievementService;
 
 
     @Transactional
@@ -165,6 +165,9 @@ public class DonationService {
         donation.setUpdatedAt(LocalDateTime.now());
 
         donation = donationRepository.save(donation);
+
+        User user = userRepository.findUserById(donation.getUserId()).orElseThrow();
+        achievementService.validateAndUnlockAchievements(user);
 
         return mapToResponse(donation);
     }

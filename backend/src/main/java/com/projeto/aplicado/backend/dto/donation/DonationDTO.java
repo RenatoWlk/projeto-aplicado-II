@@ -2,7 +2,7 @@ package com.projeto.aplicado.backend.dto.donation;
 
 
 import com.projeto.aplicado.backend.model.enums.BloodType;
-import com.projeto.aplicado.backend.model.users.Donation;
+import com.projeto.aplicado.backend.model.Donation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

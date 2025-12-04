@@ -7,11 +7,12 @@ import com.projeto.aplicado.backend.dto.bloodbank.*;
 import com.projeto.aplicado.backend.dto.donation.AvailableSlotsDTO;
 import com.projeto.aplicado.backend.dto.donation.DailyAvailabilityDTO;
 import com.projeto.aplicado.backend.dto.donation.SlotDTO;
+import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.*;
 import com.projeto.aplicado.backend.model.enums.BloodType;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.BloodBank;
-import com.projeto.aplicado.backend.model.users.Donation;
+import com.projeto.aplicado.backend.model.Donation;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.BloodBankRepository;
 import com.projeto.aplicado.backend.repository.DonationRepository;
@@ -35,6 +36,7 @@ public class BloodBankService {
     private final GeolocationService geolocationService;
     private final PasswordEncoder passwordEncoder;
     private final DonationRepository donationRepository;
+    private final AchievementService achievementService;
 
     /**
      * Creates a new blood bank with default values and saves it to the database.
@@ -49,6 +51,7 @@ public class BloodBankService {
         bloodBank.setPassword(passwordEncoder.encode(dto.getPassword()));
         bloodBank.setAddress(dto.getAddress());
         bloodBank.setPhone(dto.getPhone());
+        bloodBank.setRegistrationDate(LocalDate.now());
         bloodBank.setRole(Role.BLOODBANK);
         bloodBank.setCnpj(dto.getCnpj());
         bloodBank.setCampaigns(new ArrayList<>());
@@ -352,10 +355,10 @@ public class BloodBankService {
     @Transactional
     public void scheduleDonation(DonationScheduleDTO dto) {
         User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(Role.USER, "Usuário não encontrado"));
 
         BloodBank bloodBank = bloodBankRepository.findBloodBankById(dto.getBloodBankId())
-                .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(Role.BLOODBANK, "Banco de sangue não encontrado"));
 
         if (user.getScheduledDonations() == null) {
             user.setScheduledDonations(new ArrayList<>());
@@ -401,6 +404,8 @@ public class BloodBankService {
 
         slot.setAvailableSpots(slot.getAvailableSpots() - 1);
         bloodBankRepository.save(availability);
+
+        achievementService.validateAndUnlockAchievements(user);
     }
 
     /**

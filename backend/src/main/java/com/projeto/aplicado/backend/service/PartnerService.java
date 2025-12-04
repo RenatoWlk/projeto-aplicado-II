@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +43,7 @@ public class PartnerService {
         partner.setPassword(passwordEncoder.encode(dto.getPassword()));
         partner.setAddress(dto.getAddress());
         partner.setPhone(dto.getPhone());
+        partner.setRegistrationDate(LocalDate.now());
         partner.setRole(Role.PARTNER);
         partner.setCnpj(dto.getCnpj());
         partner.setOffers(dto.getOffers());

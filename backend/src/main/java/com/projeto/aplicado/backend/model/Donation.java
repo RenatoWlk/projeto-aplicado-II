@@ -1,4 +1,4 @@
-package com.projeto.aplicado.backend.model.users;
+package com.projeto.aplicado.backend.model;
 
 import com.projeto.aplicado.backend.model.enums.BloodType;
 import lombok.Data;

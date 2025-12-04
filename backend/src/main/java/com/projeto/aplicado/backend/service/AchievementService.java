@@ -5,12 +5,14 @@ import com.projeto.aplicado.backend.exception.AchievementException;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.achievement.Achievement;
 import com.projeto.aplicado.backend.model.achievement.UnlockedAchievement;
+import com.projeto.aplicado.backend.model.enums.AchievementsNotifications;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.AchievementRepository;
 import com.projeto.aplicado.backend.repository.EligibilityQuestionnaireRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,6 +25,7 @@ public class AchievementService {
     private final AchievementRepository achievementRepository;
     private final EligibilityQuestionnaireRepository questionnaireRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * Validates and unlocks achievements for a user based on their stats.
@@ -35,21 +38,24 @@ public class AchievementService {
             throw new UserNotFoundException(Role.USER, "User or User ID is null when validating achievements");
         }
 
-        // TODO use this function to unlock achievements when schedule donations and confirm donation
         List<Achievement> allAchievements = achievementRepository.findAll();
 
         for (Achievement achievement : allAchievements) {
             List<UnlockedAchievement> unlockedAchievements = user.getUnlockedAchievements();
             boolean alreadyUnlocked = unlockedAchievements.stream()
                     .anyMatch(ua -> ua.getAchievementId().equals(achievement.getId()));
+            Pair<Boolean, AchievementsNotifications> match = matchesCondition(user, achievement);
+            boolean matchesCondition = match.getFirst();
+            AchievementsNotifications notification = match.getSecond();
 
-            if (!alreadyUnlocked && matchesCondition(user, achievement)) {
+            if (!alreadyUnlocked && matchesCondition) {
                 UnlockedAchievement unlocked = new UnlockedAchievement();
                 unlocked.setAchievementId(achievement.getId());
                 unlocked.setUnlockedAt(LocalDateTime.now());
 
                 user.getUnlockedAchievements().add(unlocked);
                 user.setTotalPoints(user.getTotalPoints() + achievement.getPoints());
+                notificationService.activateForUser(user.getId(), notification.getId(), 72);
             }
         }
 
@@ -61,31 +67,84 @@ public class AchievementService {
      * 
      * @param user The user to check.
      * @param achievement The achievement to check against.
-     * @return true if the user meets the conditions, false otherwise.
+     * @return checks if the user meets the conditions, and the notification of the achievement.
      * @throws AchievementException in case the operation fails or an error occurs matching the condition.
      */
-    private boolean matchesCondition(User user, Achievement achievement) throws AchievementException {
+    private Pair<Boolean, AchievementsNotifications> matchesCondition(User user, Achievement achievement) throws AchievementException {
         try {
-            switch (achievement.getCondition().getType()) {
+            String type = achievement.getCondition().getType();
+            String value = achievement.getCondition().getValue();
+
+            switch (type) {
+
                 case AchievementsConditionsTypes.TIMES_DONATED:
-                    return user.getTimesDonated() >= Integer.parseInt(achievement.getCondition().getValue());
+                    int required = Integer.parseInt(value);
+                    boolean ok = user.getTimesDonated() >= required;
+
+                    if (!ok) return Pair.of(false, AchievementsNotifications.NONE);
+
+                    return switch (required) {
+                        case 1 -> Pair.of(true, AchievementsNotifications.FIRST_DONATION);
+                        case 5 -> Pair.of(true, AchievementsNotifications.FIVE_DONATIONS);
+                        case 10 -> Pair.of(true, AchievementsNotifications.TEN_DONATIONS);
+                        case 25 -> Pair.of(true, AchievementsNotifications.TWENTY_FIVE_DONATIONS);
+                        case 50 -> Pair.of(true, AchievementsNotifications.FIFTY_DONATIONS);
+                        default -> Pair.of(true, AchievementsNotifications.NONE);
+                    };
+
                 case AchievementsConditionsTypes.TIMES_SCHEDULED:
-                    return user.getScheduledDonations().size() >= Integer.parseInt(achievement.getCondition().getValue());
+                    int count = user.getScheduledDonations().size();
+                    int limit = Integer.parseInt(value);
+                    boolean scheduledOk = count >= limit;
+
+                    if (!scheduledOk) return Pair.of(false, AchievementsNotifications.NONE);
+
+                    return switch (limit) {
+                        case 1 -> Pair.of(true, AchievementsNotifications.FIRST_APPOINTMENT);
+                        case 10 -> Pair.of(true, AchievementsNotifications.TEN_APPOINTMENTS);
+                        case 30 -> Pair.of(true, AchievementsNotifications.THIRTY_APPOINTMENTS);
+                        default -> Pair.of(true, AchievementsNotifications.NONE);
+                    };
+
                 case AchievementsConditionsTypes.TIMES_DONATED_IN_YEAR:
                     int currentYear = LocalDate.now().getYear();
-                    long donationsThisYear = user.getDonations().stream()
+                    long donations = user.getDonations().stream()
                             .filter(d -> d.getDate().getYear() == currentYear)
                             .count();
-                    return donationsThisYear >= Integer.parseInt(achievement.getCondition().getValue());
+                    int needed = Integer.parseInt(value);
+
+                    boolean yearOk = donations >= needed;
+                    if (!yearOk) return Pair.of(false, AchievementsNotifications.NONE);
+
+                    return switch (needed) {
+                        case 2 -> Pair.of(true, AchievementsNotifications.TWO_DONATIONS_IN_YEAR);
+                        case 3 -> Pair.of(true, AchievementsNotifications.THREE_DONATIONS_IN_YEAR);
+                        case 4 -> Pair.of(true, AchievementsNotifications.FOUR_DONATIONS_IN_YEAR);
+                        case 5 -> Pair.of(true, AchievementsNotifications.FIVE_DONATIONS_IN_YEAR);
+                        default -> Pair.of(true, AchievementsNotifications.NONE);
+                    };
+
                 case AchievementsConditionsTypes.QUESTIONNAIRE_ANSWERED:
-                    return questionnaireRepository.findByUserId(user.getId()) != null;
-                case AchievementsConditionsTypes.SCHEDULED_IN_FIRST_WEEK, AchievementsConditionsTypes.DONATED_4_TIMES_PER_YEAR_BY_5_YEARS:
-                    return true; // TODO finish conditions for achievements
+                    boolean answered = questionnaireRepository.findByUserId(user.getId()) != null;
+                    return Pair.of(answered, answered ? AchievementsNotifications.FIRST_QUESTIONNAIRE : AchievementsNotifications.NONE);
+
+                case AchievementsConditionsTypes.SCHEDULED_IN_FIRST_WEEK:
+                    boolean week = user.getRegistrationDate().plusDays(7).isAfter(LocalDate.now());
+                    return Pair.of(week, week ? AchievementsNotifications.FIRST_WEEK_DONATION : AchievementsNotifications.NONE);
+
+                case AchievementsConditionsTypes.DONATED_4_TIMES_PER_YEAR_BY_5_YEARS:
+                    boolean streak = hasFiveYearStreak(user);
+                    return Pair.of(streak, streak ? AchievementsNotifications.DONATED_FIVE_YEARS_STREAK : AchievementsNotifications.NONE);
+
                 default:
-                    return false;
+                    return Pair.of(false, AchievementsNotifications.NONE);
             }
+
         } catch (Exception e) {
-            throw new AchievementException("Error trying to match condition: " + achievement.getCondition().getValue() + " of type: " + achievement.getCondition().getType());
+            throw new AchievementException(
+                    "Error matching condition: " + achievement.getCondition().getValue() +
+                            " of type: " + achievement.getCondition().getType()
+            );
         }
     }
 
@@ -133,5 +192,20 @@ public class AchievementService {
                 .toList();
 
         return achievementRepository.findAllById(unlockedIds);
+    }
+
+    private boolean hasFiveYearStreak(User user) {
+        int currentYear = LocalDate.now().getYear();
+
+        for (int i = 0; i < 5; i++) {
+            int year = currentYear - i;
+
+            long donations = user.getDonations().stream()
+                    .filter(d -> d.getDate().getYear() == year)
+                    .count();
+
+            if (donations < 4) return false;
+        }
+        return true;
     }
 }

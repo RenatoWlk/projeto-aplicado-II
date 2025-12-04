@@ -10,6 +10,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public abstract class UserBase {
     @Id
@@ -19,5 +21,6 @@ public abstract class UserBase {
     private String password;
     private Address address;
     private String phone;
+    private LocalDate registrationDate;
     private Role role; // "USER", "PARTNER" and "BLOODBANK"
 }
