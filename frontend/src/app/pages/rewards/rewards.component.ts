@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RewardsService, Reward, RewardsResponse } from './rewards.service';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'rewards',
@@ -22,6 +23,9 @@ export class RewardsComponent implements OnInit {
   rewards: Reward[] = [];
   isLoading = false;
 
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
+
   constructor(
     private rewardsService: RewardsService, 
     private notificationService: NotificationBannerService,
@@ -31,10 +35,18 @@ export class RewardsComponent implements OnInit {
     this.loadRewards();
   }
 
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private async loadRewards(): Promise<void> {
     this.isLoading = true;
 
-    this.rewardsService.getRewards().subscribe({
+    this.rewardsService.getRewards()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
       next: async (res) => {
         if (!Array.isArray(res) && (res as RewardsResponse).rewards !== undefined) {
           const response = res as RewardsResponse;
@@ -88,7 +100,9 @@ export class RewardsComponent implements OnInit {
 
     const rewardId = this.selectedReward.id;
 
-    this.rewardsService.redeemReward(rewardId).subscribe({
+    this.rewardsService.redeemReward(rewardId)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: () => {
         this.loadRewards();
         this.closeModal();

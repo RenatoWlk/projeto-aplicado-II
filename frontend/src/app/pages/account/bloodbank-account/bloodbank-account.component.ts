@@ -4,6 +4,7 @@ import { BloodBank, BloodBankAccountService } from './bloodbank-account.service'
 import { CommonModule } from '@angular/common';
 // IMPORTANTE: Importe a Campaign do Dashboard para manter a tipagem correta
 import { Campaign } from '../../dashboard/dashboard.service'; 
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-bloodbank-account',
@@ -36,10 +37,12 @@ export class BloodBankAccountComponent implements OnInit {
   
   isLoadingBloodbankCampaigns: boolean = false;
 
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
+
   constructor(
     private fb: FormBuilder,
     private bloodBankService: BloodBankAccountService
-    // REMOVIDO: private bbDashboardService... (Não precisamos mais dele aqui)
   ) {}
 
   ngOnInit(): void {
@@ -66,11 +69,18 @@ export class BloodBankAccountComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadBloodBank(): void {
     this.isLoading = true;
     this.error = null;
 
-    this.bloodBankService.getBloodBank().subscribe({
+    this.bloodBankService.getBloodBank()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (data) => {
         this.bloodBank = data;
         this.fillProfileForm(data);
@@ -188,7 +198,9 @@ export class BloodBankAccountComponent implements OnInit {
       }
     };
 
-    this.bloodBankService.updateBloodBank(updatedProfile).subscribe({
+    this.bloodBankService.updateBloodBank(updatedProfile)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (updated) => {
         this.bloodBank = updated;
         this.editProfileMode = false;
@@ -247,7 +259,9 @@ export class BloodBankAccountComponent implements OnInit {
         campaigns: currentCampaigns
     };
 
-    this.bloodBankService.updateBloodBank(updatedBloodBank).subscribe({
+    this.bloodBankService.updateBloodBank(updatedBloodBank)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
         next: (updated) => {
             this.bloodBank = updated;
             this.isLoading = false;
@@ -274,7 +288,9 @@ export class BloodBankAccountComponent implements OnInit {
         campaigns: updatedCampaigns
     };
 
-    this.bloodBankService.updateBloodBank(updatedBloodBank).subscribe({
+    this.bloodBankService.updateBloodBank(updatedBloodBank)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
         next: (updated) => {
             this.bloodBank = updated;
             this.isLoading = false;

@@ -15,6 +15,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .schedule-button-container {
@@ -26,6 +28,7 @@
 .full-width {
   width: 30rem;
   gap: 2rem;
+  margin: 0 auto;
 }
 
 .mat-label,
@@ -132,6 +135,14 @@
   justify-content: space-between;
   gap: 12px;
   padding: 1rem;
+}
+
+.date-time-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
 }
 
 .schedule-btn {
@@ -439,3 +450,4 @@
     }
   }
 }
+

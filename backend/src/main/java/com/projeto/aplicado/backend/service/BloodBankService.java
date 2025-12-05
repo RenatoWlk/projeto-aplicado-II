@@ -413,9 +413,11 @@ public class BloodBankService {
      *
      * @return list of blood banks with available slots
      */
+    /*(
     public List<BloodBank> findBloodBanksWithAvailableSlots() {
         return bloodBankRepository.findByAvailabilitySlotsNotNull();
     }
+    **/
 
     /**
      * Finds all blood banks with available dates only.
@@ -537,7 +539,7 @@ public class BloodBankService {
         // 6. Calcular disponibilidade
         List<AvailableSlotsDTO.SlotInfo> slotsInfo = daySlots.getSlots().stream()
                 .map(slot -> {
-                    String slotTime = slot.getTime().toString().trim(); // ← ADICIONE .trim() aqui também
+                    String slotTime = slot.getTime().toString().trim();
                     int totalSpots = slot.getAvailableSpots();
                     int bookedSpots = bookingsByHour.getOrDefault(slotTime, 0L).intValue();
                     int availableSpots = Math.max(0, totalSpots - bookedSpots);
@@ -551,5 +553,12 @@ public class BloodBankService {
                 }).toList();
 
         return new AvailableSlotsDTO(dateStr, slotsInfo);
+    }
+
+    public List<BloodBankResponseDTO> findAllWithAvailableSlots() {
+        return bloodBankRepository.findBloodBanksWithAvailableSlots().stream()
+                .filter(bloodBank -> !bloodBank.getAvailabilitySlots().isEmpty())
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 }

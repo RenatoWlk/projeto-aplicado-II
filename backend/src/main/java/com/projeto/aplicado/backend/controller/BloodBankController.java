@@ -95,9 +95,16 @@ public class BloodBankController {
         bloodBankService.addAvailabilitySlots(slotsDTO);
         return ResponseEntity.ok().build();
     }
+    /**
     @GetMapping("/available-slots")
     public ResponseEntity<List<BloodBank>> getBloodBanksWithAvailableSpots() {
         List<BloodBank> bloodBanks = bloodBankService.findBloodBanksWithAvailableSlots();
+        return ResponseEntity.ok(bloodBanks);
+    }
+    **/
+    @GetMapping("/available-bloodbanks")
+    public ResponseEntity<List<BloodBankResponseDTO>> getBloodBanksWithNotNullDates() {
+        List<BloodBankResponseDTO> bloodBanks = bloodBankService.findAllWithAvailableSlots();
         return ResponseEntity.ok(bloodBanks);
     }
 
