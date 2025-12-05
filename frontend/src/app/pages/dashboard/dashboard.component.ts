@@ -122,24 +122,6 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Validate the user eligibility to donate/schedule.
-   */
-  private async loadUserQuestionnaire(): Promise<void> {
-    this.questionnaireService.getUserQuestionnaires().subscribe({
-      next: (questionnaireAnswer) => {
-        if (questionnaireAnswer && questionnaireAnswer.length > 0) {
-          this.showTutorial = false;
-        } else {
-          this.showTutorial = true;
-        }
-      },
-      error: () => {
-        this.notificationService.show('Erro ao carregar eligibilidade do usuário', 'error', 1500);
-      }
-    });
-  }
-
-  /**
    * Fetches campaigns from the server and stores them in the component.
    */
   private getPosts(): void {
