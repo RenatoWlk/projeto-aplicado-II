@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 import { AppRoutesPaths } from '../../shared/app.constants';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +19,9 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
 
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -30,6 +34,11 @@ export class LoginComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   login() {
     if (this.loginForm.invalid) {
       this.notificationService.show('Preencha todos os campos corretamente', 'error', 1500);
@@ -39,7 +48,9 @@ export class LoginComponent {
     const email = this.loginForm.value.email.trim();
     const password = this.loginForm.value.password;
 
-    this.authService.login(email, password).subscribe({
+    this.authService.login(email, password)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: () => {
         this.notificationService.show('Login realizado com sucesso!', 'success', 1500);
         setTimeout(() => {

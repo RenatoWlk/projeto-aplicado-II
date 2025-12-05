@@ -12,6 +12,7 @@ import { QuestionnairePdfService } from './questionnaire-pdf.service';
 import { AppRoutesPaths } from '../../../shared/app.constants';
 import { DonationInfoService } from '../../donation-info/donation-info.service';
 import { RouterModule } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 
 interface DonationHistory {
@@ -61,6 +62,9 @@ export class UserAccountComponent implements OnInit {
 
   lastQuestionnaire: any = null;
 
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
+
   constructor(
     private userService: UserAccountService,
     private donationService: DonationService,
@@ -80,10 +84,17 @@ export class UserAccountComponent implements OnInit {
     this.loadDonationHistory();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   private loadUser(): void {
     this.isLoading = true;
-    this.userService.getUser().subscribe({
+    this.userService.getUser()
+    
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (userData) => {
         this.user = userData;
         this.patchProfileForm();
@@ -134,7 +145,9 @@ export class UserAccountComponent implements OnInit {
     const userId = this.authService.getCurrentUserId();
     this.isLoading = true;
 
-    this.donationService.getUserDonations(userId).subscribe({
+    this.donationService.getUserDonations(userId)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (donations: any[]) => { // Tipando como array
         this.isLoading = false;
 
@@ -283,7 +296,9 @@ export class UserAccountComponent implements OnInit {
     address: { street: this.profileForm.value.address }
   };
 
-    this.userService.updateUser(updatedData).subscribe({
+    this.userService.updateUser(updatedData)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (updatedUser) => {
         this.user = updatedUser;
         this.successMessage = 'Profile updated successfully';
@@ -303,7 +318,9 @@ export class UserAccountComponent implements OnInit {
     this.isLoading = true;
     const { currentPassword, newPassword } = this.passwordForm.value;
 
-    this.userService.changePassword(currentPassword, newPassword).subscribe({
+    this.userService.changePassword(currentPassword, newPassword)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: () => {
         this.successMessage = 'Password changed successfully';
         this.isLoading = false;
@@ -431,7 +448,9 @@ export class UserAccountComponent implements OnInit {
   public getUserStats(): void {
     this.loadingStatsAndAchievements = true;
 
-    this.dashboardService.getUserStats(this.userId).subscribe({
+    this.dashboardService.getUserStats(this.userId)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (stats: UserStats) => {
         if (stats.achievements) {
           stats.achievements = this.sortAchievementsByRarity(stats.achievements);
@@ -469,7 +488,9 @@ export class UserAccountComponent implements OnInit {
 
   private loadLastQuestionnaire(): void {
     this.isLoading = true;
-    this.userService.getQuestionnairesByUser().subscribe({
+    this.userService.getQuestionnairesByUser()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (questionnaire) => {
         this.lastQuestionnaire = questionnaire[0] || null;
         this.isLoading = false;
@@ -758,7 +779,9 @@ formatPhone(event: any): void {
 private calculateDonationStatus(): void {
     if (!this.user || !this.userId) return;
 
-    this.donationService.getUserDonations(this.userId).subscribe({
+    this.donationService.getUserDonations(this.userId)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (donations: DonationResponse[]) => {
         
         const completedDonations = donations.filter(

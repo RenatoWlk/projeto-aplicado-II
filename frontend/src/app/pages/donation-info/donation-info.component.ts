@@ -10,6 +10,7 @@ import { CustomHeaderComponent } from '../calendar/custom-header/custom-header.c
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { FormsModule } from '@angular/forms';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
+import { Subject, takeUntil } from 'rxjs';
 
 interface DashboardStats {
   scheduledDonations: number;
@@ -47,6 +48,9 @@ export class DonationInfoComponent implements OnInit {
   selectedDate: Date = new Date() // today
   readonly customHeader = CustomHeaderComponent;
 
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
+
   stats: DashboardStats = {
     scheduledDonations: 0,
     totalDonations: 0,
@@ -72,13 +76,20 @@ export class DonationInfoComponent implements OnInit {
     this.loadTodayDonations();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   /**
    * Carrega as estatísticas do dashboard
    */
 loadStats(): void {
   this.loadingStats = true;
   
-  this.donationService.getStats(this.bloodBankId).subscribe({
+  this.donationService.getStats(this.bloodBankId)
+  .pipe(takeUntil(this.destroy$))
+  .subscribe({
     next: (data: any) => {
       this.stats.totalDonations = data.completedDonations || 0;
       this.stats.scheduledDonations = 
@@ -98,58 +109,59 @@ loadStats(): void {
   });
 }
 
-  /**
-   * Carrega os agendamentos do dia selecionado
-   */
-  loadTodayDonations(): void {
-    this.loadingDonations = true;
-    
-    // Converte Date para ISO String
-    const dateStr = this.selectedDate.toISOString();
-    
-    this.donationService.getBloodBankDonations(
-      this.bloodBankId,
-      dateStr
-    ).subscribe({
-      next: (donations) => {
-        this.todayDonations = donations.map(d => ({
-          id: d.id,
-          userName: d.userName || 'Nome não disponível',
-          bloodType: d.bloodType,
-          date: d.date,
-          hour: d.hour,
-          status: d.status,
-          userId: d.userId
-        })).sort((a, b) => a.hour.localeCompare(b.hour));
-        
-        this.loadingDonations = false;
-      },
-      error: (err) => {
-        console.error('Erro:', err);
-        this.loadingDonations = false;
-      }
-    });
-  }
+/**
+ * Formata Date para YYYY-MM-DD (sem timezone)
+ */
+private formatDateForAPI(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
-  /**
-   * Atualiza a lista quando mudar a data
-   */
-  onDateChange(event: MatDatepickerInputEvent<Date>): void {
+/**
+ * Carrega os agendamentos do dia selecionado
+ */
+loadTodayDonations(): void {
+  this.loadingDonations = true;
+  
+  const dateStr = this.formatDateForAPI(this.selectedDate);
+  
+  this.donationService.getBloodBankDonations(
+    this.bloodBankId,
+    dateStr
+  )
+  .pipe(takeUntil(this.destroy$))
+  .subscribe({
+    next: (donations) => {
+      this.todayDonations = donations.map(d => ({
+        id: d.id,
+        userName: d.userName || 'Nome não disponível',
+        bloodType: d.bloodType,
+        date: d.date,
+        hour: d.hour,
+        status: d.status,
+        userId: d.userId
+      })).sort((a, b) => a.hour.localeCompare(b.hour));
+      
+      this.loadingDonations = false;
+    },
+    error: (err) => {
+      console.error('Erro:', err);
+      this.loadingDonations = false;
+    }
+  });
+}
+
+/**
+ * Atualiza a lista quando mudar a data
+ */
+onDateChange(event: MatDatepickerInputEvent<Date>): void {
   if (event.value) {
     this.selectedDate = event.value;
-    // Converte para ISO String para a API
-    const isoDate = event.value.toISOString();
     this.loadTodayDonations();
   }
 }
-
-  /**
-   * Formata a data para exibição
-   */
-  formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('pt-BR');
-  }
 
   /**
    * Retorna classe CSS baseada no status
@@ -182,7 +194,9 @@ loadStats(): void {
    * Confirmar uma doação
    */
   confirmDonation(donationId: string): void {
-    this.donationService.confirmDonation(donationId, this.bloodBankId).subscribe({
+    this.donationService.confirmDonation(donationId, this.bloodBankId)
+    .pipe(takeUntil(this.destroy$))    
+    .subscribe({
       next: (response: any) => {
         this.notificationService.show('Doação confirmada!' ,"success", 3000);
         this.loadTodayDonations();
@@ -198,7 +212,9 @@ loadStats(): void {
    * Completar uma doação
    */
   completeDonation(donationId: string, notes?: string): void {
-    this.donationService.completeDonation(donationId, this.bloodBankId, notes).subscribe({
+    this.donationService.completeDonation(donationId, this.bloodBankId, notes)
+    .pipe(takeUntil(this.destroy$))    
+    .subscribe({
       next: (response: any) => {
         this.notificationService.show('Doação completada!' ,"success", 3000);
         // Recarregar lista e estatísticas
@@ -216,7 +232,9 @@ loadStats(): void {
    */
   cancelDonation(donationId: string, userId: string): void {
 
-      this.donationService.cancelDonation(donationId, userId).subscribe({
+      this.donationService.cancelDonation(donationId, userId)
+      .pipe(takeUntil(this.destroy$))      
+      .subscribe({
         next: (response: any) => {
         this.notificationService.show('Doação cancelada!' ,"success", 3000);
           // Recarregar lista e estatísticas

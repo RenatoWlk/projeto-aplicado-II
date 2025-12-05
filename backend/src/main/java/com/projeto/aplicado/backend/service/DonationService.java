@@ -45,9 +45,6 @@ public class DonationService {
                     throw new RuntimeException("Você já possui um agendamento para este dia");
                 });
 
-        // REMOVIDO: Verificação de disponibilidade
-        // O frontend já verifica usando getAvailableSlots antes de permitir agendar
-
         // Criar doação
         Donation donation = new Donation();
         donation.setUserId(userId);

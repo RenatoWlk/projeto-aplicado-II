@@ -8,6 +8,7 @@ import { AppRoutesPaths } from '../../shared/app.constants';
 import { NotificationModalComponent } from '../../shared/notifications/notification-modal/notification-modal.component';
 import { NotificationEventService } from '../../shared/notifications/notification-event.service';
 import { UserRole } from '../../shared/app.enums';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -28,6 +29,9 @@ export class HeaderComponent implements OnInit {
 
   isNotificationsOpen = false;
   unreadCount = 0;
+
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
 
   private slogans: string[] = [
     'Uma doação pode salvar até 4 vidas!',
@@ -56,7 +60,9 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     this.setRandomSlogan();
 
-    this.headerService.sloganTrigger.subscribe(() => this.setRandomSlogan());
+    this.headerService.sloganTrigger
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(() => this.setRandomSlogan());
 
     this.isLoggedIn = this.authService.isAuthenticated();
     if (!this.isLoggedIn) return;
@@ -68,13 +74,22 @@ export class HeaderComponent implements OnInit {
 
     this.loadHeaderUnreadCount();
 
-    this.notificationEventService.refresh$.subscribe(() => {
+    this.notificationEventService.refresh$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(() => {
       this.loadHeaderUnreadCount();
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadHeaderUnreadCount() {
-    this.headerService.getNotificationsUnreadCount(this.currentUserId).subscribe(count => {
+    this.headerService.getNotificationsUnreadCount(this.currentUserId)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(count => {
       this.unreadCount = count;
     });
   }

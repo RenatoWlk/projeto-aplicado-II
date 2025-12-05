@@ -9,6 +9,7 @@ import { Offer } from '../dashboard.service';
 import { Reward } from '../../rewards/rewards.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { NotificationService } from '../../../shared/notifications/notifications.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'partner-dashboard',
@@ -37,6 +38,9 @@ export class PartnerDashboardComponent implements OnInit {
 
   private partnerId: string = "";
 
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
+
   constructor(
     private authService: AuthService,
     private partnerDashboardService: PartnerDashboardService,
@@ -50,8 +54,14 @@ export class PartnerDashboardComponent implements OnInit {
     this.loadRewards();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadOffers(): void {
     this.partnerDashboardService.getPartnerOffers(this.partnerId)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((offers) => {
         this.partnerOffers = offers;
         this.isLoadingOffers = false;
@@ -60,6 +70,7 @@ export class PartnerDashboardComponent implements OnInit {
 
   private loadRewards(): void {
     this.partnerDashboardService.getPartnerRewards(this.partnerId)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((rewards) => {
         this.partnerRewards = rewards;
         this.isLoadingRewards = false;
@@ -69,7 +80,9 @@ export class PartnerDashboardComponent implements OnInit {
   createNewOffer(data: any): void {
     this.isOfferModalOpen = false;
 
-    this.partnerDashboardService.createOffer(data).subscribe({
+    this.partnerDashboardService.createOffer(data)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: () => {
         this.notificationBannerService.show('Oferta criada com sucesso!', 'success', 1500);
         this.loadOffers();
@@ -84,7 +97,9 @@ export class PartnerDashboardComponent implements OnInit {
   createNewReward(data: any): void {
     this.isRewardModalOpen = false;
 
-    this.partnerDashboardService.createReward(data).subscribe({
+    this.partnerDashboardService.createReward(data)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: () => {
         this.notificationBannerService.show('Recompensa criada com sucesso!', 'success', 1500);
         this.loadRewards();
@@ -107,6 +122,7 @@ export class PartnerDashboardComponent implements OnInit {
 
     if (this.deleteType === 'offer') {
       this.partnerDashboardService.deleteOffer(this.itemToDelete.id)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
           next: () => {
             this.notificationBannerService.show('Oferta excluída!', 'success', 1500);
@@ -118,6 +134,7 @@ export class PartnerDashboardComponent implements OnInit {
         });
     } else {
       this.partnerDashboardService.deleteReward(this.itemToDelete.id)
+        .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
             this.notificationBannerService.show('Recompensa excluída!', 'success', 1500);

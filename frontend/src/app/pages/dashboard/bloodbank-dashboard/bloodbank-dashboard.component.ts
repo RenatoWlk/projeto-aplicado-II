@@ -11,6 +11,7 @@ import { DonationService } from '../../calendar/donator-calendar/donator-calenda
 import { NotificationBannerService } from '../../../shared/notification-banner/notification-banner.service';
 import { BloodBankDashboardService, BloodBankStats, DonationsOverTime } from './bloodbank-dashboard.service';
 import { NotificationService } from '../../../shared/notifications/notifications.service';
+import { Subject, takeUntil } from 'rxjs';
 
 const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'] as const;
 type MonthType = typeof MONTHS[number];
@@ -35,6 +36,9 @@ export class BloodbankDashboardComponent implements OnInit {
   private bloodbankId: string = "";
   isCampaignModalOpen: boolean = false;
   averageDonation: number = 0;
+
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
 
   // Preloaders
   isLoadingBloodbankStats: boolean = true;
@@ -148,11 +152,18 @@ export class BloodbankDashboardComponent implements OnInit {
     this.loadDonations();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   // ==========================================
   // LOAD DONATIONS
   // ==========================================
   async loadDonations(): Promise<void> {
-    this.donationService.getBloodBankDonations(this.bloodbankId).subscribe({
+    this.donationService.getBloodBankDonations(this.bloodbankId)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (donations: any[]) => {
         this.processStats(donations);
         this.updateCharts();
@@ -292,7 +303,9 @@ export class BloodbankDashboardComponent implements OnInit {
   // CAMPAIGNS
   // ==========================================
   private loadCampaigns(): void {
-    this.bbDashboardService.getBloodbankCampaigns(this.bloodbankId).subscribe({
+    this.bbDashboardService.getBloodbankCampaigns(this.bloodbankId)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (campaigns: Campaign[]) => {
         this.bloodbankCampaigns = campaigns;
         this.isLoadingBloodbankCampaigns = false;
@@ -307,7 +320,9 @@ export class BloodbankDashboardComponent implements OnInit {
   createNewCampaign(data: any): void {
     this.isCampaignModalOpen = false;
 
-    this.bbDashboardService.createCampaign(data).subscribe({
+    this.bbDashboardService.createCampaign(data)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: () => {
         this.loadCampaigns();
         this.notificationService.activateForAll('new_campaigns', 24).subscribe();

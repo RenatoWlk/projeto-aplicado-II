@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +13,7 @@ import { RouterModule } from '@angular/router';
 import { RegisterService } from '../../pages/register/register.service';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 import { AppRoutesPaths } from '../../shared/app.constants';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -23,9 +24,11 @@ import { AppRoutesPaths } from '../../shared/app.constants';
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit, OnDestroy{
   readonly appRoutesPaths = AppRoutesPaths;
   userForm!: FormGroup;
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
 
   constructor(private fb: FormBuilder, private registerService: RegisterService, private notificationService: NotificationBannerService) {}
 
@@ -78,6 +81,11 @@ export class RegisterComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+  
   get credentialsGroup() {
     return this.userForm.get('credentials') as FormGroup;
   }
@@ -197,7 +205,9 @@ export class RegisterComponent {
         },
       };
 
-      this.registerService.registerDonator(payload).subscribe({
+      this.registerService.registerDonator(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (res) => {
           this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
         },
@@ -225,7 +235,9 @@ export class RegisterComponent {
         phone: this.clean(this.bloodbankInfoFormGroup.get('telephone')?.value),
       };
 
-      this.registerService.registerBloodBank(payload).subscribe({
+      this.registerService.registerBloodBank(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (res) => {
           this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
         },
@@ -253,7 +265,9 @@ export class RegisterComponent {
         phone: this.clean(this.partnerInfoFormGroup.get('telephone')?.value),
       };
 
-      this.registerService.registerPartner(payload).subscribe({
+      this.registerService.registerPartner(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (res) => {
           this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
         },

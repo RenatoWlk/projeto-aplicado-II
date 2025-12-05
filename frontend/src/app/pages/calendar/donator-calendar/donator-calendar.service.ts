@@ -110,9 +110,9 @@ export class DonationService {
 
     constructor(private http: HttpClient) {}
 
-    // Pega os bancos de sangue que disponbilizaram datas de doação
-    getBloodBanksWithAvailableSlots(): Observable<BloodBank[]> {
-        return this.http.get<BloodBank[]>(`${this.BLOODBANK_API}/available-slots`);
+    // Get Available bloodBanks
+    getBloodBanksWithAvailableSlotsNotNull(): Observable<BloodBank[]> {
+        return this.http.get<BloodBank[]>(`${this.BLOODBANK_API}/available-bloodbanks`);
     }
 
     // Complete donation data.

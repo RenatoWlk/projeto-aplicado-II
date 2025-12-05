@@ -13,6 +13,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { NotificationBannerService } from '../../../shared/notification-banner/notification-banner.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-bloodbank-calendar',
@@ -30,7 +31,10 @@ export class BloodbankCalendarComponent {
 
   readonly customHeader = CustomHeaderComponent;
   selected: Date = new Date();
-
+  
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
+  
   calendarStats : CalendarStats = {
     lastDonationDate : new Date(),
     nextDonationDate : new Date(),
@@ -51,6 +55,11 @@ export class BloodbankCalendarComponent {
     private notificationService: NotificationBannerService,
   ) {}
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   addAvailableSlots() {
     const id = this.authService.getCurrentUserId();
     const startDate = this.rangeForm.controls.startDate.value!;
@@ -68,7 +77,9 @@ export class BloodbankCalendarComponent {
     const slotsByDate = this.generateSlotsByDate(startDate, endDate, startTime, endTime, availableSpots)
     const payload = {id: id, availabilitySlots: slotsByDate};
 
-    this.bloodbankService.addAvailableSlots(payload).subscribe({
+    this.bloodbankService.addAvailableSlots(payload)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: () => {
         this.notificationService.show('Datas disponibilizadas com sucesso!', "success", 3000);
       },

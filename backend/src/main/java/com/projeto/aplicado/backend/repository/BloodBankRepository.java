@@ -21,8 +21,8 @@ public interface BloodBankRepository extends MongoRepository<BloodBank, String> 
     @Query("{ 'role': 'BLOODBANK' }")
     List<BloodBank> findAllBloodBanks();
 
-    @Query("{ 'availabilitySlots.0': { $exists: true } }")
-    List<BloodBank> findByAvailabilitySlotsNotNull();
+    @Query("{ 'availabilitySlots': { $exists: true, $ne: []} }")
+    List<BloodBank> findBloodBanksWithAvailableSlots();
 
     @Aggregation(pipeline = {
             "{ '$match': { 'availabilitySlots.0': { '$exists': true } } }",

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { QuestionnaireService, QuestionnaireData } from './questionnaire.service';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-questionnaire',
@@ -18,6 +19,9 @@ export class QuestionnaireComponent {
   submitted = false;
   success = false;
   isEligible: boolean = false
+
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
 
   questionLabels: Record<string, string> = {
     age: 'Idade entre 16 e 69 anos',
@@ -87,7 +91,9 @@ export class QuestionnaireComponent {
   }
 
   private handleGenderValidation(): void {
-    this.form.get('gender')?.valueChanges.subscribe((gender) => {
+    this.form.get('gender')?.valueChanges
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((gender) => {
       const maleFields = ['lastDonationMale'];
       const femaleFields = ['lastDonationFemale', 'pregnant', 'recentChildbirth'];
 
@@ -171,6 +177,7 @@ export class QuestionnaireComponent {
     // console.log('Objeto JSON Completo sendo enviado:', JSON.stringify(data, null, 2));
 
     this.questionnaireService.submitQuestionnaire(data)
+    .pipe(takeUntil(this.destroy$))
     .subscribe({
         next: response => {
           this.notificationService.show('Questionário respondido com sucesso!', 'success', 3000)
@@ -178,6 +185,11 @@ export class QuestionnaireComponent {
         error: err => this.notificationService.show('Erro ao enviar questionário!', 'error', 3000),
     });
 
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   resetForm(): void {

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Partner, Offer, PartnerAccountService } from './partner-account.service';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-partner-account',
@@ -29,6 +30,9 @@ export class PartnerAccountComponent implements OnInit {
   offersCount = 0;
   activeOffersCount = 0;
 
+  // Subject to manage unsubscribe
+  private destroy$ = new Subject<void>();
+  
   constructor(
     private partnerService: PartnerAccountService,
     private fb: FormBuilder
@@ -40,9 +44,16 @@ export class PartnerAccountComponent implements OnInit {
     this.initOfferForm();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadPartner(): void {
     this.isLoading = true;
-    this.partnerService.getPartner().subscribe({
+    this.partnerService.getPartner()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (partner) => {
         this.partnerUser = partner;
         this.updateOfferStats();
@@ -197,7 +208,9 @@ export class PartnerAccountComponent implements OnInit {
       }
     };
 
-    this.partnerService.updatePartner(updatedProfile).subscribe({
+    this.partnerService.updatePartner(updatedProfile)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (updated) => {
         this.partnerUser = updated;
         this.patchProfileForm();
@@ -282,7 +295,9 @@ export class PartnerAccountComponent implements OnInit {
     };
 
     if (this.addOfferMode) {
-      this.partnerService.addOffer(offerToSave).subscribe({
+      this.partnerService.addOffer(offerToSave)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (updatedOffers) => {
           this.partnerUser!.offers = updatedOffers;
           this.updateOfferStats();
@@ -297,7 +312,9 @@ export class PartnerAccountComponent implements OnInit {
         }
       });
     } else if (this.editOfferMode && this.editingOfferIndex !== null) {
-      this.partnerService.updateOffer(this.editingOfferIndex, offerToSave).subscribe({
+      this.partnerService.updateOffer(this.editingOfferIndex, offerToSave)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: (updatedOffers) => {
           this.partnerUser!.offers = updatedOffers;
           this.updateOfferStats();
@@ -327,7 +344,9 @@ export class PartnerAccountComponent implements OnInit {
     if (!this.partnerUser) return;
     this.isLoading = true;
 
-    this.partnerService.removeOffer(offer).subscribe({
+    this.partnerService.removeOffer(offer)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
       next: (updatedOffers) => {
         this.partnerUser!.offers = updatedOffers;
         this.updateOfferStats();
