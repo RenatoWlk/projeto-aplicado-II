@@ -18,7 +18,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final AchievementService achievementService;
 
     /**
      * Creates a new user.

@@ -1,4 +1,4 @@
-package com.projeto.aplicado.backend.dto;
+package com.projeto.aplicado.backend.dto.notification;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

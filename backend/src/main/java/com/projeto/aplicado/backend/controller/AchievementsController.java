@@ -47,4 +47,11 @@ public class AchievementsController {
         achievementService.validateAndUnlockAchievements(user);
         return ResponseEntity.ok(achievementService.getAchievementsFromUser(user));
     }
+
+    @PostMapping("/unlock-scrt/{userId}")
+    public ResponseEntity<Void> unlockScrt(@PathVariable String userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        achievementService.unlockAchievementByType(user, "secret_opened");
+        return ResponseEntity.ok().build();
+    }
 }

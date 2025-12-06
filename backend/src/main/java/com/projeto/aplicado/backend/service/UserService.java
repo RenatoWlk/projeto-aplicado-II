@@ -2,6 +2,7 @@ package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.ChangePasswordDTO;
+import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.dto.user.UserLocationDTO;
 import com.projeto.aplicado.backend.dto.user.UserStatsDTO;
 import com.projeto.aplicado.backend.dto.user.UserRequestDTO;
@@ -30,6 +31,7 @@ public class UserService {
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final GeolocationService geolocationService;
+    private final NotificationService notificationService;
 
     /**
      * Creates a new user in the system.
@@ -84,6 +86,11 @@ public class UserService {
     public void unlockMapAchievement(String id) throws UserNotFoundException {
         User user = userRepository.findUserById(id).orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when unlocking map achievement"));
         achievementService.unlockAchievementByType(user, "map_opened");
+        ActivateRequestDTO activateRequestDTO = new ActivateRequestDTO();
+        activateRequestDTO.setUserId(id);
+        activateRequestDTO.setBaseId("achievement_opened_map");
+        activateRequestDTO.setHoursToExpire(72);
+        notificationService.activateForUser(activateRequestDTO);
     }
 
     /**

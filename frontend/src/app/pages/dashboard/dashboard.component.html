@@ -277,7 +277,7 @@
             { icon: 'fa-heart', label: 'Você doou', value: totalLitersDonated},
             { icon: 'fa-tint', label: 'Tipo sanguíneo', value: userStats.bloodType },
             { icon: 'fa-clock', label: 'Próxima doação', value: userStats.timeUntilNextDonation },
-            { icon: 'fa-calendar-check', label: 'Última doação', value: (userStats.lastDonationDate | date: 'dd/MM/yyyy') },
+            { icon: 'fa-calendar-check', label: 'Última doação', value: userStats.lastDonationDate ? (userStats.lastDonationDate | date: 'dd/MM/yyyy') : 'Ainda não doou' },
             { icon: 'custom', label: 'Total de pontos', value: userStats.totalPoints }
           ]">
             <ng-container *ngIf="stat.icon !== 'custom'; else customIcon">

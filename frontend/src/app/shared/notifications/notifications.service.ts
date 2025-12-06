@@ -30,9 +30,9 @@ export class NotificationService {
     return this.http.get<number>(`${this.baseUrl}/${userId}/unread-count`);
   }
 
-  activateForUser(userId: string, baseId: string, hoursToExpire: number = 24): Observable<void> {
-    const payload = { userId: userId, baseId: baseId, hoursToExpire: hoursToExpire };
-    return this.http.post<void>(`${this.baseUrl}/activate-user`, payload);
+  activateForUser(userId: string, baseId: string, hoursToExpire: number = 24): Observable<ActivateNotification> {
+    const payload: ActivateNotification = { userId: userId, baseId: baseId, hoursToExpire: hoursToExpire };
+    return this.http.post<ActivateNotification>(`${this.baseUrl}/activate-user`, payload);
   }
 
   activateForAll(baseId: string, hoursToExpire: number = 24): Observable<ActivateNotificationAll> {

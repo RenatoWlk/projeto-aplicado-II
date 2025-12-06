@@ -1,8 +1,9 @@
 package com.projeto.aplicado.backend.controller;
 
-import com.projeto.aplicado.backend.dto.NotificationDTO;
+import com.projeto.aplicado.backend.dto.notification.ActivateAllRequestDTO;
+import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
+import com.projeto.aplicado.backend.dto.notification.NotificationDTO;
 import com.projeto.aplicado.backend.service.NotificationService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,13 +27,13 @@ public class NotificationController {
     }
 
     @PostMapping("/activate-user")
-    public ResponseEntity<Void> activateForUser(@RequestBody ActivateRequest req) {
-        service.activateForUser(req.userId, req.baseId, req.hoursToExpire);
+    public ResponseEntity<Void> activateForUser(@RequestBody ActivateRequestDTO req) {
+        service.activateForUser(req);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/activate-all")
-    public ResponseEntity<Void> activateForAll(@RequestBody ActivateAllRequest req) {
+    public ResponseEntity<Void> activateForAll(@RequestBody ActivateAllRequestDTO req) {
         service.activateForAllUsers(req);
         return ResponseEntity.ok().build();
     }
@@ -47,18 +48,5 @@ public class NotificationController {
     public ResponseEntity<Void> markAll(@PathVariable String userId) {
         service.markAllRead(userId);
         return ResponseEntity.ok().build();
-    }
-
-    @Data
-    public static class ActivateRequest {
-        public String userId;
-        public String baseId;
-        public int hoursToExpire = 24;
-    }
-
-    @Data
-    public static class ActivateAllRequest {
-        public String baseId;
-        public int hoursToExpire = 24;
     }
 }

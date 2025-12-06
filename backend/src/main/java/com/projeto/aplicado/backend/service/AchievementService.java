@@ -1,6 +1,7 @@
 package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.constants.AchievementsConditionsTypes;
+import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.exception.AchievementException;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.achievement.Achievement;
@@ -55,7 +56,12 @@ public class AchievementService {
 
                 user.getUnlockedAchievements().add(unlocked);
                 user.setTotalPoints(user.getTotalPoints() + achievement.getPoints());
-                notificationService.activateForUser(user.getId(), notification.getId(), 72);
+
+                ActivateRequestDTO activateNotificationDto = new ActivateRequestDTO();
+                activateNotificationDto.setUserId(user.getId());
+                activateNotificationDto.setBaseId(notification.getId());
+                activateNotificationDto.setHoursToExpire(72);
+                notificationService.activateForUser(activateNotificationDto);
             }
         }
 

@@ -1,7 +1,8 @@
 package com.projeto.aplicado.backend.service;
 
-import com.projeto.aplicado.backend.controller.NotificationController;
-import com.projeto.aplicado.backend.dto.NotificationDTO;
+import com.projeto.aplicado.backend.dto.notification.ActivateAllRequestDTO;
+import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
+import com.projeto.aplicado.backend.dto.notification.NotificationDTO;
 import com.projeto.aplicado.backend.model.NotificationBase;
 import com.projeto.aplicado.backend.model.UserNotification;
 import com.projeto.aplicado.backend.model.users.User;
@@ -23,29 +24,48 @@ public class NotificationService {
     private final NotificationRepository baseRepository;
 
     // Activate a notification for one user
-    public void activateForUser(String userId, String baseId, int hoursToExpire) {
+    public void activateForUser(ActivateRequestDTO dto) {
+        System.out.println("ACTIVATE FOR USER: " + dto.getUserId() + " " + dto.getBaseId() + " " + dto.getHoursToExpire());
+        String userId = dto.getUserId();
+        String baseId = dto.getBaseId();
+        int hoursToExpire = dto.getHoursToExpire();
+
         User user = userRepository.findById(userId).orElseThrow();
-
-        UserNotification un = new UserNotification(baseId, false, Instant.now(), Instant.now().plus(hoursToExpire, ChronoUnit.HOURS));
-
         if (user.getActiveNotifications() == null) {
             user.setActiveNotifications(new ArrayList<>());
         }
+
+        Instant now = Instant.now();
+        // Avoid duplicates
+        boolean alreadyActive = user.getActiveNotifications().stream()
+                .anyMatch(n -> n.getNotificationBaseId().equals(baseId) && n.getExpireAt().isAfter(now));
+        if (alreadyActive) {
+            return;
+        }
+
+        UserNotification un = new UserNotification(baseId, false, now, now.plus(hoursToExpire, ChronoUnit.HOURS));
+
         user.getActiveNotifications().add(un);
         userRepository.save(user);
     }
 
     // Activate notification for all users
-    public void activateForAllUsers(NotificationController.ActivateAllRequest dto) {
+    public void activateForAllUsers(ActivateAllRequestDTO dto) {
         List<User> users = userRepository.findAllUsers();
-        Instant expireAt = Instant.now().plus(dto.getHoursToExpire(), ChronoUnit.HOURS);
-        UserNotification newNotification = new UserNotification(dto.getBaseId(), false, Instant.now(), expireAt);
+        Instant now = Instant.now();
+        Instant expireAt = now.plus(dto.getHoursToExpire(), ChronoUnit.HOURS);
 
         for (User user : users) {
             if (user.getActiveNotifications() == null) {
                 user.setActiveNotifications(new ArrayList<>());
             }
-            user.getActiveNotifications().add(newNotification);
+
+            boolean alreadyActive = user.getActiveNotifications().stream().anyMatch(n ->
+                            n.getNotificationBaseId().equals(dto.getBaseId()) && n.getExpireAt().isAfter(now));
+            if (!alreadyActive) {
+                UserNotification notification = new UserNotification(dto.getBaseId(), false, now, expireAt);
+                user.getActiveNotifications().add(notification);
+            }
         }
 
         userRepository.saveAll(users);
