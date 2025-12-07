@@ -30,6 +30,7 @@ export interface Offer {
 }
 
 export interface Campaign {
+    id: string
     title: string;
     body: string;
     startDate: Date;

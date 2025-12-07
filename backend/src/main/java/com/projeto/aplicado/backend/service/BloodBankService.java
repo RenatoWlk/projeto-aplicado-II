@@ -295,6 +295,7 @@ public class BloodBankService {
 
         for (Campaign campaign : bloodBank.getCampaigns()) {
             CampaignDTO dto = new CampaignDTO();
+            dto.setId(campaign.getId());
             dto.setTitle(campaign.getTitle());
             dto.setBody(campaign.getBody());
             dto.setStartDate(campaign.getStartDate());

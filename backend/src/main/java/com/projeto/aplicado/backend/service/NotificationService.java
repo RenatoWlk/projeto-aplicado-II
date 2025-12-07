@@ -25,7 +25,6 @@ public class NotificationService {
 
     // Activate a notification for one user
     public void activateForUser(ActivateRequestDTO dto) {
-        System.out.println("ACTIVATE FOR USER: " + dto.getUserId() + " " + dto.getBaseId() + " " + dto.getHoursToExpire());
         String userId = dto.getUserId();
         String baseId = dto.getBaseId();
         int hoursToExpire = dto.getHoursToExpire();

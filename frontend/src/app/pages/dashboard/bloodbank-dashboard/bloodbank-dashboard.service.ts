@@ -29,13 +29,13 @@ const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', '
 const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 export interface DonationsOverTime {
-    donations: number;
-    month: 'Jan' | 'Fev' | 'Mar' | 'Abr' | 'Mai' | 'Jun' | 'Jul' | 'Ago' | 'Set' | 'Out' | 'Nov' | 'Dez';
-    year: number;
+  donations: number;
+  month: 'Jan' | 'Fev' | 'Mar' | 'Abr' | 'Mai' | 'Jun' | 'Jul' | 'Ago' | 'Set' | 'Out' | 'Nov' | 'Dez';
+  year: number;
 }
 
 /**
- * Interface para estatísticas do banco de sangue
+ * Blood bank statistics response model
  */
 export interface BloodBankStats {
   totalDonations: number;
@@ -55,36 +55,54 @@ export interface BloodBankStats {
 }
 
 export interface NewCampaign {
-    bloodbankEmail: string;
-    title: string;
-    body: string;
-    startDate: Date;
-    endDate: Date;
-    location: Address;
-    phone: string;
+  id: string;
+  bloodbankEmail: string;
+  title: string;
+  body: string;
+  startDate: Date;
+  endDate: Date;
+  location: Address;
+  phone: string;
 }
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class BloodBankDashboardService {
-    constructor(private http: HttpClient, private auth: AuthService) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
-    getBloodbankStats(bloodbankId: string): Observable<BloodBankStats> {
-        return this.http.get<BloodBankStats>(`/api/bloodbanks/${bloodbankId}/stats`);
-    }
+  /**
+   * Fetches aggregated statistics from the blood bank.
+   */
+  getBloodbankStats(bloodbankId: string): Observable<BloodBankStats> {
+    return this.http.get<BloodBankStats>(`/api/bloodbanks/${bloodbankId}/stats`);
+  }
 
-    getBloodbankCampaigns(bloodbankId: string): Observable<Campaign[]> {
-        return this.http.get<Campaign[]>(`/api/bloodbanks/${bloodbankId}/campaigns`);
-    }
+  /**
+   * Retrieves all campaigns created by a specific blood bank.
+   */
+  getBloodbankCampaigns(bloodbankId: string): Observable<Campaign[]> {
+    return this.http.get<Campaign[]>(`/api/bloodbanks/${bloodbankId}/campaigns`);
+  }
 
-    createCampaign(campaign: NewCampaign): Observable<Campaign> {
-        campaign.bloodbankEmail = this.auth.getCurrentUserEmail();
-        return this.http.post<NewCampaign>(DashboardConstants.CREATE_CAMPAIGN_ENDPOINT, campaign);
-    }
+  /**
+   * Creates a new campaign for the authenticated blood bank.
+   */
+  createCampaign(campaign: NewCampaign): Observable<Campaign> {
+    campaign.bloodbankEmail = this.auth.getCurrentUserEmail();
+    return this.http.post<NewCampaign>(DashboardConstants.CREATE_CAMPAIGN_ENDPOINT, campaign);
+  }
 
-     /**
-   * Processa dados brutos de doações e retorna estatísticas
+  /**
+   * Deletes a campaign for the authenticated blood bank.
+   */
+  deleteCampaign(campaignId: string) {
+    const bloodBankId: string = this.auth.getCurrentUserId();
+    return this.http.delete(`/api/bloodbanks/${bloodBankId}/campaigns/${campaignId}`);
+  }
+
+  /**
+   * Processes raw donation data and extracts all computed statistics.
    */
   processStats(donations: DonationData[]): ProcessedStats {
     return {
@@ -98,43 +116,43 @@ export class BloodBankDashboardService {
   }
 
   /**
-   * Retorna total de doações
+   * Returns the total number of donations.
    */
   private getTotalDonations(donations: DonationData[]): number {
     return donations.length;
   }
 
   /**
-   * Retorna doações agendadas (PENDING ou CONFIRMED)
+   * Returns donations with status PENDING or CONFIRMED.
    */
   private getScheduledDonations(donations: DonationData[]): number {
-    return donations.filter(d => 
+    return donations.filter(d =>
       d.status === 'PENDING' || d.status === 'CONFIRMED'
     ).length;
   }
 
   /**
-   * Retorna doações completadas
+   * Returns the number of completed donations.
    */
   private getCompletedDonations(donations: DonationData[]): number {
     return donations.filter(d => d.status === 'COMPLETED').length;
   }
 
   /**
-   * Retorna doações canceladas
+   * Returns the number of cancelled donations.
    */
   private getCancelledDonations(donations: DonationData[]): number {
     return donations.filter(d => d.status === 'CANCELLED').length;
   }
 
   /**
-   * Processa doações ao longo do tempo (últimos 8 meses)
+   * Computes donation counts for the last 8 months, grouped by month.
    */
   private getDonationsOverTime(donations: DonationData[]): Array<{ month: string; year: number; donations: number }> {
     const now = new Date();
     const donationsByMonth: Record<string, { month: string; year: number; donations: number }> = {};
 
-    // Inicializa os últimos 8 meses
+    // Initialize last 8 months
     for (let i = 7; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const key = `${date.getFullYear()}-${date.getMonth()}`;
@@ -145,13 +163,13 @@ export class BloodBankDashboardService {
       };
     }
 
-    // Conta doações completadas por mês
+    // Count completed donations per month
     donations
       .filter(d => d.status === 'COMPLETED')
       .forEach(donation => {
         const donationDate = new Date(donation.date);
         const key = `${donationDate.getFullYear()}-${donationDate.getMonth()}`;
-        
+
         if (donationsByMonth[key]) {
           donationsByMonth[key].donations++;
         }
@@ -161,31 +179,29 @@ export class BloodBankDashboardService {
   }
 
   /**
-   * Processa distribuição de tipos sanguíneos
+   * Computes distribution of completed donations per blood type.
    */
   private getBloodTypeDistribution(donations: DonationData[]): Record<string, number> {
     const distribution: Record<string, number> = {};
 
-    // Inicializa todos os tipos com zero
+    // Initialize all blood types
     BLOOD_TYPES.forEach(type => {
       distribution[type] = 0;
     });
 
-    // Conta doações completadas por tipo sanguíneo
-    donations
-      .filter(d => d.status === 'COMPLETED' && d.bloodType)
-      .forEach(donation => {
-        const bloodType = donation.bloodType!;
-        if (distribution.hasOwnProperty(bloodType)) {
-          distribution[bloodType]++;
-        }
-      });
+    // Count completed donations by blood type
+    donations.filter(d => d.status === 'COMPLETED' && d.bloodType).forEach(donation => {
+      const bloodType = donation.bloodType!;
+      if (distribution.hasOwnProperty(bloodType)) {
+        distribution[bloodType]++;
+      }
+    });
 
     return distribution;
   }
 
   /**
-   * Calcula média de doações mensais
+   * Calculates the average donations per month over a period.
    */
   calculateAverageDonations(donationsOverTime: Array<{ donations: number }>): number {
     if (!donationsOverTime || donationsOverTime.length === 0) {
@@ -197,7 +213,7 @@ export class BloodBankDashboardService {
   }
 
   /**
-   * Formata dados para o gráfico de linha
+   * Formats data for the line chart component.
    */
   formatLineChartData(donationsOverTime: Array<{ month: string; year: number; donations: number }>) {
     return {
@@ -207,7 +223,7 @@ export class BloodBankDashboardService {
   }
 
   /**
-   * Formata dados para o gráfico de rosca (doughnut)
+   * Formats data for the doughnut chart component.
    */
   formatDoughnutChartData(
     bloodTypeDistribution: Record<string, number>,

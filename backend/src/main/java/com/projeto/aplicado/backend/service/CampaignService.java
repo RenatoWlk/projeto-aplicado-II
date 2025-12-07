@@ -5,8 +5,11 @@ import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.Campaign;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.repository.BloodBankRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class CampaignService {
                 .orElseThrow(() -> new UserNotFoundException(Role.BLOODBANK, "Blood bank not found with email provided when creating a campaign"));
 
         Campaign camp = new Campaign();
+        camp.setId(new ObjectId().toHexString());
         camp.setTitle(dto.getTitle());
         camp.setBody(dto.getBody());
         camp.setStartDate(dto.getStartDate());
@@ -38,11 +42,34 @@ public class CampaignService {
         camp.setPhone(bb.getPhone());
         camp.setLocation(bb.getAddress());
 
-        // Add offer to partner
         bb.getCampaigns().add(camp);
         bloodBankRepository.save(bb);
 
         return toCampaignDTO(camp);
+    }
+
+    public void deleteCampaign(String bloodBankId, String campaignId) {
+        var bloodBank = bloodBankRepository.findById(bloodBankId)
+                .orElseThrow(() -> new UserNotFoundException(Role.BLOODBANK, "Blood bank not found"));
+
+        boolean assignedAnyId = false;
+        for (var c : bloodBank.getCampaigns()) {
+            if (c.getId() == null || c.getId().isBlank()) {
+                c.setId(new ObjectId().toHexString());
+                assignedAnyId = true;
+            }
+        }
+
+        if (assignedAnyId) {
+            bloodBankRepository.save(bloodBank);
+        }
+
+        boolean removed = bloodBank.getCampaigns().removeIf(c -> campaignId.equals(c.getId()));
+        if (!removed) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Campaign not found");
+        }
+
+        bloodBankRepository.save(bloodBank);
     }
 
     /**
@@ -58,6 +85,7 @@ public class CampaignService {
 
     private CampaignDTO toCampaignDTO(Campaign campaign) {
         CampaignDTO dto = new CampaignDTO();
+        dto.setId(campaign.getId());
         dto.setTitle(campaign.getTitle());
         dto.setBody(campaign.getBody());
         dto.setStartDate(campaign.getStartDate());

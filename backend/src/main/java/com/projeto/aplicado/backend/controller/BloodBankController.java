@@ -10,6 +10,7 @@ import com.projeto.aplicado.backend.model.DailyAvailability;
 import com.projeto.aplicado.backend.model.Slot;
 import com.projeto.aplicado.backend.model.users.BloodBank;
 import com.projeto.aplicado.backend.service.BloodBankService;
+import com.projeto.aplicado.backend.service.CampaignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BloodBankController {
     private final BloodBankService bloodBankService;
+    private final CampaignService campaignService;
 
     /**
      * Creates a new blood bank.
@@ -88,6 +90,15 @@ public class BloodBankController {
     @GetMapping("/{id}/campaigns")
     public ResponseEntity<List<CampaignDTO>> getCampaignsById(@PathVariable String id) {
         return ResponseEntity.ok(bloodBankService.findCampaignsById(id));
+    }
+
+    @DeleteMapping("/{bloodBankId}/campaigns/{campaignId}")
+    public ResponseEntity<Void> deleteCampaignById(
+            @PathVariable String bloodBankId,
+            @PathVariable String campaignId) {
+
+        campaignService.deleteCampaign(bloodBankId, campaignId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/publish-dates")

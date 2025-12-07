@@ -2,8 +2,10 @@ package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.EligibilityQuestionnaireDTO;
+import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.EligibilityQuestionnaire;
+import com.projeto.aplicado.backend.model.enums.AchievementsNotifications;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.EligibilityQuestionnaireRepository;
@@ -20,6 +22,7 @@ public class EligibilityQuestionnaireService {
     private final EligibilityQuestionnaireRepository questionnaireRepository;
     private final UserRepository userRepository;
     private final AchievementService achievementService;
+    private final NotificationService notificationService;
 
     public EligibilityQuestionnaire saveQuestionnaire(EligibilityQuestionnaireDTO dto) throws UserNotFoundException {
         EligibilityQuestionnaire questionnaire = questionnaireRepository
@@ -53,6 +56,11 @@ public class EligibilityQuestionnaireService {
         if (dto.isEligible()) {
             User user = userRepository.findUserById(dto.getUserId()).orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when unlocking achievement when saving questionnaire"));
             achievementService.unlockAchievementByType(user, "questionnaire_all_correct");
+            ActivateRequestDTO notificationDTO = new ActivateRequestDTO();
+            notificationDTO.setUserId(dto.getUserId());
+            notificationDTO.setBaseId(AchievementsNotifications.QUESTIONNAIRE_PERFECT.getId());
+            notificationDTO.setHoursToExpire(72);
+            notificationService.activateForUser(notificationDTO);
         }
 
         return questionnaireRepository.save(questionnaire);

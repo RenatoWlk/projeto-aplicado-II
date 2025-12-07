@@ -23,7 +23,6 @@ type MonthType = typeof MONTHS[number];
   styleUrl: './bloodbank-dashboard.component.scss'
 })
 export class BloodbankDashboardComponent implements OnInit {
-
   // Dashboard data
   bloodbankStats: BloodBankStats = {
     totalDonations: 0,
@@ -35,6 +34,8 @@ export class BloodbankDashboardComponent implements OnInit {
   bloodbankCampaigns: Campaign[] = [];
   private bloodbankId: string = "";
   isCampaignModalOpen: boolean = false;
+  isDeleteModalOpen = false;
+  postToDelete: any = null;
   averageDonation: number = 0;
 
   // Subject to manage unsubscribe
@@ -332,5 +333,28 @@ export class BloodbankDashboardComponent implements OnInit {
         this.notificationBannerService.show('Erro ao criar campanha', 'error');
       }
     });
+  }
+
+  openDeleteModal(post: any) {
+    this.postToDelete = post;
+    this.isDeleteModalOpen = true;
+  }
+
+  confirmDelete() {
+    if (!this.postToDelete) return;
+
+    this.bbDashboardService.deleteCampaign(this.postToDelete.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.notificationBannerService.show('Campanha excluída!', 'success', 1500);
+          this.loadCampaigns();
+        },
+        error: () => {
+          this.notificationBannerService.show('Erro ao excluir campanha. Tente novamente', 'error', 1500);
+        }
+      });
+
+    this.isDeleteModalOpen = false;
   }
 }

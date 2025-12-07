@@ -122,8 +122,8 @@ export class PartnerDashboardComponent implements OnInit {
 
     if (this.deleteType === 'offer') {
       this.partnerDashboardService.deleteOffer(this.itemToDelete.id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
           next: () => {
             this.notificationBannerService.show('Oferta excluída!', 'success', 1500);
             this.loadOffers();

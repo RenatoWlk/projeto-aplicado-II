@@ -81,7 +81,7 @@
 <!-- =========================== -->
 <section class="app-card">
     <div class="app-card-header">
-        <i class="fas fa-chart-line app-card-icon"></i>
+        <i class="fas fa-bullhorn app-card-icon"></i>
         <h2 class="app-card-title">Minhas campanhas</h2>
         <div class="create-post-container">
         <button class="app-button create-post-button" (click)="isCampaignModalOpen = true">
@@ -93,8 +93,11 @@
 
     <app-preloader *ngIf="isLoadingBloodbankCampaigns" type="spinner" [visible]="true"></app-preloader>
 
-    <div class="cards-grid-large cards-grid-overflow">
-      <article class="card" *ngFor="let post of bloodbankCampaigns">
+    <div class="cards-grid-large" *ngIf="!isLoadingBloodbankCampaigns && bloodbankCampaigns.length > 0">
+      <article class="card campaign-card" *ngFor="let post of bloodbankCampaigns">
+        <button class="delete-icon" (click)="openDeleteModal(post)">
+            <i class="fas fa-trash"></i>
+        </button>
         <header class="card-header">
           <h3 class="card-title">{{ post.title }}</h3>
           <p class="card-subtitle">
@@ -124,4 +127,21 @@
         type="post"
         (submitForm)="createNewCampaign($event)">
     </form-create-item>
+</modal>
+
+<!-- ==================== -->
+<!-- DELETE CONFIRM MODAL -->
+<!-- ==================== -->
+<modal
+    title="Confirmar exclusão"
+    [visible]="isDeleteModalOpen"
+    (close)="isDeleteModalOpen = false">
+
+    <div style="text-align: center; padding: 1rem;">
+        <p>Deseja realmente excluir esta campanha?</p>
+
+        <button class="app-button delete-button" (click)="confirmDelete()">
+            Excluir
+        </button>
+    </div>
 </modal>
