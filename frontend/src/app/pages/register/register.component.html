@@ -1,36 +1,36 @@
 <div class="stepper app-card">
-  <mat-horizontal-stepper [linear]=false>
+  <mat-horizontal-stepper [linear]=true>
 
     <!-- Etapa 1: Escolher usuário -->
-    <mat-step>
+    <mat-step [completed]="selectedOption !== ''">
       <form [formGroup]="userForm">
         <h2 class="register-title">Quem é você?</h2>
         <ng-template matStepLabel>Tipo de usuário</ng-template>
         <div class="custom-radio-group">
-          <button mat-button matStepperNext
+          <button mat-button type="button"
             class="radio-option"
             [class.selected]="selectedOption === 'donator'"
-            (click)="selectedOption = 'donator'"
+            (click)="selectUserType('donator')"
             data-tooltip="Quero doar sangue!"
           >
             <i class="fa-solid fa-users app-card-icon"></i>
             <span>Doador</span>
           </button>
 
-          <button mat-button matStepperNext
+          <button mat-button type="button"
             class="radio-option"
             [class.selected]="selectedOption === 'bloodbank'"
-            (click)="selectedOption = 'bloodbank'"
+            (click)="selectUserType('bloodbank')"
             data-tooltip="Quero promover campanhas de doação de sangue!"
           >
             <i class="fa-solid fa-hospital app-card-icon"></i>
             <span>Banco de Sangue</span>
           </button>
 
-          <button mat-button matStepperNext
+          <button mat-button type="button"
             class="radio-option"
             [class.selected]="selectedOption === 'partner'"
-            (click)="selectedOption = 'partner'"
+            (click)="selectUserType('partner')"
             data-tooltip="Quero incentivar a doação de sangue!"
           >
             <i class="fa-solid fa-handshake-angle app-card-icon"></i>
@@ -47,24 +47,45 @@
         <mat-form-field appearance="outline" class="custom-form-field">
           <mat-label class="input-label">Email</mat-label>
           <input matInput formControlName="email" type="email" required/>
+          <mat-error *ngIf="credentialsGroup.get('email')?.hasError('required')">
+            Email é obrigatório
+          </mat-error>
+          <mat-error *ngIf="credentialsGroup.get('email')?.hasError('email')">
+            Email inválido
+          </mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline" class="custom-form-field">
           <mat-label class="input-label">Senha</mat-label>
           <input matInput formControlName="password" type="password" required/>
+          <mat-error *ngIf="credentialsGroup.get('password')?.hasError('required')">
+            Senha é obrigatória
+          </mat-error>
+          <mat-error *ngIf="credentialsGroup.get('password')?.hasError('minlength')">
+            Senha deve ter no mínimo 6 caracteres
+          </mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline" class="custom-form-field">
           <mat-label class="input-label">Confirmar senha</mat-label>
           <input matInput formControlName="confirmed_password" type="password" required/>
+          <mat-error *ngIf="credentialsGroup.get('confirmed_password')?.hasError('required')">
+            Confirmação de senha é obrigatória
+          </mat-error>
+          <mat-error *ngIf="credentialsGroup.get('confirmed_password')?.hasError('minlength')">
+            Senha deve ter no mínimo 6 caracteres
+          </mat-error>
+          <mat-error *ngIf="credentialsGroup.hasError('passwordMismatch')">
+            As senhas não coincidem
+          </mat-error>
         </mat-form-field>
         <div class="actions">
           <button mat-button matStepperPrevious class="app-button">Voltar</button>
-          <button mat-button matStepperNext class="app-button">Próximo</button>
+          <button mat-button matStepperNext class="app-button" [disabled]="credentialsGroup.invalid">Próximo</button>
         </div>
       </form>
     </mat-step>
     
     <!-- Etapa 3: Dados pessoais: DONATOR -->
-    <mat-step *ngIf="selectedOption === 'donator'"[stepControl]="personalInfoGroup">
+    <mat-step *ngIf="selectedOption === 'donator'" [stepControl]="personalInfoGroup">
       <form [formGroup]="personalInfoGroup">
         <ng-template matStepLabel>Dados Pessoais</ng-template>
 
@@ -73,11 +94,17 @@
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Nome</mat-label>
               <input matInput formControlName="name" required />
+              <mat-error *ngIf="personalInfoGroup.get('name')?.hasError('required')">
+                Nome é obrigatório
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CPF</mat-label>
               <input matInput formControlName="cpf" required (input)="formatCPF($event)" maxlength="15" />
+              <mat-error *ngIf="personalInfoGroup.get('cpf')?.hasError('required')">
+                CPF é obrigatório
+              </mat-error>
               <mat-error *ngIf="personalInfoGroup.get('cpf')?.hasError('pattern')">
                 CPF inválido
               </mat-error>
@@ -90,6 +117,9 @@
                 <mat-option value="Feminino">Feminino</mat-option>
                 <mat-option value="Other">Não informar</mat-option>
               </mat-select>
+              <mat-error *ngIf="personalInfoGroup.get('gender')?.hasError('required')">
+                Gênero é obrigatório
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field select">
@@ -105,39 +135,57 @@
                 <mat-option value="O-">O-</mat-option>
                 <mat-option value="unknown">Não sei informar</mat-option>
               </mat-select>
+              <mat-error *ngIf="personalInfoGroup.get('bloodtype')?.hasError('required')">
+                Tipo sanguíneo é obrigatório
+              </mat-error>
             </mat-form-field>
 
           <mat-form-field appearance="outline" class="custom-form-field">
             <mat-label class="input-label">Telefone</mat-label>
             <input matInput formControlName="telephone" required (input)="formatPhone($event)" maxlength="16" />
+            <mat-error *ngIf="personalInfoGroup.get('telephone')?.hasError('required')">
+              Telefone é obrigatório
+            </mat-error>
           </mat-form-field>
           </div>
           <div class="column">
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Cidade</mat-label>
               <input matInput formControlName="city" required />
+              <mat-error *ngIf="personalInfoGroup.get('city')?.hasError('required')">
+                Cidade é obrigatória
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Estado</mat-label>
               <input matInput formControlName="state" required />
+              <mat-error *ngIf="personalInfoGroup.get('state')?.hasError('required')">
+                Estado é obrigatório
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Rua</mat-label>
               <input matInput formControlName="street" required />
+              <mat-error *ngIf="personalInfoGroup.get('street')?.hasError('required')">
+                Rua é obrigatória
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CEP</mat-label>
               <input matInput formControlName="zipcode" required (input)="formatCEP($event)" maxlength="9" />
+              <mat-error *ngIf="personalInfoGroup.get('zipcode')?.hasError('required')">
+                CEP é obrigatório
+              </mat-error>
             </mat-form-field>
           </div>
         </div>
 
         <div class="actions">
           <button mat-button matStepperPrevious class="app-button">Voltar</button>
-          <button mat-button matStepperNext class="app-button">Próximo</button>
+          <button mat-button matStepperNext class="app-button" [disabled]="personalInfoGroup.invalid">Próximo</button>
         </div>
       </form>
     </mat-step>
@@ -153,21 +201,33 @@
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Nome da instituição</mat-label>
               <input matInput formControlName="instituitonName" required />
+              <mat-error *ngIf="bloodbankInfoFormGroup.get('instituitonName')?.hasError('required')">
+                Nome da instituição é obrigatório
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Cidade</mat-label>
               <input matInput formControlName="city" required />
+              <mat-error *ngIf="bloodbankInfoFormGroup.get('city')?.hasError('required')">
+                Cidade é obrigatória
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Rua</mat-label>
               <input matInput formControlName="street" required />
+              <mat-error *ngIf="bloodbankInfoFormGroup.get('street')?.hasError('required')">
+                Rua é obrigatória
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CEP</mat-label>
               <input matInput formControlName="zipcode" required (input)="formatCEP($event)" maxlength="9" />
+              <mat-error *ngIf="bloodbankInfoFormGroup.get('zipcode')?.hasError('required')">
+                CEP é obrigatório
+              </mat-error>
             </mat-form-field>
           </div>
 
@@ -176,31 +236,35 @@
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CNPJ</mat-label>
               <input matInput formControlName="cnpj" required (input)="formatCNPJ($event)" maxlength="18" />
+              <mat-error *ngIf="bloodbankInfoFormGroup.get('cnpj')?.hasError('required')">
+                CNPJ é obrigatório
+              </mat-error>
               <mat-error *ngIf="bloodbankInfoFormGroup.get('cnpj')?.hasError('pattern')">
-                CNPJ deve conter 11 dígitos
+                CNPJ inválido
               </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Estado</mat-label>
               <input matInput formControlName="state" required />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="custom-form-field">
-              <mat-label class="input-label">Bairro</mat-label>
-              <input matInput formControlName="neighborhood" required />
+              <mat-error *ngIf="bloodbankInfoFormGroup.get('state')?.hasError('required')">
+                Estado é obrigatório
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Telefone</mat-label>
-              <input matInput formControlName="telephone" required  (input)="formatPhone($event)" maxlength="15" />
+              <input matInput formControlName="telephone" required (input)="formatPhone($event)" maxlength="15" />
+              <mat-error *ngIf="bloodbankInfoFormGroup.get('telephone')?.hasError('required')">
+                Telefone é obrigatório
+              </mat-error>
             </mat-form-field>
           </div>
         </div>
 
         <div class="actions">
           <button mat-button matStepperPrevious class="app-button">Voltar</button>
-          <button mat-button matStepperNext class="app-button">Próximo</button>
+          <button mat-button matStepperNext class="app-button" [disabled]="bloodbankInfoFormGroup.invalid">Próximo</button>
         </div>
       </form>
     </mat-step>
@@ -217,21 +281,33 @@
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Nome do Parceiro</mat-label>
               <input matInput formControlName="partnerName" required />
+              <mat-error *ngIf="partnerInfoFormGroup.get('partnerName')?.hasError('required')">
+                Nome do parceiro é obrigatório
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Cidade</mat-label>
               <input matInput formControlName="city" required />
+              <mat-error *ngIf="partnerInfoFormGroup.get('city')?.hasError('required')">
+                Cidade é obrigatória
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Rua</mat-label>
               <input matInput formControlName="street" required />
+              <mat-error *ngIf="partnerInfoFormGroup.get('street')?.hasError('required')">
+                Rua é obrigatória
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CEP</mat-label>
-              <input matInput formControlName="zipcode" required />
+              <input matInput formControlName="zipcode" required (input)="formatCEP($event)" maxlength="9" />
+              <mat-error *ngIf="partnerInfoFormGroup.get('zipcode')?.hasError('required')">
+                CEP é obrigatório
+              </mat-error>
             </mat-form-field>
           </div>
 
@@ -239,32 +315,36 @@
           <div class="column">
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">CNPJ</mat-label>
-              <input matInput formControlName="cnpj" required />
+              <input matInput formControlName="cnpj" required (input)="formatCNPJ($event)" maxlength="18" />
+              <mat-error *ngIf="partnerInfoFormGroup.get('cnpj')?.hasError('required')">
+                CNPJ é obrigatório
+              </mat-error>
               <mat-error *ngIf="partnerInfoFormGroup.get('cnpj')?.hasError('pattern')">
-                CNPJ deve conter 11 dígitos
+                CNPJ inválido
               </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Estado</mat-label>
               <input matInput formControlName="state" required />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="custom-form-field">
-              <mat-label class="input-label">Bairro</mat-label>
-              <input matInput formControlName="neighborhood" required />
+              <mat-error *ngIf="partnerInfoFormGroup.get('state')?.hasError('required')">
+                Estado é obrigatório
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Telefone</mat-label>
-              <input matInput formControlName="telephone" required />
+              <input matInput formControlName="telephone" required (input)="formatPhone($event)" maxlength="15" />
+              <mat-error *ngIf="partnerInfoFormGroup.get('telephone')?.hasError('required')">
+                Telefone é obrigatório
+              </mat-error>
             </mat-form-field>
           </div>
         </div>
 
         <div class="actions">
           <button mat-button matStepperPrevious class="app-button">Voltar</button>
-          <button mat-button matStepperNext class="app-button">Próximo</button>
+          <button mat-button matStepperNext class="app-button" [disabled]="partnerInfoFormGroup.invalid">Próximo</button>
         </div>
       </form>
     </mat-step>

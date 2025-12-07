@@ -129,7 +129,6 @@
     </div>
     
     <div class="donation-cta">
-      
       <ng-container *ngIf="activeAppointment">
         <i class="fa-solid fa-calendar-check"></i>
         <p>Você tem uma doação agendada!</p>
@@ -140,9 +139,9 @@
       </ng-container>
 
       <ng-container *ngIf="!activeAppointment && canDonateNow()">
-        <i class="fa-solid fa-heart-pulse"></i>
+        <i class="fa-solid fa-heart-pulse app-card-icon"></i>
         <p>Você está apto para doar sangue!</p>
-        <button type="button" class="cta-button" (click)="onFindBloodBank()">
+        <button type="button" class="secondary back-button" (click)="onFindBloodBank()">
           <i class="fa-solid fa-map-marker-alt"></i>
           Encontrar Banco de Sangue
         </button>

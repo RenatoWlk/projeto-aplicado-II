@@ -24,6 +24,9 @@
                     <input matInput [matTimepicker]="startTime" formControlName="startTime">
                     <mat-timepicker-toggle matIconSuffix [for]="startTime"></mat-timepicker-toggle>
                     <mat-timepicker #startTime></mat-timepicker>
+                    <mat-error *ngIf="rangeForm.get('startTime')?.hasError('timeRange')">
+                        Horário deve estar entre 08:00 e 17:00
+                    </mat-error>
                 </mat-form-field>
 
                 <!-- End time -->
@@ -32,8 +35,13 @@
                     <input matInput [matTimepicker]="endTime" formControlName="endTime">
                     <mat-timepicker-toggle matIconSuffix [for]="endTime"></mat-timepicker-toggle>
                     <mat-timepicker #endTime></mat-timepicker>
+                    <mat-error *ngIf="rangeForm.get('endTime')?.hasError('timeRange')">
+                        Horário deve estar entre 08:00 e 17:00
+                    </mat-error>
+                    <mat-error *ngIf="rangeForm.get('endTime')?.hasError('endTimeBeforeStart')">
+                        Horário final deve ser depois do inicial
+                    </mat-error>
                 </mat-form-field>
-
                 
                 <!-- Slots quantity -->
                 <mat-form-field appearance="outline" class="custom-form-field full-width">

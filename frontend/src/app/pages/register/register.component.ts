@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { MatStepperModule } from '@angular/material/stepper';
+import { MatStepperModule, MatStepper } from '@angular/material/stepper';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -30,9 +30,31 @@ export class RegisterComponent implements OnInit, OnDestroy{
   // Subject to manage unsubscribe
   private destroy$ = new Subject<void>();
 
+  @ViewChild(MatStepper) stepper!: MatStepper;
+
   constructor(private fb: FormBuilder, private registerService: RegisterService, private notificationService: NotificationBannerService) {}
 
   selectedOption: string = '';
+
+  // Método para selecionar o tipo de usuário e avançar
+  selectUserType(type: string): void {
+    this.selectedOption = type;
+    // Aguardar um ciclo de detecção de mudanças antes de avançar
+    setTimeout(() => {
+      this.stepper.next();
+    }, 0);
+  }
+
+  // Validator customizado para verificar se as senhas coincidem
+  private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+    const password = group.get('password')?.value;
+    const confirmedPassword = group.get('confirmed_password')?.value;
+    
+    if (password && confirmedPassword && password !== confirmedPassword) {
+      return { passwordMismatch: true };
+    }
+    return null;
+  }
 
   ngOnInit(): void {
     this.userForm = this.fb.group({
@@ -42,7 +64,7 @@ export class RegisterComponent implements OnInit, OnDestroy{
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmed_password: ['', [Validators.required, Validators.minLength(6)]],
-      }),
+      }, { validators: this.passwordMatchValidator }),
 
       /** USER */
       personalInfo: this.fb.group({
@@ -60,7 +82,7 @@ export class RegisterComponent implements OnInit, OnDestroy{
       /** BLOOD BANK */
       bloodbankInfo: this.fb.group({ 
         instituitonName: ['', Validators.required],
-        cnpj: ['', Validators.required],
+        cnpj: ['', [Validators.required, Validators.pattern(/^[\d\.\-\/]{14,18}$/)]],
         city: ['', Validators.required],
         state: ['', Validators.required],
         street: ['', Validators.required],
@@ -71,7 +93,7 @@ export class RegisterComponent implements OnInit, OnDestroy{
       /** PARTNER */
       partnerInfo: this.fb.group({ 
         partnerName: ['', Validators.required],
-        cnpj: ['', Validators.required],
+        cnpj: ['', [Validators.required, Validators.pattern(/^[\d\.\-\/]{14,18}$/)]],
         city: ['', Validators.required],
         state: ['', Validators.required],
         street: ['', Validators.required],
@@ -121,7 +143,15 @@ export class RegisterComponent implements OnInit, OnDestroy{
     }
 
     input.value = value;
-    this.personalInfoGroup.get('telephone')?.setValue(value, { emitEvent: false });
+    
+    // Atualizar o FormControl apropriado baseado no tipo de usuário
+    if (this.selectedOption === 'donator') {
+      this.personalInfoGroup.get('telephone')?.setValue(value, { emitEvent: false });
+    } else if (this.selectedOption === 'bloodbank') {
+      this.bloodbankInfoFormGroup.get('telephone')?.setValue(value, { emitEvent: false });
+    } else if (this.selectedOption === 'partner') {
+      this.partnerInfoFormGroup.get('telephone')?.setValue(value, { emitEvent: false });
+    }
   }
 
   formatCPF(event: any): void {
@@ -151,7 +181,15 @@ export class RegisterComponent implements OnInit, OnDestroy{
     }
 
     input.value = value;
-    this.personalInfoGroup.get('zipcode')?.setValue(value, { emitEvent: false });
+    
+    // Atualizar o FormControl apropriado baseado no tipo de usuário
+    if (this.selectedOption === 'donator') {
+      this.personalInfoGroup.get('zipcode')?.setValue(value, { emitEvent: false });
+    } else if (this.selectedOption === 'bloodbank') {
+      this.bloodbankInfoFormGroup.get('zipcode')?.setValue(value, { emitEvent: false });
+    } else if (this.selectedOption === 'partner') {
+      this.partnerInfoFormGroup.get('zipcode')?.setValue(value, { emitEvent: false });
+    }
   }
 
   formatCNPJ(event: any): void {
@@ -172,8 +210,12 @@ export class RegisterComponent implements OnInit, OnDestroy{
 
     input.value = value;
 
-    this.personalInfoGroup.get('cnpj')?.setValue(value, { emitEvent: false });
-
+    // Atualizar o FormControl apropriado baseado no tipo de usuário
+    if (this.selectedOption === 'bloodbank') {
+      this.bloodbankInfoFormGroup.get('cnpj')?.setValue(value, { emitEvent: false });
+    } else if (this.selectedOption === 'partner') {
+      this.partnerInfoFormGroup.get('cnpj')?.setValue(value, { emitEvent: false });
+    }
   }
 
   private clean(value: string | null | undefined): string {
@@ -278,4 +320,3 @@ export class RegisterComponent implements OnInit, OnDestroy{
     }
   }
 }
-

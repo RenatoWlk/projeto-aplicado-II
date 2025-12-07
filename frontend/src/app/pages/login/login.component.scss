@@ -2,10 +2,14 @@ $primary-color: #3bacff;
 $primary-hover: #1a5ed9;
 $error-color: red;
 
+* {
+  font-family: 'Poppins', sans-serif;
+}
+
 body, html {
   margin: 0;
   padding: 0;
-  font-family: 'Poppins', sans-serif;
+
   background-color: $primary-color;
   height: 100vh;
 }

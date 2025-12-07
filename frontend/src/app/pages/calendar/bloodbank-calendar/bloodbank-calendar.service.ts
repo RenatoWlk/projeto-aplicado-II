@@ -4,26 +4,6 @@ import { forkJoin, map, Observable } from "rxjs";
 import { DonationSlots, DonationResponse } from "../../donation-info/donation.model";
 import { DonationInfoService } from "../../donation-info/donation-info.service";
 
-// export interface DonationSlots {
-//     id: string,
-//     availabilitySlots: { date: string,slots: { time: string, availableSpots: number, }[], } [],
-// }
-
-// @Injectable({
-//     providedIn: 'root'
-// })
-// export class BloodbankService {
-//     constructor(
-//         private http: HttpClient,
-//     ) {}
-
-//     addAvailableSlots(slot : DonationSlots): Observable<any> {
-//         return this.http.post<DonationSlots>(`/api/bloodbanks/publish-dates`, slot);
-//     }
-// }
-
-
-
 @Injectable({
   providedIn: 'root'
 })
