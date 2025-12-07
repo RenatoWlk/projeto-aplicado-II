@@ -4,6 +4,7 @@ import com.projeto.aplicado.backend.dto.user.UserLocationDTO;
 import com.projeto.aplicado.backend.dto.user.UserRequestDTO;
 import com.projeto.aplicado.backend.dto.user.UserResponseDTO;
 import com.projeto.aplicado.backend.dto.user.UserStatsDTO;
+import com.projeto.aplicado.backend.repository.UserRepository;
 import com.projeto.aplicado.backend.service.AchievementService;
 import com.projeto.aplicado.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserRepository userRepository;
 
     /**
      * Creates a new user.

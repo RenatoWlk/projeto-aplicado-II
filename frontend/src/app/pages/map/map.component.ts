@@ -2,9 +2,10 @@ import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { MapService, Location } from './map.service';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { PreloaderComponent } from '../../shared/preloader/preloader.component';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 const MAP_ZOOM = 16;
 
@@ -40,6 +41,7 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
   private markersLayer = L.layerGroup();
   private locationsSub?: Subscription;
   private userId!: string;
+  private destroy$ = new Subject<void>();
 
   userLocation: Location | null = null;
   locations: Location[] = [];
@@ -48,7 +50,8 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private mapService: MapService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationBannerService: NotificationBannerService,
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +63,8 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.locationsSub?.unsubscribe();
     this.map?.remove();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /** Used for size correction */
@@ -74,18 +79,32 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
 
   /** Get user location from service */
   private fetchUserLocation(): void {
-    this.mapService.getUserLocation(this.userId).subscribe((location) => {
-      this.userLocation = location;
-      this.tryInitMap();
-    });
+    this.mapService.getUserLocation(this.userId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (location) => {
+        this.userLocation = location;
+        if (this.locations.length > 0 && this.userLocation) {
+          this.tryInitMap();
+        }
+      },
+      error: () => {
+        this.notificationBannerService.show("Não foi possível carregar a sua localização. Tente novamente mais tarde.", 'error', 3000);
+      }
+    })
   }
 
   /** Get all available locations from service */
   private fetchLocations(): void {
-    this.locationsSub = this.mapService.getLocations().subscribe((locations) => {
-      this.locations = locations;
-      this.isLoadingLocations = false;
-      this.tryInitMap(); // Wait for both location and locations
+    this.locationsSub = this.mapService.getLocations().subscribe({
+      next: (locations) => {
+        this.locations = locations;
+        this.isLoadingLocations = false;
+        if (this.locations.length > 0 && this.userLocation) {
+          this.tryInitMap();
+        }
+      },
+      error: () => {
+        this.notificationBannerService.show("Não foi possível carregar as localizações. Tente novamente mais tarde.", 'error', 1500);
+      }
     });
   }
 
@@ -93,7 +112,9 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
    * Initialize map only after both user location and location list are available.
    */
   private tryInitMap(): void {
-    if (!this.userLocation || this.locations.length === 0 || this.map) return;
+    if (!this.userLocation || this.locations.length === 0 || this.map) {
+      return;
+    }
 
     this.map = L.map('map', {
       center: [this.userLocation.latitude, this.userLocation.longitude] as L.LatLngExpression,
@@ -162,10 +183,17 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
    * @param location the location to be focused on the map
    */
   selectLocation(location: Location): void {
+    if (location === undefined) {
+      this.notificationBannerService.show("Não foi possível selecionar a localização. Tente novamente mais tarde.", 'error', 3000);
+      return;
+    }
+
+    if (this.map === undefined) {
+      this.notificationBannerService.show("Não foi possível selecionar a localização. Tente novamente mais tarde.", 'error', 3000);
+      return;
+    }
+
     this.selectedLocation = location;
-    this.map.setView(
-      [location.latitude, location.longitude] as L.LatLngExpression,
-      15
-    );
+    this.map.setView([location.latitude, location.longitude] as L.LatLngExpression, 15);
   }
 }

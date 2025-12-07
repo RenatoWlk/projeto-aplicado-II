@@ -78,19 +78,29 @@ public class UserService {
     }
 
     /**
-     * Unlocks the map opened achievement.
+     * Unlocks the map opened achievement if the user is not partner or blood bank.
      *
      * @param id the ID of the user.
      * @throws UserNotFoundException In case the user was not found with the ID provided
      */
-    public void unlockMapAchievement(String id) throws UserNotFoundException {
-        User user = userRepository.findUserById(id).orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when unlocking map achievement"));
+    public void unlockMapAchievement(String id) {
+        Optional<User> opt = userRepository.findById(id);
+        if (opt.isEmpty()) {
+            return;
+        }
+
+        User user = opt.get();
+        if (user.getRole() != Role.USER) {
+            return;
+        }
         achievementService.unlockAchievementByType(user, "map_opened");
-        ActivateRequestDTO activateRequestDTO = new ActivateRequestDTO();
-        activateRequestDTO.setUserId(id);
-        activateRequestDTO.setBaseId("achievement_opened_map");
-        activateRequestDTO.setHoursToExpire(72);
-        notificationService.activateForUser(activateRequestDTO);
+
+        // Create notification
+        ActivateRequestDTO request = new ActivateRequestDTO();
+        request.setUserId(id);
+        request.setBaseId("achievement_opened_map");
+        request.setHoursToExpire(72);
+        notificationService.activateForUser(request);
     }
 
     /**
@@ -106,26 +116,10 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when finding stats by ID"));
     }
 
-    /**
-     * Retrieves all blood banks and attempts to enrich each one with geolocation data. <br>
-     * If the address is incomplete or an error occurs, coordinates are set to 0.
-     *
-     * @param id The ID of the user to get the location.
-     * @return a list of blood bank DTOs including location information.
-     * @throws UserNotFoundException In case the user was not found with the ID provided.
-     */
     public UserLocationDTO findLocationById(String id) throws UserNotFoundException {
         return userRepository.findById(id)
             .map(user -> {
                 UserLocationDTO dto = toLocationDTO(user);
-
-                if (user.getAddress() == null ||
-                        user.getAddress().getStreet() == null ||
-                        user.getAddress().getCity() == null ||
-                        user.getAddress().getState() == null ||
-                        user.getAddress().getZipCode() == null) {
-                    return dto;
-                }
 
                 try {
                     String address = removeAccents(user.getAddress().getStreet().toLowerCase());

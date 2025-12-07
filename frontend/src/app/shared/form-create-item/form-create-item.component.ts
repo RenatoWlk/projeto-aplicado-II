@@ -13,7 +13,7 @@ export class FormCreateItemComponent implements OnInit, OnChanges {
   @Input() type: 'offer' | 'post' | 'reward' = 'post';
   @Output() submitForm = new EventEmitter<any>();
 
-  form: FormGroup;
+  form!: FormGroup;
 
   constructor(private fb: FormBuilder) {
     this.form = this.createForm();
@@ -117,7 +117,11 @@ export class FormCreateItemComponent implements OnInit, OnChanges {
         this.submitForm.emit(value);
       }
 
-      this.form.reset({ discountPercentage: 0, requiredPoints: 0, stock: 0 });
+      this.form.reset({
+        discountPercentage: null,
+        requiredPoints: null,
+        stock: null
+      });
     }
   }
 }

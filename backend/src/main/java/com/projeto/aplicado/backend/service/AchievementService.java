@@ -61,7 +61,6 @@ public class AchievementService {
                 activateNotificationDto.setUserId(user.getId());
                 activateNotificationDto.setBaseId(notification.getId());
                 activateNotificationDto.setHoursToExpire(72);
-                System.out.println("NEW NOTIFICATION: " + activateNotificationDto.getUserId() + " " + activateNotificationDto.getBaseId() + " " + activateNotificationDto.getHoursToExpire());
                 notificationService.activateForUser(activateNotificationDto);
             }
         }

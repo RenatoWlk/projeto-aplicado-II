@@ -127,8 +127,6 @@ export class QuestionnaireComponent {
 
   private validateEligibility(relevantFields: string[]): boolean {
     this.invalidQuestions = [];
-    console.log('--- INICIANDO VALIDAÇÃO ---');
-    console.log('Campos Relevantes:', relevantFields);
 
     relevantFields.forEach((field) => {
       const value = this.form.get(field)?.value;
@@ -144,7 +142,6 @@ export class QuestionnaireComponent {
       }
     });
 
-    console.log('Questões Inválidas Finais:', this.invalidQuestions);
     return this.invalidQuestions.length === 0;
   }
 
@@ -172,9 +169,6 @@ export class QuestionnaireComponent {
       eligible: isEligible,
       userId: this.authService.getCurrentUserId(),
     };
-
-    // console.log('--- DEBUG DO ENVIO ---');
-    // console.log('Objeto JSON Completo sendo enviado:', JSON.stringify(data, null, 2));
 
     this.questionnaireService.submitQuestionnaire(data)
     .pipe(takeUntil(this.destroy$))
