@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { DashboardConstants } from './constants/dashboard.constants';
 import { BloodType } from '../../shared/app.enums';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { DonationData } from './bloodbank-dashboard/bloodbank-dashboard.model';
 
 export interface Address {
     street: string;
@@ -42,8 +43,9 @@ export interface Campaign {
 export interface UserStats {
     timesDonated: number;
     potentialLivesSaved: number;
-    timeUntilNextDonation: string;
-    lastDonationDate: Date;
+    nextDonationDate?: Date | null;
+    daysUntilNextDonation?: number | null;
+    lastDonationDate: Date | null;
     achievements: Achievement[];
     totalPoints: number;
     bloodType: BloodType;
@@ -76,5 +78,9 @@ export class DashboardService {
 
     getUserStats(userId: string): Observable<UserStats> {
         return this.http.get<UserStats>(`/api/users/${userId}/stats`);
+    }
+
+    getUserDonations(userId: string): Observable<DonationData[]> {
+        return this.http.get<DonationData[]>(`/api/donations/user/${userId}`)
     }
 }

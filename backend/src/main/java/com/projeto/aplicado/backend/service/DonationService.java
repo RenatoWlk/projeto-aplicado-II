@@ -164,6 +164,8 @@ public class DonationService {
         donation = donationRepository.save(donation);
 
         User user = userRepository.findUserById(donation.getUserId()).orElseThrow();
+        user.setTimesDonated(user.getTimesDonated() + 1);
+        userRepository.save(user);
         achievementService.validateAndUnlockAchievements(user);
 
         return mapToResponse(donation);

@@ -19,7 +19,6 @@ public class UserResponseDTO {
     private String cpf;
     private String gender;
     private BloodType bloodType;
-    private Integer timeUntilNextDonation;
     private LocalDate lastDonationDate;
     private String photoUrl;
 }

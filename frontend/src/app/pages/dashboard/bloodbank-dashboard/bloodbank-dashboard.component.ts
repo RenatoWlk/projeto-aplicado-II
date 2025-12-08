@@ -170,8 +170,7 @@ export class BloodbankDashboardComponent implements OnInit {
         this.updateCharts();
         this.isLoadingBloodbankStats = false;
       },
-      error: (error) => {
-        console.error('Failed to load donations:', error);
+      error: () => {
         this.notificationBannerService.show('Erro ao carregar doações', 'error');
         this.isLoadingBloodbankStats = false;
       }

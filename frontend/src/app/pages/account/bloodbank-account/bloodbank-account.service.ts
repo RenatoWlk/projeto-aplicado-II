@@ -5,7 +5,6 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { Address } from '../../dashboard/dashboard.service';
 import { Campaign } from '../../dashboard/dashboard.service';
 
-
 export interface BloodBank {
   id: string;
   name: string;

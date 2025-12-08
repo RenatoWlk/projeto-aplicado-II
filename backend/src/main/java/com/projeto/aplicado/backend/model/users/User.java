@@ -26,7 +26,6 @@ public class User extends UserBase {
     private BloodType bloodType;
     private List<DonationAppointment> donations;
     private int timesDonated;
-    private int timeUntilNextDonation;
     private LocalDate lastDonationDate;
     private List<UnlockedAchievement> unlockedAchievements = new ArrayList<>();
     private int totalPoints;

@@ -10,10 +10,8 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { QuestionnairePdfService } from './questionnaire-pdf.service';
 import { AppRoutesPaths } from '../../../shared/app.constants';
-import { DonationInfoService } from '../../donation-info/donation-info.service';
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-
 
 interface DonationHistory {
   userName?: string;
@@ -22,7 +20,6 @@ interface DonationHistory {
   status: DonationStatus;
   bloodBankName?: string;
 }
-
 
 @Component({
   selector: 'app-user-account',

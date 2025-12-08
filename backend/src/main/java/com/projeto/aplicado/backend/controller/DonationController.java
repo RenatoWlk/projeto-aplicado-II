@@ -26,12 +26,8 @@ public class DonationController {
      * @return the created donation response
      */
     @PostMapping
-    public ResponseEntity<DonationDTO> createDonation(
-            @Valid @RequestBody CreateDonationDTO request) {
-
-        DonationDTO response = donationService.createDonation(
-                request.getUserId(), request);
-
+    public ResponseEntity<DonationDTO> createDonation(@Valid @RequestBody CreateDonationDTO request) {
+        DonationDTO response = donationService.createDonation(request.getUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -48,7 +44,6 @@ public class DonationController {
             @RequestParam(defaultValue = "false") boolean activeOnly) {
 
         List<DonationDTO> donations = donationService.getUserDonations(userId, activeOnly);
-
         return ResponseEntity.ok(donations);
     }
 
@@ -66,9 +61,7 @@ public class DonationController {
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String status) {
 
-        List<DonationDTO> donations = donationService.getBloodBankDonations(
-                bloodBankId, date, status);
-
+        List<DonationDTO> donations = donationService.getBloodBankDonations(bloodBankId, date, status);
         return ResponseEntity.ok(donations);
     }
 
@@ -100,7 +93,6 @@ public class DonationController {
 
         String reason = request != null ? request.getReason() : null;
         DonationDTO response = donationService.cancelDonation(id, userId, reason);
-
         return ResponseEntity.ok(response);
     }
 
@@ -112,12 +104,8 @@ public class DonationController {
      * @return the updated donation
      */
     @PatchMapping("/{id}/confirm")
-    public ResponseEntity<DonationDTO> confirmDonation(
-            @PathVariable String id,
-            @RequestParam String bloodBankId) {
-
+    public ResponseEntity<DonationDTO> confirmDonation(@PathVariable String id, @RequestParam String bloodBankId) {
         DonationDTO response = donationService.confirmDonation(id, bloodBankId);
-
         return ResponseEntity.ok(response);
     }
 
@@ -137,7 +125,6 @@ public class DonationController {
 
         String notes = request != null ? request.getReason() : null;
         DonationDTO response = donationService.completeDonation(id, bloodBankId, notes);
-
         return ResponseEntity.ok(response);
     }
 
@@ -154,7 +141,6 @@ public class DonationController {
             @RequestParam(defaultValue = "7") int days) {
 
         List<DonationDTO> donations = donationService.getUpcomingDonations(bloodBankId, days);
-
         return ResponseEntity.ok(donations);
     }
 

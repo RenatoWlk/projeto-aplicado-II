@@ -13,6 +13,8 @@ import { PartnerDashboardComponent } from "./partner-dashboard/partner-dashboard
 import { QuestionnaireService } from '../questionnaire/questionnaire.service';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 import { Subject, takeUntil } from 'rxjs';
+import { DonationData } from './bloodbank-dashboard/bloodbank-dashboard.model';
+import { UserAccountService } from '../account/user-account/user-account.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,6 +47,7 @@ export class DashboardComponent implements OnInit {
   offers: Offer[] = [];
   nearbyBloodbanks: Bloodbank[] = [];
   userStats: UserStats = {} as any;
+  userDonations: DonationData[] = [];
   totalLitersDonated: string = "";
 
   // Preloaders
@@ -59,10 +62,10 @@ export class DashboardComponent implements OnInit {
   constructor(
     private dashboardService: DashboardService, 
     private authService: AuthService,
+    private userService: UserAccountService,
     private questionnaireService: QuestionnaireService,
-    private notificationService: NotificationBannerService,
+    private notificationBannerService: NotificationBannerService,
   ) {}
-  
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isAuthenticated();
@@ -97,11 +100,10 @@ export class DashboardComponent implements OnInit {
         }
       },
       error: () => {
-        this.notificationService.show('Erro ao carregar eligibilidade do usuário', 'error', 1500);
+        this.notificationBannerService.show('Erro ao carregar eligibilidade do usuário', 'error', 1500);
       }
     });
   }
-
 
   /**
    * Loads all required dashboard data for logged users.
@@ -111,6 +113,7 @@ export class DashboardComponent implements OnInit {
     this.getOffers();
     this.getNearbyBloodbanks();
     this.getUserStats();
+    this.getUserDonations();
   }
 
   /**
@@ -172,14 +175,86 @@ export class DashboardComponent implements OnInit {
   public getUserStats(): void {
     this.dashboardService.getUserStats(this.userId)
     .pipe(takeUntil(this.destroy$))
-    .subscribe((stats: UserStats) => {
-      stats.achievements = this.sortAchievementsByRarity(stats.achievements);
-      stats.potentialLivesSaved = this.calculatePotentialLivesSaved(stats.timesDonated);
-      stats.timeUntilNextDonation = this.getReadableTimeUntilNextDonation(stats.timeUntilNextDonation);
-      this.totalLitersDonated = this.calculateLitersDonated(stats.timesDonated);
-      this.userStats = stats;
-      this.loadingStatsAndAchievements = false;
+    .subscribe({
+      next: (stats) => {
+        stats.achievements = this.sortAchievementsByRarity(stats.achievements);
+        stats.potentialLivesSaved = this.calculatePotentialLivesSaved(stats.timesDonated);
+        this.totalLitersDonated = this.calculateLitersDonated(stats.timesDonated);
+        this.userStats = stats;
+        this.loadingStatsAndAchievements = false;
+      },
+      error: () => {
+        this.notificationBannerService.show('Erro ao buscar estatísticas do usuário.', 'error', 1500);
+      }
     });
+  }
+
+  public getUserDonations(): void {
+    this.userService.getUser()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (user) => this.loadDonations(user),
+      });
+  }
+
+  private loadDonations(user: any): void {
+    this.dashboardService.getUserDonations(this.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (donations: DonationData[]) => {
+          this.userDonations = donations;
+          this.processDonationStats(user);
+          this.loadingStatsAndAchievements = false;
+        },
+        error: () => {
+          this.notificationBannerService.show('Erro ao buscar as doações do usuário.', 'error');
+          this.loadingStatsAndAchievements = false;
+        }
+      });
+  }
+
+  private processDonationStats(user: any): void {
+    const completed = this.getCompletedDonationsSorted();
+    const last = completed[0] ?? null;
+
+    const lastDate = last ? new Date(last.updatedAt ?? last.date) : null;
+    this.userStats.lastDonationDate = lastDate;
+
+    const intervalDays = user.gender === 'Masculino' ? 90 : 120;
+
+    if (lastDate) {
+      this.calculateNextDonation(lastDate, intervalDays);
+    } else {
+      this.userStats.nextDonationDate = null;
+      this.userStats.daysUntilNextDonation = null;
+    }
+  }
+
+  private getCompletedDonationsSorted(): DonationData[] {
+    return this.userDonations
+      .filter(d => d.status === 'COMPLETED')
+      .sort((a, b) => {
+        const dateA = new Date(a.updatedAt ?? a.date).getTime();
+        const dateB = new Date(b.updatedAt ?? b.date).getTime();
+        return dateB - dateA;
+      });
+  }
+
+  private calculateNextDonation(lastDate: Date, intervalDays: number): void {
+    const next = new Date(lastDate);
+    next.setDate(next.getDate() + intervalDays);
+    this.userStats.nextDonationDate = next;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const nextMidnight = new Date(next);
+    nextMidnight.setHours(0, 0, 0, 0);
+
+    const diffMs = nextMidnight.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    this.userStats.daysUntilNextDonation = diffDays > 0 ? diffDays : 0;
   }
 
   /**

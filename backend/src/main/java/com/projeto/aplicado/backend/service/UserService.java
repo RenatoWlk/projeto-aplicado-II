@@ -1,6 +1,5 @@
 package com.projeto.aplicado.backend.service;
 
-import com.projeto.aplicado.backend.constants.Messages;
 import com.projeto.aplicado.backend.dto.ChangePasswordDTO;
 import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.dto.user.UserLocationDTO;
@@ -21,7 +20,6 @@ import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +50,6 @@ public class UserService {
         user.setGender(dto.getGender());
         user.setBloodType(dto.getBloodType());
         user.setTimesDonated(0);
-        user.setTimeUntilNextDonation(0);
         user.setLastDonationDate(null);
         user.setUnlockedAchievements(List.of());
         user.setScheduledDonations(List.of());
@@ -167,7 +164,6 @@ public class UserService {
     private UserStatsDTO toStatsDTO(User user) {
         UserStatsDTO dto = new UserStatsDTO();
         dto.setTimesDonated(user.getTimesDonated());
-        dto.setTimeUntilNextDonation(user.getTimeUntilNextDonation());
         dto.setLastDonationDate(user.getLastDonationDate());
         dto.setAchievements(achievementService.getAchievementsFromUser(user));
         dto.setTotalPoints(user.getTotalPoints());

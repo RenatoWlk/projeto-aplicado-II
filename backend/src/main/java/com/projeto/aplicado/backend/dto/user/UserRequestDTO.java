@@ -16,6 +16,5 @@ public class UserRequestDTO {
     private String cpf;
     private String gender;
     private BloodType bloodType;
-    private int timeUntilNextDonation;
     private LocalDate lastDonationDate;
 }
