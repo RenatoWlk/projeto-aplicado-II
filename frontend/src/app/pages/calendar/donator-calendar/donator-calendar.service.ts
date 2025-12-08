@@ -176,18 +176,11 @@ export class DonationService {
     /**
      * Cancelar agendamento (usuário)
      */
-    cancelDonation(
-        donationId: string,
-        userId: string,
-        reason?: string
-    ): Observable<DonationResponse> {
+    cancelDonation(donationId: string, userId: string): Observable<DonationResponse> {
         const params = new HttpParams().set('userId', userId);
-        const body = reason ? { reason } : {};
-
         return this.http.patch<DonationResponse>(
             `${this.DONATION_API}/${donationId}/cancel`,
-            body,
-            { params }
+            {},{ params }
         );
     }
 
