@@ -1,58 +1,171 @@
-<div class="calendar-layout">
-    <div class="app-card schedule-card">
-        <div class="app-card-header">
-            <i class="fa-solid fa-calendar-days app-card-icon"></i>
-            <h2 class="app-card-title">Disponibilize datas para doação!</h2>
+<div class="calendar-full-content">
+    <div class="calendar-layout">
+        <div class="app-card schedule-card">
+            <div class="app-card-header">
+                <i class="fa-solid fa-calendar-days app-card-icon"></i>
+                <h2 class="app-card-title">Disponibilize datas para doação!</h2>
+            </div>
+
+            <form [formGroup]="rangeForm" style="margin-top: 50px;">
+                <div class="form-body">
+                    <!-- Date range -->
+                    <mat-form-field appearance="outline" class="custom-form-field full-width">
+                        <mat-label>Insira um intervalo de datas</mat-label>
+                        <mat-date-range-input [rangePicker]="picker">
+                            <input matStartDate formControlName="startDate" placeholder="Data inicial">
+                            <input matEndDate formControlName="endDate" placeholder="Data final">
+                        </mat-date-range-input>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-date-range-picker #picker [calendarHeaderComponent]="customHeader"></mat-date-range-picker>
+                    </mat-form-field>
+
+                    <!-- Start time -->
+                    <mat-form-field appearance="outline" class="custom-form-field full-width">
+                        <mat-label>Horário inicial</mat-label>
+                        <input matInput [matTimepicker]="startTime" formControlName="startTime">
+                        <mat-timepicker-toggle matIconSuffix [for]="startTime"></mat-timepicker-toggle>
+                        <mat-timepicker #startTime></mat-timepicker>
+                        <mat-error *ngIf="rangeForm.get('startTime')?.hasError('timeRange')">
+                            Horário deve estar entre 08:00 e 17:00
+                        </mat-error>
+                    </mat-form-field>
+
+                    <!-- End time -->
+                    <mat-form-field appearance="outline" class="custom-form-field full-width">
+                        <mat-label>Horário final</mat-label>
+                        <input matInput [matTimepicker]="endTime" formControlName="endTime">
+                        <mat-timepicker-toggle matIconSuffix [for]="endTime"></mat-timepicker-toggle>
+                        <mat-timepicker #endTime></mat-timepicker>
+                        <mat-error *ngIf="rangeForm.get('endTime')?.hasError('timeRange')">
+                            Horário deve estar entre 08:00 e 17:00
+                        </mat-error>
+                        <mat-error *ngIf="rangeForm.get('endTime')?.hasError('endTimeBeforeStart')">
+                            Horário final deve ser depois do inicial
+                        </mat-error>
+                    </mat-form-field>
+                    
+                    <!-- Slots quantity -->
+                    <mat-form-field appearance="outline" class="custom-form-field full-width">
+                        <mat-label>Vagas por intervalo de 30 minutos</mat-label>
+                        <input matInput formControlName="availableSpots" type="number">
+                    </mat-form-field>
+                </div>
+
+                <div class="schedule-button-container">
+                    <button type="button" class="schedule-btn" (click)="addAvailableSlots()">
+                        Disponibilizar datas para doação
+                    </button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <form [formGroup]="rangeForm" style="margin-top: 50px;">
-            <div class="form-body">
-                <!-- Date range -->
-                <mat-form-field appearance="outline" class="custom-form-field full-width">
-                    <mat-label>Insira um intervalo de datas</mat-label>
-                    <mat-date-range-input [rangePicker]="picker">
-                        <input matStartDate formControlName="startDate" placeholder="Data inicial">
-                        <input matEndDate formControlName="endDate" placeholder="Data final">
-                    </mat-date-range-input>
-                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-date-range-picker #picker [calendarHeaderComponent]="customHeader"></mat-date-range-picker>
-                </mat-form-field>
-
-                <!-- Start time -->
-                <mat-form-field appearance="outline" class="custom-form-field full-width">
-                    <mat-label>Horário inicial</mat-label>
-                    <input matInput [matTimepicker]="startTime" formControlName="startTime">
-                    <mat-timepicker-toggle matIconSuffix [for]="startTime"></mat-timepicker-toggle>
-                    <mat-timepicker #startTime></mat-timepicker>
-                    <mat-error *ngIf="rangeForm.get('startTime')?.hasError('timeRange')">
-                        Horário deve estar entre 08:00 e 17:00
-                    </mat-error>
-                </mat-form-field>
-
-                <!-- End time -->
-                <mat-form-field appearance="outline" class="custom-form-field full-width">
-                    <mat-label>Horário final</mat-label>
-                    <input matInput [matTimepicker]="endTime" formControlName="endTime">
-                    <mat-timepicker-toggle matIconSuffix [for]="endTime"></mat-timepicker-toggle>
-                    <mat-timepicker #endTime></mat-timepicker>
-                    <mat-error *ngIf="rangeForm.get('endTime')?.hasError('timeRange')">
-                        Horário deve estar entre 08:00 e 17:00
-                    </mat-error>
-                    <mat-error *ngIf="rangeForm.get('endTime')?.hasError('endTimeBeforeStart')">
-                        Horário final deve ser depois do inicial
-                    </mat-error>
-                </mat-form-field>
-                
-                <!-- Slots quantity -->
-                <mat-form-field appearance="outline" class="custom-form-field full-width">
-                    <mat-label>Vagas por intervalo de 30 minutos</mat-label>
-                    <input matInput formControlName="availableSpots">
-                </mat-form-field>
+    <div class="available-dates">
+        <div class="app-card schedule-card">
+            <div class="app-card-header">
+                <i class="fa-solid fa-calendar-check app-card-icon"></i>
+                <h2 class="app-card-title">Datas disponibilizadas para doação:</h2>
             </div>
 
-            <div class="schedule-button-container">
-                <button type="button" class="schedule-btn" (click)="addAvailableSlots()">Disponibilizar datas para doação</button>
+            <!-- Mostrar mensagem se não houver datas -->
+            <div *ngIf="availableDates().length === 0" class="no-data">
+                <i class="fas fa-calendar-times"></i>
+                <p>Nenhuma data de doação disponibilizada</p>
             </div>
-        </form>
+
+            <!-- Lista de datas disponibilizadas -->
+            <div *ngIf="availableDates().length > 0">
+                <div class="dates-list">
+                    <div *ngFor="let dateItem of paginatedDates()" class="date-card">
+                        <div class="date-header">
+                            <h3 class="date-title">
+                                <i class="fa-solid fa-calendar"></i>
+                                {{ formatDate(dateItem.date) }}
+                            </h3>
+                            <div class="date-summary">
+                                <span class="badge badge-total">
+                                    <i class="fa-solid fa-users"></i>
+                                    Total: {{ getTotalSlotsForDay(dateItem.slots) }} vagas
+                                </span>
+                                <span class="badge badge-booked" *ngIf="getBookedSlotsForDay(dateItem.slots) > 0">
+                                    <i class="fa-solid fa-user-check"></i>
+                                    Reservadas: {{ getBookedSlotsForDay(dateItem.slots) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="slots-container">
+                            <div class="slots-scroll">
+                                <div *ngFor="let slot of dateItem.slots" class="slot-item" [class.slot-full]="slot.availableSpots === slot.bookedSpots">
+                                    <div class="slot-time">
+                                        <i class="fa-solid fa-clock"></i>
+                                        {{ slot.time }}
+                                    </div>
+                                    <div class="slot-availability">
+                                        <span class="available-count">
+                                            {{ slot.availableSpots - (slot.bookedSpots || 0) }}/{{ slot.availableSpots }}
+                                        </span>
+                                        <span class="available-label">disponíveis</span>
+                                    </div>
+                                    <div class="slot-status">
+                                        <span *ngIf="slot.availableSpots === slot.bookedSpots" class="status-full">
+                                            <i class="fa-solid fa-circle-xmark"></i> Lotado
+                                        </span>
+                                        <span *ngIf="slot.availableSpots !== slot.bookedSpots" class="status-available">
+                                            <i class="fa-solid fa-circle-check"></i> Disponível
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="cancel-date-btn" (click)="cancelDate(dateItem.date)" title="Cancelar disponibilidade desta data">
+                                <i class="fa-solid fa-trash"></i>
+                                Cancelar Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paginação -->
+                <div class="pagination-container" *ngIf="totalPages() > 1">
+                    <div class="pagination-info">
+                        Mostrando {{ (currentPage() - 1) * itemsPerPage + 1 }} - 
+                        {{ currentPage() * itemsPerPage > availableDates().length ? availableDates().length : currentPage() * itemsPerPage }} 
+                        de {{ availableDates().length }} datas
+                    </div>
+                    
+                    <div class="pagination-controls">
+                        <button 
+                            class="pagination-btn" 
+                            (click)="previousPage()" 
+                            [disabled]="currentPage() === 1"
+                            [class.disabled]="currentPage() === 1">
+                            <i class="fa-solid fa-chevron-left"></i>
+                            Anterior
+                        </button>
+                        
+                        <div class="pagination-numbers">
+                            <button 
+                                *ngFor="let page of getPageNumbers()"
+                                class="pagination-number"
+                                [class.active]="page === currentPage()"
+                                [class.dots]="page === -1"
+                                [disabled]="page === -1"
+                                (click)="goToPage(page)">
+                                {{ page === -1 ? '...' : page }}
+                            </button>
+                        </div>
+                        
+                        <button 
+                            class="pagination-btn" 
+                            (click)="nextPage()" 
+                            [disabled]="currentPage() === totalPages()"
+                            [class.disabled]="currentPage() === totalPages()">
+                            Próxima
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

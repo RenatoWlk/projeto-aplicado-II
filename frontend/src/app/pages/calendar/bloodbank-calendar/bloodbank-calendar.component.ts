@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewEncapsulation, signal, computed } from '@angular/core';
 import { CustomHeaderComponent } from '../custom-header/custom-header.component';
 import { CalendarStats } from '../calendar.service';
 import { BloodbankService } from './bloodbank-calendar.service';
@@ -14,12 +14,30 @@ import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { NotificationBannerService } from '../../../shared/notification-banner/notification-banner.service';
 import { Subject, takeUntil } from 'rxjs';
+import { DonationService } from '../donator-calendar/donator-calendar.service';
+
+// Interface para as datas disponibilizadas
+interface AvailableDate {
+  date: string;
+  slots: {
+    time: string;
+    availableSpots: number;
+    bookedSpots?: number;
+  }[];
+}
 
 @Component({
   selector: 'app-bloodbank-calendar',
-  imports: [MatDatepickerModule, MatCardModule, CommonModule, MatFormFieldModule, MatDateRangeInput, MatTimepickerModule, ReactiveFormsModule, 
-    MatInputModule,
-    MatFormFieldModule],
+  imports: [
+    MatDatepickerModule, 
+    MatCardModule, 
+    CommonModule, 
+    MatFormFieldModule, 
+    MatDateRangeInput, 
+    MatTimepickerModule, 
+    ReactiveFormsModule, 
+    MatInputModule
+  ],
   templateUrl: './bloodbank-calendar.component.html',
   styleUrl: './bloodbank-calendar.component.scss',
   providers: [provideNativeDateAdapter()],
@@ -35,10 +53,30 @@ export class BloodbankCalendarComponent {
   // Subject to manage unsubscribe
   private destroy$ = new Subject<void>();
   
-  calendarStats : CalendarStats = {
-    lastDonationDate : new Date(),
-    nextDonationDate : new Date(),
-    daysUntilNextDonation : 0,
+  // Signal para armazenar as datas disponibilizadas
+  availableDates = signal<AvailableDate[]>([]);
+  
+  // Controles de paginação
+  currentPage = signal<number>(1);
+  itemsPerPage = 1; // Número de datas por página
+  
+  // Computed signal para datas paginadas
+  paginatedDates = computed(() => {
+    const dates = this.availableDates();
+    const start = (this.currentPage() - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return dates.slice(start, end);
+  });
+  
+  // Computed signal para total de páginas
+  totalPages = computed(() => {
+    return Math.ceil(this.availableDates().length / this.itemsPerPage);
+  });
+  
+  calendarStats: CalendarStats = {
+    lastDonationDate: new Date(),
+    nextDonationDate: new Date(),
+    daysUntilNextDonation: 0,
   }
 
   rangeForm = new FormGroup({
@@ -59,6 +97,7 @@ export class BloodbankCalendarComponent {
     private bloodbankService: BloodbankService,
     private authService: AuthService,
     private notificationService: NotificationBannerService,
+    private donationService: DonationService
   ) {
     // Escutar mudanças no startTime para revalidar endTime
     this.rangeForm.controls.startTime.valueChanges
@@ -66,6 +105,10 @@ export class BloodbankCalendarComponent {
       .subscribe(() => {
         this.rangeForm.controls.endTime.updateValueAndValidity();
       });
+  }
+
+  ngOnInit(): void {
+    this.getAvailableDates();
   }
 
   ngOnDestroy(): void {
@@ -171,6 +214,9 @@ export class BloodbankCalendarComponent {
     .subscribe({
       next: () => {
         this.notificationService.show('Datas disponibilizadas com sucesso!', "success", 3000);
+        // Recarregar as datas após adicionar e voltar para página 1
+        this.currentPage.set(1);
+        this.getAvailableDates();
       },
       error: (err) => {
         this.notificationService.show('Erro ao disponibilizar datas', "error", 3000);
@@ -221,5 +267,138 @@ export class BloodbankCalendarComponent {
       current.setDate(current.getDate() + 1);
     }
     return result;
+  }
+
+  getAvailableDates() {
+    const bloodbankId = this.authService.getCurrentUserId();
+    
+    this.donationService.getAvailableDonationDates(bloodbankId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          let dates;
+
+          if (response && response.availabilitySlots) {
+            dates = response.availabilitySlots;
+          } else if (Array.isArray(response)) {
+            dates = response;
+          } else {
+            dates = [];
+          }
+
+          // 👉 Ordenar as datas em ordem crescente
+          dates.sort((a: any, b: any) => {
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+          });
+
+          this.availableDates.set(dates);
+        },
+        error: () => {
+          this.notificationService.show(
+            'Erro pegando datas disponibilizadas',
+            'error',
+            1500
+          );
+        },
+      });
+  }
+
+  // Formata a data para exibição
+  formatDate(dateStr: string): string {
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('pt-BR', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+
+  // Calcula total de vagas disponíveis para um dia
+  getTotalSlotsForDay(slots: any[]): number {
+    return slots.reduce((total, slot) => total + slot.availableSpots, 0);
+  }
+
+  // Calcula vagas ocupadas para um dia
+  getBookedSlotsForDay(slots: any[]): number {
+    return slots.reduce((total, slot) => total + (slot.bookedSpots || 0), 0);
+  }
+
+  // Métodos de paginação
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(page => page + 1);
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.update(page => page - 1);
+    }
+  }
+
+  // Gera array de números de página para exibir
+  getPageNumbers(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+    
+    if (total <= 7) {
+      // Se tiver 7 ou menos páginas, mostra todas
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Sempre mostra primeira página
+      pages.push(1);
+      
+      if (current > 3) {
+        pages.push(-1); // -1 representa "..."
+      }
+      
+      // Páginas ao redor da atual
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      if (current < total - 2) {
+        pages.push(-1); // -1 representa "..."
+      }
+      
+      // Sempre mostra última página
+      pages.push(total);
+    }
+    
+    return pages;
+  }
+
+  // Cancela a disponibilidade de uma data
+  cancelDate(date: string): void {
+    if (confirm(`Tem certeza que deseja cancelar a disponibilidade da data ${this.formatDate(date)}?`)) {
+      const bloodbankId = this.authService.getCurrentUserId();
+      
+      // Ajuste esta chamada conforme sua API
+      this.donationService.cancelAvailableDate(bloodbankId, date)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.notificationService.show('Data cancelada com sucesso!', 'success', 3000);
+            this.getAvailableDates();
+          },
+        error: (err) => {
+          const errorMsg = err.error?.error || 'Erro ao cancelar data';
+          this.notificationService.show(errorMsg, 'error', 3000);
+        }
+        });
+    }
   }
 }

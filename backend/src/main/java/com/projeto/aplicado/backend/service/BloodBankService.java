@@ -562,4 +562,65 @@ public class BloodBankService {
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Cancela uma data disponível do banco de sangue
+     * Valida se não há doações ativas antes de remover
+     *
+     * @param bloodbankId ID do banco de sangue
+     * @param date Data no formato ISO (YYYY-MM-DDTHH:mm:ss.sssZ)
+     * @throws RuntimeException se houver doações ativas ou banco não encontrado
+     */
+    @Transactional
+    public void cancelAvailableDate(String bloodbankId, String date) {
+        // 1. Buscar o banco de sangue
+        BloodBank bloodBank = bloodBankRepository.findBloodBankById(bloodbankId)
+                .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
+
+        // 2. Verificar se há doações ativas para esta data
+        List<Donation.DonationStatus> activeStatuses = Arrays.asList(
+                Donation.DonationStatus.PENDING,
+                Donation.DonationStatus.CONFIRMED
+        );
+
+        // Extrair apenas YYYY-MM-DD
+        String datePrefix = date.substring(0, 10);
+        LocalDate targetDate = LocalDate.parse(datePrefix);
+
+        List<Donation> activeDonations = donationRepository
+                .findByBloodBankIdAndDateStartsWithAndStatusIn(
+                        bloodbankId,
+                        datePrefix,
+                        activeStatuses
+                );
+
+        if (!activeDonations.isEmpty()) {
+            throw new RuntimeException(
+                    "Não é possível cancelar esta data pois há " +
+                            activeDonations.size() +
+                            " doação(ões) agendada(s). Cancele os agendamentos primeiro."
+            );
+        }
+
+        // 3. Buscar slots disponíveis
+        List<DailyAvailability> availabilitySlots = bloodBank.getAvailabilitySlots();
+
+        if (availabilitySlots == null || availabilitySlots.isEmpty()) {
+            throw new RuntimeException("Nenhuma data disponível encontrada");
+        }
+
+        // 4. Remover a data correspondente
+        List<DailyAvailability> updatedSlots = availabilitySlots.stream()
+                .filter(slot -> slot.getDate() == null || !slot.getDate().isEqual(targetDate))
+                .collect(Collectors.toList());
+
+        // Verificar se realmente removeu algo
+        if (updatedSlots.size() == availabilitySlots.size()) {
+            throw new RuntimeException("Data não encontrada nos slots disponíveis");
+        }
+
+        // 5. Atualizar e salvar
+        bloodBank.setAvailabilitySlots(updatedSlots);
+        bloodBankRepository.save(bloodBank);
+    }
 }

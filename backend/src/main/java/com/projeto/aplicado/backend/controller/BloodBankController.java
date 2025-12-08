@@ -165,4 +165,18 @@ public class BloodBankController {
         List<DailyAvailabilityDTO> availableDates = bloodBankService.getAvailableDonationDatesWithSpots(bloodbankId);
         return ResponseEntity.ok(availableDates);
     }
+
+    @DeleteMapping("/cancel-available-date")
+    public ResponseEntity<?> cancelAvailableDate(
+            @RequestParam String bloodbankId,
+            @RequestParam String date) {
+        try {
+            bloodBankService.cancelAvailableDate(bloodbankId, date);
+            return ResponseEntity.ok()
+                    .body(Map.of("message", "Data cancelada com sucesso"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 }

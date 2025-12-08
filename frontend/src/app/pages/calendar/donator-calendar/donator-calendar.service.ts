@@ -123,6 +123,13 @@ export class DonationService {
         );
     }
 
+    cancelAvailableDate(bloodbankId: string, date: string): Observable<DailyAvailability> {
+        return this.http.delete<DailyAvailability>(
+            `${this.BLOODBANK_API}/cancel-available-date`,
+            { params: {bloodbankId, date} }
+        );
+    }
+
     /**
      * Envia o agendamento escolhido pelo usuário
      */
