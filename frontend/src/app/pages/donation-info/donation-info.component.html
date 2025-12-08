@@ -104,7 +104,8 @@
       <mat-form-field appearance="outline" class="custom-form-field full-width"> 
         <mat-label>Data disponível: </mat-label>
         <input matInput
-          [matDatepicker]="datepicker" 
+          [matDatepicker]="datepicker"
+          [matDatepickerFilter]="datesWithDonations"
           [(ngModel)]="selectedDate"
           (dateChange)="onDateChange($event)"
         >

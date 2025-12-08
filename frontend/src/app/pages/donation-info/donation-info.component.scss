@@ -87,6 +87,10 @@
   margin-left: 0.5rem;
 }
 
+.custom-form-field {
+  min-width: 350px !important;
+}
+
 .ranking-list li {
   display: grid;
   // grid-template-columns: 1fr 2fr 1fr 1.5fr 2.5fr;
