@@ -88,6 +88,73 @@ export class DonatorCalendarComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  /**
+   * Cancela o agendamento do usuário
+   */
+  public async cancelDonation() {
+    if (!this.activeAppointment) {
+      this.notificationService.show('Agendamento cancelado com sucesso!', 'success', 2000);
+      this.activeAppointment = null;
+    }
+
+    // Confirmar cancelamento
+    const confirmar = confirm('Tem certeza que deseja cancelar seu agendamento?');
+    
+    if (!confirmar) {
+      return;
+    }
+
+    const userId = this.authService.getCurrentUserId();
+    
+    // Buscar o ID da doação ativa
+    this.donationService.getUserDonations(userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (donations: any[]) => {
+          const activeDonation = donations.find(
+            d => d.status !== 'CANCELLED' && d.status !== 'COMPLETED'
+          );
+
+          if (!activeDonation) {
+            this.notificationService.show('Agendamento não encontrado', 'error', 1500);
+            return;
+          }
+
+          // Realizar o cancelamento
+          this.donationService.cancelDonation(activeDonation.id, userId)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: async () => {
+                this.notificationService.show('Agendamento cancelado com sucesso!', 'success', 2000);
+                this.activeAppointment = null;
+                this.selectedBloodBankId = null;
+
+                this.scheduleForm.reset();
+                await this.loadUsereligibility();
+                await this.checkActiveAppointment();
+                await this.checkIfUserCanDonate();
+
+                this.cdr.markForCheck();
+              },
+              error: (error) => {
+                console.error('Erro ao cancelar:', error);
+                this.notificationService.show(
+                  'Erro ao cancelar agendamento. Tente novamente ou contate suporte4vidas@gmail.com', 
+                  'error', 
+                  3000
+                );
+                this.cdr.markForCheck();
+              }
+            });
+        },
+        error: () => {
+          this.notificationService.show('Erro ao buscar agendamento', 'error', 1500);
+          this.cdr.markForCheck();
+        }
+      }
+    );
+  }
+
   /* -------------------------------------------------------------------------- */
   /*                          Donor Eligibility Check                            */
   /* -------------------------------------------------------------------------- */
