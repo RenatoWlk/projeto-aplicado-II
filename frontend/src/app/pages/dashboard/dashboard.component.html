@@ -251,6 +251,7 @@
               <a class="phone-link" [href]="'tel:' + bloodbank.phone">{{ bloodbank.phone }}</a>
             </footer>
           </article>
+          <p *ngIf="!loadingBloodbanks && nearbyBloodbanks.length === 0">Não foi possível encontrar bancos de sangue próximos a você :(</p>
         </div>
       </ng-container>
     </ng-container>
@@ -275,11 +276,11 @@
             { icon: 'fa-hand-holding-heart', label: 'Doações', value: userStats.timesDonated },
             { icon: 'fa-heartbeat', label: 'Vidas salvas', value: userStats.potentialLivesSaved },
             { icon: 'fa-heart', label: 'Você doou', value: totalLitersDonated},
+            { icon: 'custom', label: 'Total de pontos', value: userStats.totalPoints },
             { icon: 'fa-tint', label: 'Tipo sanguíneo', value: userStats.bloodType },
             { icon: 'fa-calendar-check', label: 'Última doação', value: userStats.lastDonationDate ? (userStats.lastDonationDate | date: 'dd/MM/yyyy') : 'Ainda não doou' },
-            { icon: 'fa-clock', label: 'Próxima doação', value: userStats.nextDonationDate ? (userStats.nextDonationDate | date: 'dd/MM/yyyy') : 'Pré-agende!' },
+            { icon: 'fa-clock', label: 'Data para doar de novo', value: userStats.nextDonationDate ? (userStats.nextDonationDate | date: 'dd/MM/yyyy') : 'Pré-agende agora!' },
             { icon: 'fa-calendar-day', label: 'Dias até poder doar', value: userStats.daysUntilNextDonation || 'Já pode doar!' },
-            { icon: 'custom', label: 'Total de pontos', value: userStats.totalPoints }
           ]">
             <ng-container *ngIf="stat.icon !== 'custom'; else customIcon">
               <i class="fas {{ stat.icon }} stat-icon"></i>

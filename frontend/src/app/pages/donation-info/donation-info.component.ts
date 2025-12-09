@@ -248,17 +248,17 @@ export class DonationInfoComponent implements OnInit {
    */
   completeDonation(donationId: string, notes?: string): void {
     this.donationService.completeDonation(donationId, this.bloodBankId, notes)
-    .pipe(takeUntil(this.destroy$))    
-    .subscribe({
-      next: () => {
-        this.notificationBannerService.show('Doação completada!' ,"success", 3000);
-        this.loadTodayDonations();
-        this.loadStats();
-      },
-      error: () => {
-        this.notificationBannerService.show('Erro ao completar doação. Contate suporte4vidas@gmail.com', "error", 3000);
-      }
-    });
+      .pipe(takeUntil(this.destroy$))    
+      .subscribe({
+        next: () => {
+          this.notificationBannerService.show('Doação completada!', "success", 3000);
+          this.loadTodayDonations();
+          this.loadStats();
+        },
+        error: () => {
+          this.notificationBannerService.show('Erro ao completar doação. Contate suporte4vidas@gmail.com', "error", 3000);
+        }
+      });
   }
 
   /**
@@ -341,7 +341,6 @@ export class DonationInfoComponent implements OnInit {
     const day = String(selected.getDate()).padStart(2, '0');
     const formatted = `${year}-${month}-${day}`;
 
-    console.log(this.donationDates);
     return this.donationDates.has(formatted);
   };
 }

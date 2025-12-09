@@ -58,10 +58,6 @@
                     </span>
                 </div>
             </div>
-            <button class="cancel-date-btn" (click)="cancelDonation()" title="Cancelar pré-agendamento">
-                <i class="fa-solid fa-trash"></i>
-                Cancelar Data
-            </button>
             <p class="info-message">
                 Você poderá realizar um novo agendamento após este ser cancelado ou completado.
             </p>
@@ -72,6 +68,10 @@
                     Email: <strong>{{ activeAppointment.bloodBankEmail }}</strong>
                 </p>
             </div>
+            <button class="cancel-date-btn" (click)="cancelDonation()" title="Cancelar pré-agendamento">
+                <i class="fa-solid fa-trash"></i>
+                Cancelar Pré-agendamento
+            </button>
         </ng-container>
 
         <!-- User donate recently -->

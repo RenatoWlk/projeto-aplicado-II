@@ -11,45 +11,76 @@ import java.util.Optional;
 @Repository
 public interface DonationRepository extends MongoRepository<Donation, String> {
 
-    // Buscar por usuário
+    /**
+     * Retrieves all donations made by a specific user, ordered by date and hour (descending).
+     */
     List<Donation> findByUserIdOrderByDateDescHourDesc(String userId);
 
-    // Buscar por usuário com status específicos
+    /**
+     * Retrieves donations for a user filtered by specific status values,
+     * ordered by date and hour (descending).
+     */
     List<Donation> findByUserIdAndStatusInOrderByDateDescHourDesc(
             String userId, List<Donation.DonationStatus> statuses);
 
-    // Buscar por banco de sangue
+    /**
+     * Retrieves donations for a specific blood bank, ordered by date and hour (ascending).
+     */
     List<Donation> findByBloodBankIdOrderByDateAscHourAsc(String bloodBankId);
 
-    // Buscar por banco de sangue e data
+    /**
+     * Retrieves donations for a blood bank on a specific date
+     * filtered by given status values, ordered by hour (ascending).
+     */
     List<Donation> findByBloodBankIdAndDateAndStatusInOrderByHourAsc(
             String bloodBankId, String date, List<Donation.DonationStatus> statuses);
 
-    // Buscar por banco de sangue, data e hora
+    /**
+     * Retrieves donations for a blood bank on a specific date and hour,
+     * filtered by given status values.
+     */
     List<Donation> findByBloodBankIdAndDateAndHourAndStatusIn(
             String bloodBankId, String date, String hour, List<Donation.DonationStatus> statuses);
 
-    // DonationRepository.java
+    /**
+     * Retrieves donations for a blood bank where the date starts with the given prefix.
+     * Useful for month-based queries (e.g., "2025-12").
+     */
     @Query("{ 'bloodBankId': ?0, 'date': { $regex: ?1 }, 'status': { $in: ?2 } }")
     List<Donation> findByBloodBankIdAndDateStartsWithAndStatusIn(
             String bloodBankId, String datePrefix, List<Donation.DonationStatus> statuses);
 
-    // Contar slots ocupados
+    /**
+     * Counts the number of occupied time slots for a specific blood bank, date and hour,
+     * filtered by given status values.
+     */
     long countByBloodBankIdAndDateAndHourAndStatusIn(
             String bloodBankId, String date, String hour, List<Donation.DonationStatus> statuses);
 
-    // Buscar próximos agendamentos
+    /**
+     * Retrieves upcoming donations for a blood bank within a date range
+     * filtered by given status values.
+     */
     @Query("{ 'bloodBankId': ?0, 'date': { $gte: ?1, $lte: ?2 }, 'status': { $in: ?3 } }")
     List<Donation> findUpcomingDonations(
             String bloodBankId, String startDate, String endDate, List<Donation.DonationStatus> statuses);
 
-    // Verificar agendamento duplicado
+    /**
+     * Checks whether a user already has a scheduled donation for a specific date
+     * with one of the given status values.
+     */
     Optional<Donation> findByUserIdAndDateAndStatusIn(
             String userId, String date, List<Donation.DonationStatus> statuses);
 
-    // Buscar por ID e userId (para garantir que apenas o dono acesse)
+    /**
+     * Retrieves a donation by its ID ensuring it belongs to the specified user.
+     * Used for access control.
+     */
     Optional<Donation> findByIdAndUserId(String id, String userId);
 
-    // Buscar por ID e bloodBankId (para ações do banco)
+    /**
+     * Retrieves a donation by its ID ensuring it belongs to the specified blood bank.
+     * Used for blood bank actions.
+     */
     Optional<Donation> findByIdAndBloodBankId(String id, String bloodBankId);
 }

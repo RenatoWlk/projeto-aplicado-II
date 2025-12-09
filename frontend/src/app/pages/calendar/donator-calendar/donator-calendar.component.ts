@@ -376,24 +376,19 @@ export class DonatorCalendarComponent implements OnInit, OnDestroy {
 
     const formatted = this.formatDateToString(date);
 
-    // Usar getAvailableSlots que já calcula os slots considerando agendamentos
     this.donationService.getAvailableSlots(this.selectedBloodBankId, formatted)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: response => {
-          console.log('Response from getAvailableSlots:', response); // DEBUG
-          
+        next: response => {          
           if (response && response.slots) {
             this.availableDonationHours = response.slots
               .filter((s: any) => s.availableSpots > 0)
               .map((s: any) => ({
                 time: s.time,
                 availableSpots: s.availableSpots,
-                totalSpots: s.totalSpots || s.availableSpots, // fallback
-                bookedSpots: s.bookedSpots || 0 // fallback
+                totalSpots: s.totalSpots || s.availableSpots,
+                bookedSpots: s.bookedSpots || 0
               }));
-              
-            console.log('Processed slots:', this.availableDonationHours); // DEBUG
           } else {
             this.availableDonationHours = [];
           }

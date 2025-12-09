@@ -16,7 +16,6 @@ import { NotificationBannerService } from '../../../shared/notification-banner/n
 import { Subject, takeUntil } from 'rxjs';
 import { DonationService } from '../donator-calendar/donator-calendar.service';
 
-// Interface para as datas disponibilizadas
 interface AvailableDate {
   date: string;
   slots: {
@@ -54,14 +53,11 @@ export class BloodbankCalendarComponent {
   // Subject to manage unsubscribe
   private destroy$ = new Subject<void>();
   
-  // Signal para armazenar as datas disponibilizadas
   availableDates = signal<AvailableDate[]>([]);
   
-  // Controles de paginação
   currentPage = signal<number>(1);
-  itemsPerPage = 1; // Número de datas por página
+  itemsPerPage = 1;
   
-  // Computed signal para datas paginadas
   paginatedDates = computed(() => {
     const dates = this.availableDates();
     const start = (this.currentPage() - 1) * this.itemsPerPage;
@@ -69,7 +65,6 @@ export class BloodbankCalendarComponent {
     return dates.slice(start, end);
   });
   
-  // Computed signal para total de páginas
   totalPages = computed(() => {
     return Math.ceil(this.availableDates().length / this.itemsPerPage);
   });
@@ -100,7 +95,6 @@ export class BloodbankCalendarComponent {
     private notificationService: NotificationBannerService,
     private donationService: DonationService
   ) {
-    // Escutar mudanças no startTime para revalidar endTime
     this.rangeForm.controls.startTime.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
@@ -117,7 +111,6 @@ export class BloodbankCalendarComponent {
     this.destroy$.complete();
   }
 
-  // Validator para limitar o horário entre min e max
   private timeRangeValidator(minTime: string, maxTime: string): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
@@ -142,7 +135,6 @@ export class BloodbankCalendarComponent {
     };
   }
 
-  // Validator para garantir que endTime é depois de startTime
   private endTimeAfterStartTimeValidator(): ValidatorFn {
     return (group: AbstractControl): ValidationErrors | null => {
       const formGroup = group as FormGroup;
@@ -161,11 +153,9 @@ export class BloodbankCalendarComponent {
       const endMinutes = endH * 60 + endM;
 
       if (endMinutes <= startMinutes) {
-        // Adicionar erro específico no controle endTime
         formGroup.get('endTime')?.setErrors({ endTimeBeforeStart: true });
         return { endTimeBeforeStart: true };
       } else {
-        // Remover erro se a validação passou
         const endTimeControl = formGroup.get('endTime');
         if (endTimeControl?.hasError('endTimeBeforeStart')) {
           endTimeControl.setErrors(null);
@@ -177,7 +167,6 @@ export class BloodbankCalendarComponent {
   }
 
   addAvailableSlots() {
-    // Validar o formulário antes de enviar
     if (this.rangeForm.invalid) {
       if (this.rangeForm.get('startTime')?.hasError('timeRange')) {
         this.notificationService.show('Horário inicial deve estar entre 08:00 e 17:00!', "error", 3000);
@@ -215,7 +204,6 @@ export class BloodbankCalendarComponent {
     .subscribe({
       next: () => {
         this.notificationService.show('Datas disponibilizadas com sucesso!', "success", 3000);
-        // Recarregar as datas após adicionar e voltar para página 1
         this.currentPage.set(1);
         this.getAvailableDates();
       },
@@ -270,8 +258,6 @@ export class BloodbankCalendarComponent {
     return result;
   }
 
-// Substituir o método getAvailableDates no bloodbank-calendar.component.ts
-
   getAvailableDates() {
     const bloodbankId = this.authService.getCurrentUserId();
     
@@ -289,12 +275,10 @@ export class BloodbankCalendarComponent {
             dates = [];
           }
 
-          // Ordenar por data
           dates.sort((a: any, b: any) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime();
           });
 
-          // Para cada data, buscar os slots reais considerando agendamentos
           const datesWithRealSlots = await Promise.all(
             dates.map(async (dateObj: any) => {
               try {
@@ -303,18 +287,16 @@ export class BloodbankCalendarComponent {
                   .getAvailableSlots(bloodbankId, dateStr)
                   .toPromise();
 
-                   console.log(`Slots para ${dateStr}:`, slotsResponse);
-
                 if (slotsResponse && slotsResponse.slots) {
                   return {
                     date: dateStr,
-                    slots: slotsResponse.slots // Já vem com totalSpots, bookedSpots, availableSpots
+                    slots: slotsResponse.slots
                   };
                 }
-                return dateObj; // Fallback para dados originais
+                return dateObj;
               } catch (error) {
                 console.error(`Erro ao buscar slots para ${dateObj.date}:`, error);
-                return dateObj; // Fallback para dados originais
+                return dateObj;
               }
             })
           );
@@ -331,7 +313,6 @@ export class BloodbankCalendarComponent {
       });
   }
 
-  // Atualizar método para calcular total de vagas disponíveis
   getTotalSlotsForDay(slots: any[]): number {
     return slots.reduce((total, slot) => {
       const available = slot.availableSpots !== undefined 
@@ -341,21 +322,18 @@ export class BloodbankCalendarComponent {
     }, 0);
   }
 
-  // Atualizar método para calcular vagas ocupadas
   getBookedSlotsForDay(slots: any[]): number {
     return slots.reduce((total, slot) => {
       return total + (slot.bookedSpots || 0);
     }, 0);
   }
 
-  // Método para calcular total de vagas configuradas
   getTotalConfiguredSlotsForDay(slots: any[]): number {
     return slots.reduce((total, slot) => {
       return total + (slot.totalSpots || slot.availableSpots || 0);
     }, 0);
   }
 
-  // Formata a data para exibição
   formatDate(dateStr: string): string {
     const date = new Date(dateStr + 'T00:00:00');
     return date.toLocaleDateString('pt-BR', { 
@@ -366,7 +344,6 @@ export class BloodbankCalendarComponent {
     });
   }
 
-  // Métodos de paginação
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
@@ -385,26 +362,22 @@ export class BloodbankCalendarComponent {
     }
   }
 
-  // Gera array de números de página para exibir
   getPageNumbers(): number[] {
     const total = this.totalPages();
     const current = this.currentPage();
     const pages: number[] = [];
     
     if (total <= 7) {
-      // Se tiver 7 ou menos páginas, mostra todas
       for (let i = 1; i <= total; i++) {
         pages.push(i);
       }
     } else {
-      // Sempre mostra primeira página
       pages.push(1);
       
       if (current > 3) {
-        pages.push(-1); // -1 representa "..."
+        pages.push(-1);
       }
       
-      // Páginas ao redor da atual
       const start = Math.max(2, current - 1);
       const end = Math.min(total - 1, current + 1);
       
@@ -413,22 +386,19 @@ export class BloodbankCalendarComponent {
       }
       
       if (current < total - 2) {
-        pages.push(-1); // -1 representa "..."
+        pages.push(-1);
       }
       
-      // Sempre mostra última página
       pages.push(total);
     }
     
     return pages;
   }
 
-  // Cancela a disponibilidade de uma data
   cancelDate(date: string): void {
     if (confirm(`Tem certeza que deseja cancelar a disponibilidade da data ${this.formatDate(date)}?`)) {
       const bloodbankId = this.authService.getCurrentUserId();
       
-      // Ajuste esta chamada conforme sua API
       this.donationService.cancelAvailableDate(bloodbankId, date)
         .pipe(takeUntil(this.destroy$))
         .subscribe({

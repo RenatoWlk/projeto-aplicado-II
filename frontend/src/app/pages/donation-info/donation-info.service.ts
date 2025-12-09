@@ -12,14 +12,21 @@ export class DonationInfoService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Criar um novo agendamento de doação
+   * Creates a new donation scheduling.
+   *
+   * @param request The donation creation payload.
+   * @returns Observable with the created donation data.
    */
   createDonation(request: CreateDonationRequest): Observable<DonationResponse> {
     return this.http.post<DonationResponse>(this.API_URL, request);
   }
 
   /**
-   * Buscar agendamentos de um usuário
+   * Retrieves donation records for a given user.
+   *
+   * @param userId The ID of the user.
+   * @param activeOnly If true, only active donations will be returned.
+   * @returns Observable with a list of donation responses.
    */
   getUserDonations(userId: string, activeOnly: boolean = false): Observable<DonationResponse[]> {
     const params = new HttpParams().set('activeOnly', activeOnly.toString());
@@ -27,27 +34,30 @@ export class DonationInfoService {
   }
 
   /**
-   * Buscar agendamentos de um banco de sangue
+   * Retrieves donation records for a blood bank, optionally filtered by date and status.
+   *
+   * @param bloodBankId The ID of the blood bank.
+   * @param date Optional filter for a specific date (YYYY-MM-DD).
+   * @param status Optional filter for donation status.
+   * @returns Observable with a list of donation responses.
    */
-  getBloodBankDonations( bloodBankId: string, date?: string, status?: string): Observable<DonationResponse[]> {
+  getBloodBankDonations(bloodBankId: string, date?: string, status?: string): Observable<DonationResponse[]> {
     let params = new HttpParams();
     if (date) params = params.set('date', date);
     if (status) params = params.set('status', status);
 
-    return this.http.get<DonationResponse[]>(
-      `${this.API_URL}/blood-bank/${bloodBankId}`,
-      { params }
-    );
+    return this.http.get<DonationResponse[]>(`${this.API_URL}/blood-bank/${bloodBankId}`, { params });
   }
 
   /**
-   * Verificar disponibilidade de um horário específico
+   * Checks the availability of a specific time slot.
+   *
+   * @param bloodBankId The ID of the blood bank.
+   * @param date The date to check (YYYY-MM-DD).
+   * @param hour The hour to check (HH:mm).
+   * @returns Observable containing slot availability information.
    */
-  checkSlotAvailability(
-    bloodBankId: string,
-    date: string,
-    hour: string
-  ): Observable<SlotAvailability> {
+  checkSlotAvailability(bloodBankId: string, date: string, hour: string): Observable<SlotAvailability> {
     const params = new HttpParams()
       .set('bloodBankId', bloodBankId)
       .set('date', date)
@@ -57,77 +67,76 @@ export class DonationInfoService {
   }
 
   /**
-   * Buscar doação por ID
+   * Retrieves a donation record by ID.
+   *
+   * @param id The donation ID.
+   * @returns Observable containing the donation details.
    */
   getDonationById(id: string): Observable<DonationResponse> {
     return this.http.get<DonationResponse>(`${this.API_URL}/${id}`);
   }
 
   /**
-   * Cancelar agendamento (usuário)
+   * Cancels a donation (user action).
+   *
+   * @param donationId The ID of the donation to cancel.
+   * @param userId The ID of the user performing the cancellation.
+   * @param reason Optional cancellation reason.
+   * @returns Observable with the updated donation data.
    */
-  cancelDonation(
-    donationId: string,
-    userId: string,
-    reason?: string
-  ): Observable<DonationResponse> {
+  cancelDonation(donationId: string, userId: string, reason?: string): Observable<DonationResponse> {
     const params = new HttpParams().set('userId', userId);
     const body: CancelDonationRequest = reason ? { reason } : {};
 
-    return this.http.patch<DonationResponse>(
-      `${this.API_URL}/${donationId}/cancel`,
-      body,
-      { params }
-    );
+    return this.http.patch<DonationResponse>(`${this.API_URL}/${donationId}/cancel`, body, { params });
   }
 
   /**
-   * Confirmar agendamento (banco de sangue)
+   * Confirms a donation (blood bank action).
+   *
+   * @param donationId The ID of the donation to confirm.
+   * @param bloodBankId The ID of the blood bank confirming the donation.
+   * @returns Observable with the updated donation data.
    */
   confirmDonation(donationId: string, bloodBankId: string): Observable<DonationResponse> {
     const params = new HttpParams().set('bloodBankId', bloodBankId);
-    return this.http.patch<DonationResponse>(
-      `${this.API_URL}/${donationId}/confirm`,
-      null,
-      { params }
-    );
+    return this.http.patch<DonationResponse>(`${this.API_URL}/${donationId}/confirm`, null, { params });
   }
 
   /**
-   * Completar doação (banco de sangue)
+   * Completes a donation (blood bank action).
+   *
+   * @param donationId The ID of the donation to complete.
+   * @param bloodBankId The ID of the blood bank completing the donation.
+   * @param notes Optional notes to be stored with the completion record.
+   * @returns Observable with the updated donation data.
    */
-  completeDonation(
-    donationId: string,
-    bloodBankId: string,
-    notes?: string
-  ): Observable<DonationResponse> {
+  completeDonation(donationId: string, bloodBankId: string, notes?: string): Observable<DonationResponse> {
     const params = new HttpParams().set('bloodBankId', bloodBankId);
-    const body: CancelDonationRequest = notes ? { reason: notes } : {};
+    const body: CancelDonationRequest | null = notes ? { reason: notes } : null
 
-    return this.http.patch<DonationResponse>(
-      `${this.API_URL}/${donationId}/complete`,
-      body,
-      { params }
-    );
+    return this.http.patch<DonationResponse>(`${this.API_URL}/${donationId}/complete`, body, { params });
   }
 
   /**
-   * Buscar próximos agendamentos (banco de sangue)
+   * Retrieves upcoming scheduled donations for a blood bank.
+   *
+   * @param bloodBankId The ID of the blood bank.
+   * @param days Number of days ahead to search. Defaults to 7.
+   * @returns Observable with a list of upcoming donation records.
    */
   getUpcomingDonations(bloodBankId: string, days: number = 7): Observable<DonationResponse[]> {
     const params = new HttpParams().set('days', days.toString());
-    return this.http.get<DonationResponse[]>(
-      `${this.API_URL}/blood-bank/${bloodBankId}/upcoming`,
-      { params }
-    );
+    return this.http.get<DonationResponse[]>(`${this.API_URL}/blood-bank/${bloodBankId}/upcoming`, { params });
   }
 
   /**
-   * Buscar estatísticas de doações
+   * Retrieves statistical data regarding donations from a blood bank.
+   *
+   * @param bloodBankId The ID of the blood bank.
+   * @returns Observable containing donation statistics.
    */
   getStats(bloodBankId: string): Observable<DonationStats> {
-    return this.http.get<DonationStats>(
-      `${this.API_URL}/blood-bank/${bloodBankId}/stats`,
-    );
+    return this.http.get<DonationStats>(`${this.API_URL}/blood-bank/${bloodBankId}/stats`);
   }
 }

@@ -4,12 +4,14 @@ import com.projeto.aplicado.backend.constants.AchievementsConditionsTypes;
 import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.exception.AchievementException;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
+import com.projeto.aplicado.backend.model.Donation;
 import com.projeto.aplicado.backend.model.achievement.Achievement;
 import com.projeto.aplicado.backend.model.achievement.UnlockedAchievement;
 import com.projeto.aplicado.backend.model.enums.AchievementsNotifications;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.AchievementRepository;
+import com.projeto.aplicado.backend.repository.DonationRepository;
 import com.projeto.aplicado.backend.repository.EligibilityQuestionnaireRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class AchievementService {
     private final EligibilityQuestionnaireRepository questionnaireRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final DonationRepository donationRepository;
 
     /**
      * Validates and unlocks achievements for a user based on their stats.
@@ -40,28 +43,31 @@ public class AchievementService {
         }
 
         List<Achievement> allAchievements = achievementRepository.findAll();
+        List<UnlockedAchievement> unlockedAchievements = user.getUnlockedAchievements();
 
         for (Achievement achievement : allAchievements) {
-            List<UnlockedAchievement> unlockedAchievements = user.getUnlockedAchievements();
             boolean alreadyUnlocked = unlockedAchievements.stream()
                     .anyMatch(ua -> ua.getAchievementId().equals(achievement.getId()));
-            Pair<Boolean, AchievementsNotifications> match = matchesCondition(user, achievement);
-            boolean matchesCondition = match.getFirst();
-            AchievementsNotifications notification = match.getSecond();
 
-            if (!alreadyUnlocked && matchesCondition) {
-                UnlockedAchievement unlocked = new UnlockedAchievement();
-                unlocked.setAchievementId(achievement.getId());
-                unlocked.setUnlockedAt(LocalDateTime.now());
+            if (!alreadyUnlocked) {
+                Pair<Boolean, AchievementsNotifications> match = matchesCondition(user, achievement);
+                boolean matchesCondition = match.getFirst();
 
-                user.getUnlockedAchievements().add(unlocked);
-                user.setTotalPoints(user.getTotalPoints() + achievement.getPoints());
+                if (matchesCondition) {
+                    UnlockedAchievement unlocked = new UnlockedAchievement();
+                    unlocked.setAchievementId(achievement.getId());
+                    unlocked.setUnlockedAt(LocalDateTime.now());
 
-                ActivateRequestDTO activateNotificationDto = new ActivateRequestDTO();
-                activateNotificationDto.setUserId(user.getId());
-                activateNotificationDto.setBaseId(notification.getId());
-                activateNotificationDto.setHoursToExpire(72);
-                notificationService.activateForUser(activateNotificationDto);
+                    user.getUnlockedAchievements().add(unlocked);
+                    user.setTotalPoints(user.getTotalPoints() + achievement.getPoints());
+
+                    ActivateRequestDTO activateNotificationDto = new ActivateRequestDTO();
+                    AchievementsNotifications baseNotification = match.getSecond();
+                    activateNotificationDto.setUserId(user.getId());
+                    activateNotificationDto.setBaseId(baseNotification.getId());
+                    activateNotificationDto.setHoursToExpire(72);
+                    notificationService.activateForUser(activateNotificationDto);
+                }
             }
         }
 
@@ -113,14 +119,20 @@ public class AchievementService {
                     };
 
                 case AchievementsConditionsTypes.TIMES_DONATED_IN_YEAR:
-                    int currentYear = LocalDate.now().getYear();
-                    long donations = user.getDonations().stream()
-                            .filter(d -> d.getDate().getYear() == currentYear)
-                            .count();
                     int needed = Integer.parseInt(value);
+                    int currentYear = LocalDate.now().getYear();
 
-                    boolean yearOk = donations >= needed;
-                    if (!yearOk) return Pair.of(false, AchievementsNotifications.NONE);
+                    List<Donation> allUserDons = donationRepository
+                            .findByUserIdAndStatusInOrderByDateDescHourDesc(
+                                    user.getId(),
+                                    List.of(Donation.DonationStatus.COMPLETED)
+                            );
+
+                    long donationsThisYear = allUserDons.stream()
+                            .filter(d -> parseDateOnly(d.getDate()).getYear() == currentYear)
+                            .count();
+
+                    if (donationsThisYear < needed) return Pair.of(false, AchievementsNotifications.NONE);
 
                     return switch (needed) {
                         case 2 -> Pair.of(true, AchievementsNotifications.TWO_DONATIONS_IN_YEAR);
@@ -149,7 +161,8 @@ public class AchievementService {
         } catch (Exception e) {
             throw new AchievementException(
                     "Error matching condition: " + achievement.getCondition().getValue() +
-                            " of type: " + achievement.getCondition().getType()
+                            " of type: " + achievement.getCondition().getType() +
+                            "\nMessage: " + e.getMessage()
             );
         }
     }
@@ -203,15 +216,21 @@ public class AchievementService {
     private boolean hasFiveYearStreak(User user) {
         int currentYear = LocalDate.now().getYear();
 
+        List<Donation> allUserDons = donationRepository
+                .findByUserIdAndStatusInOrderByDateDescHourDesc(user.getId(), List.of(Donation.DonationStatus.COMPLETED));
+
         for (int i = 0; i < 5; i++) {
             int year = currentYear - i;
 
-            long donations = user.getDonations().stream()
-                    .filter(d -> d.getDate().getYear() == year)
-                    .count();
+            long count = allUserDons.stream().filter(d -> parseDateOnly(d.getDate()).getYear() == year).count();
 
-            if (donations < 4) return false;
+            if (count < 4) return false;
         }
+
         return true;
+    }
+
+    private LocalDate parseDateOnly(String isoDate) {
+        return LocalDate.parse(isoDate.substring(0, 10));
     }
 }

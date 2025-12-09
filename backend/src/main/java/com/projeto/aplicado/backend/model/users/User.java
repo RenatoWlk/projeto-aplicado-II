@@ -1,6 +1,5 @@
 package com.projeto.aplicado.backend.model.users;
 
-import com.projeto.aplicado.backend.model.DonationAppointment;
 import com.projeto.aplicado.backend.model.ScheduledDonation;
 import com.projeto.aplicado.backend.model.UserNotification;
 import com.projeto.aplicado.backend.model.achievement.UnlockedAchievement;
@@ -24,11 +23,10 @@ public class User extends UserBase {
     private String cpf;
     private String gender;
     private BloodType bloodType;
-    private List<DonationAppointment> donations;
     private int timesDonated;
     private LocalDate lastDonationDate;
-    private List<UnlockedAchievement> unlockedAchievements = new ArrayList<>();
     private int totalPoints;
+    private List<UnlockedAchievement> unlockedAchievements = new ArrayList<>();
     private List<ScheduledDonation> scheduledDonations = new ArrayList<>();
     private List<String> redeemedRewardsIds = new ArrayList<>();
     private List<UserNotification> activeNotifications = new ArrayList<>();

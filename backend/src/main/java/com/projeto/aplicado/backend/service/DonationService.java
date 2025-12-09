@@ -26,7 +26,6 @@ public class DonationService {
 
     @Transactional
     public DonationDTO createDonation(String userId, CreateDonationDTO request) {
-        // Buscar usuário e validar tipo sanguíneo
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
@@ -34,7 +33,6 @@ public class DonationService {
             throw new RuntimeException("Tipo sanguíneo não cadastrado no perfil");
         }
 
-        // Verificar se já existe agendamento ativo para este usuário neste dia
         List<Donation.DonationStatus> activeStatuses = Arrays.asList(
                 Donation.DonationStatus.PENDING,
                 Donation.DonationStatus.CONFIRMED
@@ -45,7 +43,6 @@ public class DonationService {
                     throw new RuntimeException("Você já possui um agendamento para este dia");
                 });
 
-        // Criar doação
         Donation donation = new Donation();
         donation.setUserId(userId);
         donation.setBloodBankId(request.getBloodBankId());
@@ -85,7 +82,6 @@ public class DonationService {
         List<Donation> donations;
 
         if (date != null && !date.isEmpty()) {
-            // Se passou data, busca por data (TODOS os status)
             String datePrefix = date.substring(0, 10); // "YYYY-MM-DD"
 
             donations = donationRepository.findByBloodBankIdOrderByDateAscHourAsc(bloodBankId)
@@ -93,7 +89,6 @@ public class DonationService {
                     .filter(d -> d.getDate().startsWith(datePrefix))
                     .collect(Collectors.toList());
         } else {
-            // Sem data, retorna TODOS os agendamentos do banco
             donations = donationRepository.findByBloodBankIdOrderByDateAscHourAsc(bloodBankId);
         }
 
@@ -165,6 +160,7 @@ public class DonationService {
 
         User user = userRepository.findUserById(donation.getUserId()).orElseThrow();
         user.setTimesDonated(user.getTimesDonated() + 1);
+        user.setTotalPoints(user.getTotalPoints() + 100);
         userRepository.save(user);
         achievementService.validateAndUnlockAchievements(user);
 
