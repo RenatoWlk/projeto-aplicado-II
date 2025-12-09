@@ -64,7 +64,7 @@
       font-size: 1rem;
       padding: 0.5rem 0;
       border-bottom: 1px solid #f0f0f0;
-      
+
       strong {
         color: #b71c1c;
         margin-right: 0.5rem;
@@ -97,7 +97,6 @@
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 2px 8px rgba(183, 28, 28, 0.3);
-       
 
         &:hover {
           background: linear-gradient(135deg, #a31515 0%, #c62828 100%);
@@ -172,7 +171,7 @@
     border-radius: 12px;
     border: 2px solid #b71c1c;
 
-    .app-card-icon{
+    .app-card-icon {
       color: #b71c1c;
     }
 
@@ -180,7 +179,7 @@
       font-size: 1.2rem;
       font-weight: 600;
       color: #b71c1c;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.5rem;
     }
 
     .cta-button {
@@ -277,7 +276,9 @@ form {
       margin-bottom: 0.5rem;
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       padding: 0.75rem 1rem;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
@@ -354,7 +355,6 @@ form {
     }
   }
 }
-
 
 // === QUESTIONNAIRES PAGE STYLES ===
 .questionnaires-page {
@@ -461,7 +461,7 @@ form {
 
     .banner-date {
       text-align: right;
-      
+
       small {
         font-size: 0.85rem;
         opacity: 0.8;
@@ -544,7 +544,7 @@ form {
         &.yes {
           background: #e8f5e8;
           border-color: #4caf50;
-          
+
           .answer-badge {
             background: #4caf50;
             color: white;
@@ -554,7 +554,7 @@ form {
         &.no {
           background: #ffebee;
           border-color: #f44336;
-          
+
           .answer-badge {
             background: #f44336;
             color: white;
@@ -564,7 +564,7 @@ form {
         &.neutral {
           background: #f8f9fa;
           border-color: #e0e0e0;
-          
+
           .answer-badge {
             background: #757575;
             color: white;
@@ -601,126 +601,142 @@ form {
 
   // === ELIGIBILITY ACTIONS ===
   .eligibility-actions {
-    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+    border-radius: 12px;
+    border: 2px solid #b71c1c;
+    text-align: center;
+
+    .eligible-actions,
+    .not-eligible-actions {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
     .action-card {
-      padding: 2rem;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+
+      i {
+        color: #b71c1c;
+        font-size: 2.5rem;
+      }
+
+      h4 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #b71c1c;
+        margin: 0;
+      }
+
+      p {
+        font-size: 1rem;
+        color: #666;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .recommendation {
+        width: 100%;
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(183, 28, 28, 0.1);
+        border-radius: 8px;
+        text-align: left;
+
+        h5 {
+          margin: 0 0 0.75rem 0;
+          color: #b71c1c;
+          font-weight: 600;
+          font-size: 0.95rem;
+        }
+
+        ul {
+          margin: 0;
+          padding-left: 1.5rem;
+
+          li {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+          }
+        }
+      }
 
       &.eligible-card {
-        background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
-        border: 2px solid #4caf50;
-
         i {
-          font-size: 3rem;
           color: #4caf50;
-          margin-bottom: 1rem;
         }
 
         h4 {
           color: #2e7d32;
-          margin-bottom: 1rem;
-          border: none;
-          padding: 0;
-        }
-
-        p {
-          color: #2e7d32;
-          margin-bottom: 1.5rem;
-          font-size: 1.1rem;
         }
       }
 
       &.not-eligible-card {
-        background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%);
-        border: 2px solid #f44336;
-
         i {
-          font-size: 3rem;
           color: #f44336;
-          margin-bottom: 1rem;
         }
 
         h4 {
           color: #c62828;
-          margin-bottom: 1rem;
-          border: none;
-          padding: 0;
-        }
-
-        p {
-          color: #c62828;
-          margin-bottom: 1.5rem;
-          font-size: 1.1rem;
-        }
-
-        .recommendation {
-          text-align: left;
-          margin: 1.5rem 0;
-          padding: 1rem;
-          background: rgba(255, 255, 255, 0.7);
-          border-radius: 8px;
-
-          h5 {
-            color: #c62828;
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-          }
-
-          ul {
-            margin: 0;
-            padding-left: 1.5rem;
-            color: #666;
-
-            li {
-              margin-bottom: 0.5rem;
-              line-height: 1.4;
-            }
-          }
-        .action-buttons {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
-          flex-wrap: wrap;
         }
       }
     }
 
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    button,
     .action-button {
-      padding: 1rem 2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%) !important;
+      color: white !important;
       border: none;
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
       font-size: 1rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(183, 28, 28, 0.3);
 
-      &.primary {
-        background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
-        color: white;
-
-        &:hover {
-          background: linear-gradient(135deg, #43a047 0%, #5cb85c 100%);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        }
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          #a31515 0%,
+          #c62828 100%
+        ) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(183, 28, 28, 0.4);
       }
 
-      &.secondary {
-        background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
-        color: white;
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
 
-        &:hover {
-          background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
-        }
+      i {
+        font-size: 1rem;
+        color: white;
       }
     }
   }
@@ -751,7 +767,7 @@ form {
 
         &.apto {
           border-color: #4caf50;
-          
+
           i {
             color: #4caf50;
           }
@@ -759,7 +775,7 @@ form {
 
         &.não.apto {
           border-color: #f44336;
-          
+
           i {
             color: #f44336;
           }
@@ -812,7 +828,6 @@ form {
       }
     }
   }
-  }
 }
 .back-button {
   margin-top: 2rem;
@@ -826,7 +841,7 @@ form {
   border: 2px solid transparent;
   border-radius: 6px;
   cursor: pointer;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   transition: background-color 0.2s ease;
 }
@@ -834,10 +849,8 @@ form {
 .back-button:hover {
   background-color: white;
   color: #c62828;
-  border:  2px solid #c62828;
+  border: 2px solid #c62828;
 }
-
-
 
 // === RESPONSIVE DESIGN ===
 @media (max-width: 768px) {
@@ -890,7 +903,7 @@ form {
     }
 
     .questionnaire-footer {
-       .validity-notice {
+      .validity-notice {
         flex-direction: column;
         text-align: center;
       }
@@ -1069,7 +1082,6 @@ form {
   .badges-list {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
-
 }
 
 /* ----------------------------- ACHIEVEMENTS ----------------------------- */
@@ -1144,12 +1156,12 @@ form {
   justify-content: space-around;
   display: flex;
   flex-direction: row;
-  gap: 6px;                 
+  gap: 6px;
   background: #ffffff;
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 10px;
-  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .donation-list li span {
@@ -1168,7 +1180,7 @@ form {
 }
 
 .status {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: "Poppins", sans-serif !important;
   width: 130px;
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
@@ -1223,7 +1235,9 @@ form {
   font-size: 0.875rem;
   line-height: 1.2;
   pointer-events: none;
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition:
+    opacity 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
   z-index: 9999 !important;
 }
 
@@ -1260,8 +1274,18 @@ form {
 }
 
 /* ----------------------------- RARITIES ----------------------------- */
-.comum { background-color: #9fbac7; }
-.raro { background-color: #64b5f6; }
-.épico { background-color: #ba68c8; }
-.lendário { background: linear-gradient(to right, #FFD200, #F7971E); }
-.mítico { background: linear-gradient(to right, #004e92, #000428); }
+.comum {
+  background-color: #9fbac7;
+}
+.raro {
+  background-color: #64b5f6;
+}
+.épico {
+  background-color: #ba68c8;
+}
+.lendário {
+  background: linear-gradient(to right, #ffd200, #f7971e);
+}
+.mítico {
+  background: linear-gradient(to right, #004e92, #000428);
+}
