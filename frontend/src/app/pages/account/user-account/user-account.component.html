@@ -26,13 +26,13 @@
     <div class="account-header">
       <div class="profile-photo-wrapper">
         <img [src]="user?.photoUrl || 'assets/profile2.png'" 
-              alt="Foto de Perfil" 
-              class="profile-photo" />
+             alt="Foto de Perfil" 
+             class="profile-photo" />
         <input #fileInput 
-                type="file" 
-                (change)="onPhotoSelected($event)" 
-                accept="image/*" 
-                hidden>
+               type="file" 
+               (change)="onPhotoSelected($event)" 
+               accept="image/*" 
+               hidden>
         <button type="button" 
                 class="profile-photo-edit-btn" 
                 (click)="fileInput.click()"
@@ -67,89 +67,83 @@
 
   <!-- Card de Doações -->
   <div class="app-card">
-  <div class="app-card-header">
-    <i class="fa-solid fa-heart app-card-icon"></i>
-    <h2 class="app-card-title">Status de Doação</h2>
-  </div>
-  
-  <div class="donation-status">
-    <div class="donation-info">
-      
-      <div class="donation-item">
-        <i class="fa-solid fa-calendar-check"></i>
-        <div>
-          <strong>Última doação:</strong>
-          <span>{{ user?.lastDonation ? (user?.lastDonation | date:'dd/MM/yyyy') : 'Nenhuma doação registrada' }}</span>
-          <small *ngIf="user?.lastDonation">
-            ({{ calculateDaysSinceLastDonation() }} dias atrás)
-          </small>
-        </div>
-      </div>
-      
-      <div class="donation-item">
-        <i class="fa-solid fa-calendar-plus"></i>
-        <div>
-          <strong>Próxima doação:</strong>
-          
-          <ng-container *ngIf="activeAppointment; else checkAvailability">
-             <span class="status-scheduled">
-               Agendada para {{ activeAppointment.date | date:'dd/MM/yyyy' }}
-             </span>
-             <small>Horário: {{ activeAppointment.hour }} - {{ activeAppointment.bloodBankName }}</small>
-          </ng-container>
-
-          <ng-template #checkAvailability>
-             
-             <ng-container *ngIf="canDonateNow(); else waitTime">
-                <span class="status-available">Disponível Agora!</span>
-                <small>Você já está apto para doar novamente.</small>
-             </ng-container>
-             
-             <ng-template #waitTime>
-                <span>{{ user?.nextEligibleDonation | date:'dd/MM/yyyy' }}</span>
-                <small class="status-waiting">
-                  (em {{ calculateDaysUntilNextDonation() }} dias)
-                </small>
-             </ng-template>
-
-          </ng-template>
-          
-
-          <small>
-             <span *ngIf="canDonateNow()" class="can-donate" style="color: #2e7d32; font-weight: bold;">
-               Você já pode doar!
-             </span>
-             <span *ngIf="!canDonateNow() && user?.nextEligibleDonation" class="wait-time">
-               (em {{ calculateDaysUntilNextDonation() }} dias)
-             </span>
-          </small>
-        </div>
-      </div>
-
+    <div class="app-card-header">
+      <i class="fa-solid fa-heart app-card-icon"></i>
+      <h2 class="app-card-title">Status de Doação</h2>
     </div>
     
-    <div class="donation-cta">
-      <ng-container *ngIf="activeAppointment">
-        <i class="fa-solid fa-calendar-check"></i>
-        <p>Você tem uma doação agendada!</p>
-        <button type="button" class="cta-button secondary" [routerLink]="['/agendamento']"> 
-          <i class="fa-solid fa-eye"></i>
-          Ver Detalhes
-        </button>
-      </ng-container>
+    <div class="donation-status">
+      <div class="donation-info">
+        
+        <div class="donation-item">
+          <i class="fa-solid fa-calendar-check"></i>
+          <div>
+            <strong>Última doação:</strong>
+            <span>{{ user?.lastDonation ? (user?.lastDonation | date:'dd/MM/yyyy') : 'Nenhuma doação registrada' }}</span>
+            <small *ngIf="user?.lastDonation">
+              ({{ calculateDaysSinceLastDonation() }} dias atrás)
+            </small>
+          </div>
+        </div>
+        
+        <div class="donation-item">
+          <i class="fa-solid fa-calendar-plus"></i>
+          <div>
+            <strong>Próxima doação:</strong>
+            
+            <ng-container *ngIf="activeAppointment; else noAppointment">
+              <span class="status-scheduled">
+                Agendada para {{ activeAppointment.date | date:'dd/MM/yyyy' }}
+              </span>
+              <small>Horário: {{ activeAppointment.hour }} - {{ activeAppointment.bloodBankName }}</small>
+            </ng-container>
 
-      <ng-container *ngIf="!activeAppointment && canDonateNow()">
-        <i class="fa-solid fa-heart-pulse app-card-icon"></i>
-        <p>Você está apto para doar sangue!</p>
-        <button type="button" class="secondary back-button" (click)="onFindBloodBank()">
-          <i class="fa-solid fa-map-marker-alt"></i>
-          Encontrar Banco de Sangue
-        </button>
-      </ng-container>
+            <ng-template #noAppointment>
+              <ng-container *ngIf="canDonateNow(); else cantDonateYet">
+                <span class="status-available">Disponível Agora!</span>
+                <small>Você já está apto para doar novamente.</small>
+              </ng-container>
+              
+              <ng-template #cantDonateYet>
+                <ng-container *ngIf="hasEverDonated(); else neverDonatedYet">
+                  <span>{{ user?.nextEligibleDonation | date:'dd/MM/yyyy' }}</span>
+                  <small class="status-waiting">
+                    (em {{ calculateDaysUntilNextDonation() }} dias)
+                  </small>
+                </ng-container>
+                
+                <ng-template #neverDonatedYet>
+                  <span class="status-waiting">Aguardando elegibilidade</span>
+                  <small>Complete o questionário de elegibilidade.</small>
+                </ng-template>
+              </ng-template>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      
+      <div class="donation-cta" *ngIf="!activeAppointment && canDonateNow()">
+        <ng-container *ngIf="activeAppointment">
+          <i class="fa-solid fa-calendar-check"></i>
+          <p>Você tem uma doação agendada!</p>
+          <button type="button" class="cta-button secondary" [routerLink]="['/agendamento']"> 
+            <i class="fa-solid fa-eye"></i>
+            Ver Detalhes
+          </button>
+        </ng-container>
 
+        <ng-container>
+          <i class="fa-solid fa-heart-pulse app-card-icon"></i>
+          <p>Você está apto para doar sangue!</p>
+          <button type="button" class="secondary back-button" (click)="onFindBloodBank()">
+            <i class="fa-solid fa-map-marker-alt"></i>
+            Encontrar Banco de Sangue
+          </button>
+        </ng-container>
+
+      </div>
     </div>
   </div>
-</div>
 
   <!-- Card de Ações -->
   <div class="app-card">
@@ -182,7 +176,7 @@
   </div>
 
   <!-- Card de Histórico de Doações -->
-    <div class="app-card">
+  <div class="app-card">
     <div class="app-card-header">
       <i class="fa-solid fa-heart app-card-icon"></i>
       <h2 class="app-card-title">Histórico de Doação</h2>
@@ -218,9 +212,9 @@
     <label>
       <span>Nome Completo</span>
       <input type="text" 
-              formControlName="name"
-              placeholder="Seu nome completo"
-              [class.invalid]="isFieldInvalid(profileForm, 'name')" />
+             formControlName="name"
+             placeholder="Seu nome completo"
+             [class.invalid]="isFieldInvalid(profileForm, 'name')" />
       <div *ngIf="getFieldError(profileForm, 'name')" class="error-text">
         {{ getFieldError(profileForm, 'name') }}
       </div>
@@ -229,9 +223,9 @@
     <label>
       <span>Email</span>
       <input type="email" 
-              formControlName="email"
-              placeholder="seu@email.com"
-              [class.invalid]="isFieldInvalid(profileForm, 'email')" />
+             formControlName="email"
+             placeholder="seu@email.com"
+             [class.invalid]="isFieldInvalid(profileForm, 'email')" />
       <div *ngIf="getFieldError(profileForm, 'email')" class="error-text">
         {{ getFieldError(profileForm, 'email') }}
       </div>
@@ -240,39 +234,40 @@
     <label>
       <span>Endereço</span>
       <input type="text" 
-              formControlName="address"
-              placeholder="Endereço completo"
-              [class.invalid]="isFieldInvalid(profileForm, 'address')" />
+             formControlName="address"
+             placeholder="Endereço completo"
+             [class.invalid]="isFieldInvalid(profileForm, 'address')" />
       <div *ngIf="getFieldError(profileForm, 'address')" class="error-text">
         {{ getFieldError(profileForm, 'address') }}
       </div>
     </label>
     
-   <label>
-    <span>Telefone</span>
-    <input type="tel" 
-         formControlName="phone"
-         placeholder="(00) 0 0000-0000"
-         [class.invalid]="isFieldInvalid(profileForm, 'phone')"
-         (input)="formatPhone($event)" 
-         maxlength="16" /> <div *ngIf="getFieldError(profileForm, 'phone')" class="error-text">
-    {{ getFieldError(profileForm, 'phone') }}
-  </div>
-</label>
+    <label>
+      <span>Telefone</span>
+      <input type="tel" 
+             formControlName="phone"
+             placeholder="(00) 0 0000-0000"
+             [class.invalid]="isFieldInvalid(profileForm, 'phone')"
+             (input)="formatPhone($event)" 
+             maxlength="16" />
+      <div *ngIf="getFieldError(profileForm, 'phone')" class="error-text">
+        {{ getFieldError(profileForm, 'phone') }}
+      </div>
+    </label>
     
     <label>
-  <span>CPF</span>
-  <input type="text" 
-         formControlName="cpf"
-         placeholder="000.000.000-00"
-         [class.invalid]="isFieldInvalid(profileForm, 'cpf')" 
-         (input)="formatCPF($event)"
-         maxlength="14" />
-         
-  <div *ngIf="getFieldError(profileForm, 'cpf')" class="error-text">
-    {{ getFieldError(profileForm, 'cpf') }}
-  </div>
-  </label>
+      <span>CPF</span>
+      <input type="text" 
+             formControlName="cpf"
+             placeholder="000.000.000-00"
+             [class.invalid]="isFieldInvalid(profileForm, 'cpf')" 
+             (input)="formatCPF($event)"
+             maxlength="14" />
+      
+      <div *ngIf="getFieldError(profileForm, 'cpf')" class="error-text">
+        {{ getFieldError(profileForm, 'cpf') }}
+      </div>
+    </label>
 
     <label>
       <span>Gênero</span>
@@ -316,9 +311,9 @@
     <label>
       <span>Senha Atual</span>
       <input type="password" 
-              formControlName="currentPassword"
-              placeholder="Digite sua senha atual"
-              [class.invalid]="isFieldInvalid(passwordForm, 'currentPassword')" />
+             formControlName="currentPassword"
+             placeholder="Digite sua senha atual"
+             [class.invalid]="isFieldInvalid(passwordForm, 'currentPassword')" />
       <div *ngIf="getFieldError(passwordForm, 'currentPassword')" class="error-text">
         {{ getFieldError(passwordForm, 'currentPassword') }}
       </div>
@@ -327,9 +322,9 @@
     <label>
       <span>Nova Senha</span>
       <input type="password" 
-              formControlName="newPassword"
-              placeholder="Digite a nova senha (mín. 6 caracteres)"
-              [class.invalid]="isFieldInvalid(passwordForm, 'newPassword')" />
+             formControlName="newPassword"
+             placeholder="Digite a nova senha (mín. 6 caracteres)"
+             [class.invalid]="isFieldInvalid(passwordForm, 'newPassword')" />
       <div *ngIf="getFieldError(passwordForm, 'newPassword')" class="error-text">
         {{ getFieldError(passwordForm, 'newPassword') }}
       </div>
@@ -338,9 +333,9 @@
     <label>
       <span>Confirmar Nova Senha</span>
       <input type="password" 
-              formControlName="confirmPassword"
-              placeholder="Digite novamente a nova senha"
-              [class.invalid]="isFieldInvalid(passwordForm, 'confirmPassword')" />
+             formControlName="confirmPassword"
+             placeholder="Digite novamente a nova senha"
+             [class.invalid]="isFieldInvalid(passwordForm, 'confirmPassword')" />
       <div *ngIf="getFieldError(passwordForm, 'confirmPassword')" class="error-text">
         {{ getFieldError(passwordForm, 'confirmPassword') }}
       </div>
@@ -366,28 +361,28 @@
 
 <!-- Página de Conquistas -->
 <div *ngIf="showAchievements" class="app-card achievements-page">
-  <div *ngIf = "hasAchievements; else noAchievements">  
-  <div class="app-card-header">
-    <i class="fa-solid fa-trophy app-card-icon"></i>
-    <h2 class="app-card-title">Minhas Conquistas</h2>
-  </div>
-  
-  <div class="badges-list">
-    <div class="achievements-grid" *ngIf="!loadingStatsAndAchievements">
-      <div
-        *ngFor="let achievement of userStats.achievements"
-        class="achievement-square-card tooltip-container"
-        [ngClass]="achievement.rarity.toLowerCase()"
-      >
-        <i class="fas achievement-icon" [ngClass]="achievement.imageUrl"></i>
-        <div class="achievement-info">
-          <span class="achievement-title">{{ achievement.title }}</span>
-          <span class="achievement-points">+{{ achievement.points }} pts</span>
+  <div *ngIf="hasAchievements; else noAchievements">  
+    <div class="app-card-header">
+      <i class="fa-solid fa-trophy app-card-icon"></i>
+      <h2 class="app-card-title">Minhas Conquistas</h2>
+    </div>
+    
+    <div class="badges-list">
+      <div class="achievements-grid" *ngIf="!loadingStatsAndAchievements">
+        <div
+          *ngFor="let achievement of userStats.achievements"
+          class="achievement-square-card tooltip-container"
+          [ngClass]="achievement.rarity.toLowerCase()"
+        >
+          <i class="fas achievement-icon" [ngClass]="achievement.imageUrl"></i>
+          <div class="achievement-info">
+            <span class="achievement-title">{{ achievement.title }}</span>
+            <span class="achievement-points">+{{ achievement.points }} pts</span>
+          </div>
+          <div class="tooltip">{{ achievement.description }}</div>
         </div>
-        <div class="tooltip">{{ achievement.description }}</div>
       </div>
     </div>
-  </div>
   </div>
 
   <ng-template #noAchievements>
@@ -405,7 +400,7 @@
 </div>
 
 
-<!-- Página de Questionários Melhorada -->
+<!-- Página de Questionários -->
 <div *ngIf="showQuestionnaires" class="app-card questionnaires-page">
   <div class="app-card-header">
     <i class="fa-solid fa-clipboard-list app-card-icon"></i>
@@ -424,9 +419,6 @@
           <p>{{ lastQuestionnaire.resultMessage }}</p>
         </div>
       </div>
-      <!--<div class="banner-date">
-        <small>Avaliado em {{ lastQuestionnaire.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
-      </div>-->
     </div>
 
     <!-- Botão de Download PDF -->
@@ -491,11 +483,11 @@
     </div>
 
     <!-- Questões Específicas para Mulheres -->
-    <div *ngIf="lastQuestionnaire.gender === 'Feminino'" class="questionnaire-section">
+    <div *ngIf="lastQuestionnaire.gender === 'feminino'" class="questionnaire-section">
       <h4><i class="fa-solid fa-venus"></i> Questões Específicas - Mulheres</h4>
       <div class="questions-list">
-        <div *ngIf="lastQuestionnaire.pregnant !== null && lastQuestionnaire.pregnant !== undefined" 
-             class="question-item" 
+        <!-- Grávida -->
+        <div class="question-item" 
              [ngClass]="getAnswerClass('pregnant', lastQuestionnaire.pregnant)">
           <div class="question-text">Está grávida?</div>
           <div class="answer-badge">
@@ -504,9 +496,9 @@
           </div>
         </div>
 
-        <div *ngIf="lastQuestionnaire.recentChildbirth !== null && lastQuestionnaire.recentChildbirth !== undefined" 
-             class="question-item" 
-             [ngClass]="getAnswerClass('recentChildbirth',lastQuestionnaire.recentChildbirth)">
+        <!-- Parto recente -->
+        <div class="question-item" 
+             [ngClass]="getAnswerClass('recentChildbirth', lastQuestionnaire.recentChildbirth)">
           <div class="question-text">Teve parto ou aborto nos últimos 12 meses?</div>
           <div class="answer-badge">
             <i class="fa-solid" [ngClass]="getAnswerIcon('recentChildbirth', lastQuestionnaire.recentChildbirth)"></i>
@@ -514,9 +506,9 @@
           </div>
         </div>
 
-        <div *ngIf="lastQuestionnaire.lastDonationFemale !== null && lastQuestionnaire.lastDonationFemale !== undefined" 
-             class="question-item" 
-             [ngClass]="getAnswerClass('lastDonationFemale',lastQuestionnaire.lastDonationFemale)">
+        <!-- Última doação feminina -->
+        <div class="question-item" 
+             [ngClass]="getAnswerClass('lastDonationFemale', lastQuestionnaire.lastDonationFemale)">
           <div class="question-text">Última doação foi há menos de 90 dias?</div>
           <div class="answer-badge">
             <i class="fa-solid" [ngClass]="getAnswerIcon('lastDonationFemale', lastQuestionnaire.lastDonationFemale)"></i>
@@ -527,7 +519,7 @@
     </div>
 
     <!-- Questões Específicas para Homens -->
-    <div *ngIf="lastQuestionnaire.gender === 'Masculino'" class="questionnaire-section">
+    <div *ngIf="lastQuestionnaire.gender === 'masculino'" class="questionnaire-section">
       <h4><i class="fa-solid fa-mars"></i> Questões Específicas - Homens</h4>
       <div class="questions-list">
         <div *ngIf="lastQuestionnaire.lastDonationMale !== null && lastQuestionnaire.lastDonationMale !== undefined" 
