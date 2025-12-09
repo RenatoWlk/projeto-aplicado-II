@@ -21,6 +21,7 @@ interface AvailableDate {
   date: string;
   slots: {
     time: string;
+    totalSpots: number,
     availableSpots: number;
     bookedSpots?: number;
   }[];
@@ -269,13 +270,15 @@ export class BloodbankCalendarComponent {
     return result;
   }
 
+// Substituir o método getAvailableDates no bloodbank-calendar.component.ts
+
   getAvailableDates() {
     const bloodbankId = this.authService.getCurrentUserId();
     
     this.donationService.getAvailableDonationDates(bloodbankId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: any) => {
+        next: async (response: any) => {
           let dates;
 
           if (response && response.availabilitySlots) {
@@ -286,12 +289,37 @@ export class BloodbankCalendarComponent {
             dates = [];
           }
 
-          // 👉 Ordenar as datas em ordem crescente
+          // Ordenar por data
           dates.sort((a: any, b: any) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime();
           });
 
-          this.availableDates.set(dates);
+          // Para cada data, buscar os slots reais considerando agendamentos
+          const datesWithRealSlots = await Promise.all(
+            dates.map(async (dateObj: any) => {
+              try {
+                const dateStr = dateObj.date;
+                const slotsResponse = await this.donationService
+                  .getAvailableSlots(bloodbankId, dateStr)
+                  .toPromise();
+
+                   console.log(`Slots para ${dateStr}:`, slotsResponse);
+
+                if (slotsResponse && slotsResponse.slots) {
+                  return {
+                    date: dateStr,
+                    slots: slotsResponse.slots // Já vem com totalSpots, bookedSpots, availableSpots
+                  };
+                }
+                return dateObj; // Fallback para dados originais
+              } catch (error) {
+                console.error(`Erro ao buscar slots para ${dateObj.date}:`, error);
+                return dateObj; // Fallback para dados originais
+              }
+            })
+          );
+
+          this.availableDates.set(datesWithRealSlots);
         },
         error: () => {
           this.notificationService.show(
@@ -303,6 +331,30 @@ export class BloodbankCalendarComponent {
       });
   }
 
+  // Atualizar método para calcular total de vagas disponíveis
+  getTotalSlotsForDay(slots: any[]): number {
+    return slots.reduce((total, slot) => {
+      const available = slot.availableSpots !== undefined 
+        ? slot.availableSpots 
+        : 0;
+      return total + available;
+    }, 0);
+  }
+
+  // Atualizar método para calcular vagas ocupadas
+  getBookedSlotsForDay(slots: any[]): number {
+    return slots.reduce((total, slot) => {
+      return total + (slot.bookedSpots || 0);
+    }, 0);
+  }
+
+  // Método para calcular total de vagas configuradas
+  getTotalConfiguredSlotsForDay(slots: any[]): number {
+    return slots.reduce((total, slot) => {
+      return total + (slot.totalSpots || slot.availableSpots || 0);
+    }, 0);
+  }
+
   // Formata a data para exibição
   formatDate(dateStr: string): string {
     const date = new Date(dateStr + 'T00:00:00');
@@ -312,16 +364,6 @@ export class BloodbankCalendarComponent {
       month: 'long', 
       day: 'numeric' 
     });
-  }
-
-  // Calcula total de vagas disponíveis para um dia
-  getTotalSlotsForDay(slots: any[]): number {
-    return slots.reduce((total, slot) => total + slot.availableSpots, 0);
-  }
-
-  // Calcula vagas ocupadas para um dia
-  getBookedSlotsForDay(slots: any[]): number {
-    return slots.reduce((total, slot) => total + (slot.bookedSpots || 0), 0);
   }
 
   // Métodos de paginação

@@ -337,32 +337,34 @@ export class DonatorCalendarComponent implements OnInit, OnDestroy {
   /*                          Blood Bank Selection                               */
   /* -------------------------------------------------------------------------- */
   onSelectBloodBankChange(bloodBankId: string) {
-    if (this.hasActiveAppointment) {
-      this.notificationService.show('Você já possui um agendamento ativo', 'warning', 3000);
-      return;
-    }
+  if (this.hasActiveAppointment) {
+    this.notificationService.show('Você já possui um agendamento ativo', 'warning', 3000);
+    return;
+  }
 
-    this.selectedBloodBankId = bloodBankId;
-    this.scheduleForm.get('selectedDate')?.reset();
-    this.scheduleForm.get('donationTime')?.reset();
-    this.selectedDate = null;
-    this.availableDates = [];
-    this.availableDonationHours = [];
+  this.selectedBloodBankId = bloodBankId;
+  this.scheduleForm.get('selectedDate')?.reset();
+  this.scheduleForm.get('donationTime')?.reset();
+  this.selectedDate = null;
+  this.availableDates = [];
+  this.availableDonationHours = [];
 
-    this.donationService.getAvailableDonationDates(bloodBankId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: dates => {
-          this.dailyAvailabilityData = dates;
-          this.availableDates = dates
-            .filter(d => d.slots.some(s => s.availableSpots > 0))
-            .map(d => new Date(d.date));
-        },
-        error: () => {
-          this.availableDates = [];
-          this.notificationService.show('Erro ao carregar as datas disponíveis', 'error', 3000);
-        }
-      });
+  this.donationService.getAvailableDonationDates(bloodBankId)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: dates => {
+        this.dailyAvailabilityData = dates;
+        this.availableDates = dates
+          .filter(d => d.slots.some(s => s.availableSpots > 0))
+          .map(d => new Date(d.date));
+        
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.availableDates = [];
+        this.notificationService.show('Erro ao carregar as datas disponíveis', 'error', 3000);
+      }
+    });
   }
 
   onDateSelected(date: Date | null) {
@@ -374,22 +376,32 @@ export class DonatorCalendarComponent implements OnInit, OnDestroy {
 
     const formatted = this.formatDateToString(date);
 
+    // Usar getAvailableSlots que já calcula os slots considerando agendamentos
     this.donationService.getAvailableSlots(this.selectedBloodBankId, formatted)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: slots => {
-          this.availableDonationHours = slots.slots
-            .filter((s: { availableSpots: number; }) => s.availableSpots > 0)
-            .map((s: { time: any; availableSpots: any; totalSpots: any; bookedSpots: any; }) => ({
-              time: s.time,
-              availableSpots: s.availableSpots,
-              totalSpots: s.totalSpots,
-              bookedSpots: s.bookedSpots
-            }));
+        next: response => {
+          console.log('Response from getAvailableSlots:', response); // DEBUG
+          
+          if (response && response.slots) {
+            this.availableDonationHours = response.slots
+              .filter((s: any) => s.availableSpots > 0)
+              .map((s: any) => ({
+                time: s.time,
+                availableSpots: s.availableSpots,
+                totalSpots: s.totalSpots || s.availableSpots, // fallback
+                bookedSpots: s.bookedSpots || 0 // fallback
+              }));
+              
+            console.log('Processed slots:', this.availableDonationHours); // DEBUG
+          } else {
+            this.availableDonationHours = [];
+          }
 
           this.cdr.markForCheck();
         },
-        error: () => {
+        error: (err) => {
+          console.error('Erro ao buscar slots:', err);
           this.availableDonationHours = [];
           this.notificationService.show('Erro ao carregar horários disponíveis', 'error', 3000);
           this.cdr.markForCheck();
