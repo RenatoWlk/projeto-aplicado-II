@@ -6,9 +6,9 @@ Repository for the Applied Project II. Continuation of the [4 vidas (four lives)
 
 ## Description
 
-**Quatro Vidas** is a web platform focused on promoting blood donation, connecting donors, blood banks, and partners. The system allows the registration of different user profiles, enables the monitoring of donation history, blood levels in blood banks, facilitates scheduling future donations through a personal calendar and much more.
+**Quatro Vidas**  is a web platform focused on promoting blood donation, connecting donors, blood banks, and partners. The system allows the registration of different user profiles, enables the monitoring of donation history, tracks blood stock levels at banks, and facilitates scheduling blood collections through a personal calendar, among other features.
 
-The application features an interactive dashboard, an achievement-based reward system, a map to locate nearby blood banks, and a eligibility questionnaire for donors. Developed with usability and accessibility in mind, the system uses Angular for the frontend, Java with Spring Boot for the backend, and MongoDB as the database.
+Key features include an interactive dashboard, an achievement-based rewards system, a map to locate nearby blood banks, and a donor eligibility questionnaire. Built with usability and accessibility in mind, the architecture uses Angular for the frontend, Java with Spring Boot for the backend, and MongoDB as the database.
 
 ## Dependencies
 
