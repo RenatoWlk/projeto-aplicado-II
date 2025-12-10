@@ -118,16 +118,8 @@ public class BloodBankService {
         return bloodBankRepository.findAllBloodBanks().stream().map(bloodBank -> {
             BloodBankMapDTO dto = toMapDTO(bloodBank);
 
-            if (bloodBank.getAddress() == null ||
-                    bloodBank.getAddress().getStreet() == null ||
-                    bloodBank.getAddress().getCity() == null ||
-                    bloodBank.getAddress().getState() == null ||
-                    bloodBank.getAddress().getZipCode() == null) {
-                return dto;
-            }
-
             try {
-                String address = removeAccents(bloodBank.getAddress().getStreet().toLowerCase());
+                String address = removeAccents(bloodBank.getAddress().getStreet().toLowerCase() + ", " + bloodBank.getAddress().getCity().toLowerCase());
 
                 double[] coordinates = geolocationService.getCoordinatesFromAddress(address);
                 dto.setLatitude(coordinates[0]);
@@ -153,15 +145,7 @@ public class BloodBankService {
         User user = userRepository.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException(Messages.USER_NOT_FOUND));
 
-        if (user.getAddress() == null ||
-                user.getAddress().getStreet() == null ||
-                user.getAddress().getCity() == null ||
-                user.getAddress().getState() == null ||
-                user.getAddress().getZipCode() == null) {
-            throw new RuntimeException(Messages.USER_ADDRESS_INCOMPLETE);
-        }
-
-        String userAddress = removeAccents(user.getAddress().getStreet().toLowerCase());
+        String userAddress = removeAccents(user.getAddress().getStreet().toLowerCase() + ", " + user.getAddress().getCity().toLowerCase());
         double[] userCoordinates = geolocationService.getCoordinatesFromAddress(userAddress);
         double userLat = userCoordinates[0];
         double userLon = userCoordinates[1];
@@ -173,7 +157,7 @@ public class BloodBankService {
 
             try {
                 if (bloodBank.getAddress() != null) {
-                    String fullAddress = removeAccents(bloodBank.getAddress().getStreet().toLowerCase());
+                    String fullAddress = removeAccents(bloodBank.getAddress().getStreet().toLowerCase() + ", " + bloodBank.getAddress().getCity().toLowerCase());
 
                     double[] coordinates = geolocationService.getCoordinatesFromAddress(fullAddress);
 
