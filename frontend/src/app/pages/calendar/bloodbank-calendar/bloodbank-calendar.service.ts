@@ -52,8 +52,12 @@ export class BloodbankService {
 
     if (!dateSlots) return { date: targetDate, slots: [] };
 
-    // Conta quantos agendamentos existem por horário
-    const bookingsByHour = bookings.reduce((acc, booking) => {
+    const activeBookings = bookings.filter(
+      booking => booking.status !== 'CANCELLED' && booking.status !== 'NO_SHOW'
+    );
+
+    // Conta quantos agendamentos ocupam vaga por horário
+    const bookingsByHour = activeBookings.reduce((acc, booking) => {
       acc[booking.hour] = (acc[booking.hour] || 0) + 1;
       return acc;
     }, {} as { [key: string]: number });
@@ -64,7 +68,7 @@ export class BloodbankService {
       totalSpots: slot.availableSpots,
       bookedSpots: bookingsByHour[slot.time] || 0,
       availableSpots: slot.availableSpots - (bookingsByHour[slot.time] || 0),
-      bookings: bookings.filter(b => b.hour === slot.time)
+      bookings: activeBookings.filter(b => b.hour === slot.time)
     }));
 
     return {

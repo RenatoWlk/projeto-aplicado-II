@@ -101,13 +101,13 @@
                                     </div>
                                     <div class="slot-availability">
                                         <span class="available-count">
-                                            {{ slot.totalSpots - (slot.bookedSpots || 0) }}/{{ slot.totalSpots }}
+                                            {{ slot.availableSpots }}/{{ slot.totalSpots }}
                                         </span>
                                         <span class="available-label">disponíveis</span>
                                     </div>
                                     <div class="slot-status">
                                         <span *ngIf="slot.availableSpots === 0" class="status-full">
-                                            <i class="fa-solid fa-circle-xmark"></i> Lotado
+                                            <i class="fa-solid fa-circle-xmark"></i> Indisponível
                                         </span>
                                         <span *ngIf="slot.availableSpots !== 0" class="status-available">
                                             <i class="fa-solid fa-circle-check"></i> Disponível

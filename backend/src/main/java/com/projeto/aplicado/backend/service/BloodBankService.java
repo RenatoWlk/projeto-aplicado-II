@@ -339,7 +339,16 @@ public class BloodBankService {
         for (DailyAvailabilityDTO dailyDto: dto.getAvailability()) {
             LocalDate date = dailyDto.getDate();
 
-            List<Slot> slots = dailyDto.getSlots().stream().map(s -> new Slot(s.getTime(), s.getAvailableSpots())).toList();
+            List<Slot> slots = dailyDto.getSlots().stream()
+                    .map(s -> {
+                        Slot slot = new Slot();
+                        slot.setTime(s.getTime());
+                        slot.setTotalSpots(s.getAvailableSpots());
+                        slot.setBookedSpots(0);
+                        slot.setAvailableSpots(s.getAvailableSpots());
+                        return slot;
+                    })
+                    .toList();
             DailyAvailability daily = new DailyAvailability(date, slots);
             bloodBank.getAvailabilitySlots().add(daily);
         }
@@ -497,7 +506,7 @@ public class BloodBankService {
 
         // 1. Buscar banco de sangue
         BloodBank bloodBank = bloodBankRepository.findById(bloodBankId)
-                .orElseThrow(() -> new RuntimeException("Banco de sangue nao encontrado"));
+                .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
 
         // 2. Buscar slots publicados
         List<DailyAvailability> availabilityList = bloodBank.getAvailabilitySlots();
@@ -515,35 +524,14 @@ public class BloodBankService {
             return new AvailableSlotsDTO(dateStr, Collections.emptyList());
         }
 
-        // 4. Buscar agendamentos
-        List<Donation> allDonations = donationRepository.findAll();
-        List<Donation> forThisBank = allDonations.stream()
-                .filter(d -> d.getBloodBankId().equals(bloodBankId)).toList();
-        List<Donation> bookings = forThisBank.stream()
-                .filter(d -> {
-                    boolean dateMatches = d.getDate() != null && d.getDate().startsWith(datePrefix);
-                    boolean statusMatches = d.getStatus() == Donation.DonationStatus.PENDING ||
-                            d.getStatus() == Donation.DonationStatus.CONFIRMED;
-
-
-                    return dateMatches && statusMatches;
-                }).toList();
-
-
-        // 5. Contar agendamentos por horário
-        Map<String, Long> bookingsByHour = bookings.stream()
-                .collect(Collectors.groupingBy(
-                        d -> d.getHour().trim(),
-                        Collectors.counting()
-                ));
-
-        // 6. Calcular disponibilidade
         List<AvailableSlotsDTO.SlotInfo> slotsInfo = daySlots.getSlots().stream()
                 .map(slot -> {
                     String slotTime = slot.getTime().toString().trim();
-                    int totalSpots = slot.getAvailableSpots();
-                    int bookedSpots = bookingsByHour.getOrDefault(slotTime, 0L).intValue();
-                    int availableSpots = Math.max(0, totalSpots - bookedSpots);
+
+                    // Usar valores do banco - totalSpots nunca muda
+                    int totalSpots = slot.getTotalSpots() != null ? slot.getTotalSpots() : 0;
+                    int bookedSpots = slot.getBookedSpots() != null ? slot.getBookedSpots() : 0;
+                    int availableSpots = slot.getAvailableSpots() != null ? slot.getAvailableSpots() : 0;
 
                     return new AvailableSlotsDTO.SlotInfo(
                             slotTime,
@@ -551,7 +539,8 @@ public class BloodBankService {
                             bookedSpots,
                             availableSpots
                     );
-                }).toList();
+                })
+                .toList();
 
         return new AvailableSlotsDTO(dateStr, slotsInfo);
     }

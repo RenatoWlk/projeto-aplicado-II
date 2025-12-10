@@ -11,5 +11,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class Slot {
     private LocalTime time;
+    private Integer totalSpots;
+    private Integer bookedSpots;
     private Integer availableSpots;
 }

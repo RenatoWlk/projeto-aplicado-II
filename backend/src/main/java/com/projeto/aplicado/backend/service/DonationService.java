@@ -1,18 +1,25 @@
 package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.dto.donation.*;
+import com.projeto.aplicado.backend.model.DailyAvailability;
 import com.projeto.aplicado.backend.model.Donation;
+import com.projeto.aplicado.backend.model.Slot;
+import com.projeto.aplicado.backend.model.users.BloodBank;
 import com.projeto.aplicado.backend.model.users.User;
+import com.projeto.aplicado.backend.repository.BloodBankRepository;
 import com.projeto.aplicado.backend.repository.DonationRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,8 +28,8 @@ public class DonationService {
 
     private final DonationRepository donationRepository;
     private final UserRepository userRepository;
+    private final BloodBankRepository bloodBankRepository;
     private final AchievementService achievementService;
-
 
     @Transactional
     public DonationDTO createDonation(String userId, CreateDonationDTO request) {
@@ -42,6 +49,11 @@ public class DonationService {
                 .ifPresent(d -> {
                     throw new RuntimeException("Você já possui um agendamento para este dia");
                 });
+
+        // ✅ Reserva o slot ANTES de criar a doação
+        LocalDate date = LocalDate.parse(request.getDate().substring(0, 10));
+        LocalTime time = LocalTime.parse(request.getHour());
+        bookSlot(request.getBloodBankId(), date, time);
 
         Donation donation = new Donation();
         donation.setUserId(userId);
@@ -123,6 +135,11 @@ public class DonationService {
             throw new RuntimeException("Não é possível cancelar um agendamento já completado");
         }
 
+        // ✅ Libera o slot quando cancelar
+        LocalDate date = LocalDate.parse(donation.getDate().substring(0, 10));
+        LocalTime time = LocalTime.parse(donation.getHour());
+        releaseSlot(donation.getBloodBankId(), date, time);
+
         donation.setStatus(Donation.DonationStatus.CANCELLED);
         donation.setCancellationReason(reason);
         donation.setUpdatedAt(LocalDateTime.now());
@@ -143,6 +160,7 @@ public class DonationService {
         donation = donationRepository.save(donation);
 
         return mapToResponse(donation);
+        // ✅ NÃO mexe nos slots
     }
 
     @Transactional
@@ -165,6 +183,7 @@ public class DonationService {
         achievementService.validateAndUnlockAchievements(user);
 
         return mapToResponse(donation);
+        // ✅ NÃO mexe nos slots - a vaga continua ocupada
     }
 
     public List<DonationDTO> getUpcomingDonations(String bloodBankId, int days) {
@@ -221,6 +240,87 @@ public class DonationService {
         return new DonationStatsDTO(byStatus, byBloodType, total, completed, pending, cancelled);
     }
 
+    @Transactional
+    private void bookSlot(String bloodBankId, LocalDate date, LocalTime time) {
+        BloodBank bloodBank = bloodBankRepository.findBloodBankById(bloodBankId)
+                .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
+
+        Optional<DailyAvailability> dailyAvailability = bloodBank.getAvailabilitySlots().stream()
+                .filter(da -> da.getDate().equals(date))
+                .findFirst();
+
+        if (dailyAvailability.isEmpty()) {
+            throw new RuntimeException("Data não disponível para agendamento");
+        }
+
+        Optional<Slot> slot = dailyAvailability.get().getSlots().stream()
+                .filter(s -> s.getTime().equals(time))
+                .findFirst();
+
+        if (slot.isEmpty()) {
+            throw new RuntimeException("Horário não disponível");
+        }
+
+        Slot targetSlot = slot.get();
+
+        // Inicializa campos se necessário (compatibilidade com dados antigos)
+        if (targetSlot.getTotalSpots() == null) {
+            targetSlot.setTotalSpots(targetSlot.getAvailableSpots());
+        }
+        if (targetSlot.getBookedSpots() == null) {
+            targetSlot.setBookedSpots(0);
+        }
+
+        if (targetSlot.getAvailableSpots() <= 0) {
+            throw new RuntimeException("Não há vagas disponíveis para este horário");
+        }
+
+        targetSlot.setBookedSpots(targetSlot.getBookedSpots() + 1);
+        targetSlot.setAvailableSpots(targetSlot.getAvailableSpots() - 1);
+
+        bloodBankRepository.save(bloodBank);
+    }
+
+    @Transactional
+    private void releaseSlot(String bloodBankId, LocalDate date, LocalTime time) {
+        BloodBank bloodBank = bloodBankRepository.findBloodBankById(bloodBankId)
+                .orElseThrow(() -> new RuntimeException("Banco de sangue não encontrado"));
+
+        Optional<DailyAvailability> dailyAvailability = bloodBank.getAvailabilitySlots().stream()
+                .filter(da -> da.getDate().equals(date))
+                .findFirst();
+
+        if (dailyAvailability.isEmpty()) {
+            return; // Data não existe, ignorar
+        }
+
+        Optional<Slot> slot = dailyAvailability.get().getSlots().stream()
+                .filter(s -> s.getTime().equals(time))
+                .findFirst();
+
+        if (slot.isEmpty()) {
+            return; // Horário não existe, ignorar
+        }
+
+        Slot targetSlot = slot.get();
+
+        // Inicializa campos se necessário
+        if (targetSlot.getTotalSpots() == null) {
+            targetSlot.setTotalSpots(targetSlot.getAvailableSpots());
+        }
+        if (targetSlot.getBookedSpots() == null) {
+            targetSlot.setBookedSpots(0);
+        }
+
+        if (targetSlot.getBookedSpots() > 0) {
+            targetSlot.setBookedSpots(targetSlot.getBookedSpots() - 1);
+        }
+        if (targetSlot.getAvailableSpots() < targetSlot.getTotalSpots()) {
+            targetSlot.setAvailableSpots(targetSlot.getAvailableSpots() + 1);
+        }
+
+        bloodBankRepository.save(bloodBank);
+    }
     private DonationDTO mapToResponse(Donation donation) {
         // Buscar informações do usuário e banco de sangue
         User user = userRepository.findById(donation.getUserId()).orElse(null);
