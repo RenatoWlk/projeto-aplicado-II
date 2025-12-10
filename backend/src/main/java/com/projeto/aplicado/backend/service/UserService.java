@@ -96,7 +96,7 @@ public class UserService {
         ActivateRequestDTO request = new ActivateRequestDTO();
         request.setUserId(id);
         request.setBaseId("achievement_opened_map");
-        request.setHoursToExpire(72);
+        request.setHoursToExpire(null);
         notificationService.activateForUser(request);
     }
 

@@ -697,39 +697,123 @@ mat-label,
   }
 }
 
-// Responsividade
+/* -------------------------- */
+/*      Responsive layout     */
+/* -------------------------- */
+
+@media (max-width: 1024px) {
+  .calendar-full-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .calendar-layout,
+  .available-dates {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .schedule-card {
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
+  .calendar-layout,
+  .available-dates {
+    padding: 15px;
+  }
+
+  .app-card-header h2 {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  .schedule-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem;
+  }
+
+  .dates-list {
+    padding: 1rem;
+  }
+
+  .date-card {
+    padding: 1rem;
+  }
+
   .date-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .slots-scroll {
-    overflow-x: scroll;
+    gap: 0.7rem;
   }
 
   .slot-item {
     min-width: 180px;
   }
 
+  .schedule-btn {
+    width: 100%;
+    margin: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-full-content {
+    padding: 0;
+  }
+
+  .app-card {
+    padding: 0.5rem;
+  }
+
+  .full-width {
+    width: 100% !important;
+  }
+
+  mat-label {
+    font-size: 0.9rem;
+  }
+
   .date-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
-  .pagination-controls {
-    flex-direction: column;
-    gap: 1rem;
+  .badge {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.75rem;
   }
 
-  .pagination-numbers {
-    order: -1;
+  .pagination-container {
+    padding: 1rem;
   }
 
-  .pagination-info {
-    text-align: center;
+  .pagination-btn,
+  .pagination-number {
+    height: 32px;
+    min-width: 32px;
+    font-size: 0.75rem;
   }
 
   .cancel-date-btn {
     width: 100%;
+    font-size: 0.85rem;
+    padding: 0.6rem;
+  }
+
+  .slot-item {
+    min-width: 150px;
+    padding: 0.8rem;
   }
 }

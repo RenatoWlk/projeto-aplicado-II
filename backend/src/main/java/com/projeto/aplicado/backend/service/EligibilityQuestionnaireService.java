@@ -59,7 +59,7 @@ public class EligibilityQuestionnaireService {
             ActivateRequestDTO notificationDTO = new ActivateRequestDTO();
             notificationDTO.setUserId(dto.getUserId());
             notificationDTO.setBaseId(AchievementsNotifications.QUESTIONNAIRE_PERFECT.getId());
-            notificationDTO.setHoursToExpire(72);
+            notificationDTO.setHoursToExpire(null);
             notificationService.activateForUser(notificationDTO);
         }
 

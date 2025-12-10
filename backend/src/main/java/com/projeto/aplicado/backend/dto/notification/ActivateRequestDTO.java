@@ -6,5 +6,5 @@ import lombok.Data;
 public class ActivateRequestDTO {
     public String userId;
     public String baseId;
-    public int hoursToExpire = 24;
+    public Integer hoursToExpire = 24;
 }

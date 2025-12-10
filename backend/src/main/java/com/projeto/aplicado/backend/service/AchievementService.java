@@ -5,6 +5,7 @@ import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.exception.AchievementException;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.Donation;
+import com.projeto.aplicado.backend.model.UserNotification;
 import com.projeto.aplicado.backend.model.achievement.Achievement;
 import com.projeto.aplicado.backend.model.achievement.UnlockedAchievement;
 import com.projeto.aplicado.backend.model.enums.AchievementsNotifications;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +30,6 @@ public class AchievementService {
     private final AchievementRepository achievementRepository;
     private final EligibilityQuestionnaireRepository questionnaireRepository;
     private final UserRepository userRepository;
-    private final NotificationService notificationService;
     private final DonationRepository donationRepository;
 
     /**
@@ -43,31 +44,44 @@ public class AchievementService {
         }
 
         List<Achievement> allAchievements = achievementRepository.findAll();
+        List<UserNotification> userNotifications = user.getActiveNotifications();
         List<UnlockedAchievement> unlockedAchievements = user.getUnlockedAchievements();
 
         for (Achievement achievement : allAchievements) {
             boolean alreadyUnlocked = unlockedAchievements.stream()
                     .anyMatch(ua -> ua.getAchievementId().equals(achievement.getId()));
 
+            Pair<Boolean, AchievementsNotifications> match = matchesCondition(user, achievement);
+            boolean matchesCondition;
+            if (alreadyUnlocked) {
+                matchesCondition = true;
+            } else {
+                matchesCondition = match.getFirst();
+            }
+
+            AchievementsNotifications baseNotification = match.getSecond();
+            if (!matchesCondition || baseNotification == AchievementsNotifications.NONE) {
+                continue; // nothing to do for this achievement
+            }
+
+            boolean hasActiveNotification = userNotifications.stream()
+                    .anyMatch(un -> un.getNotificationBaseId().equals(baseNotification.getId()));
+
             if (!alreadyUnlocked) {
-                Pair<Boolean, AchievementsNotifications> match = matchesCondition(user, achievement);
-                boolean matchesCondition = match.getFirst();
+                // Unlock achievement
+                UnlockedAchievement unlocked = new UnlockedAchievement();
+                unlocked.setAchievementId(achievement.getId());
+                unlocked.setUnlockedAt(LocalDateTime.now());
+                user.getUnlockedAchievements().add(unlocked);
 
-                if (matchesCondition) {
-                    UnlockedAchievement unlocked = new UnlockedAchievement();
-                    unlocked.setAchievementId(achievement.getId());
-                    unlocked.setUnlockedAt(LocalDateTime.now());
+                user.setTotalPoints(user.getTotalPoints() + achievement.getPoints());
+            }
 
-                    user.getUnlockedAchievements().add(unlocked);
-                    user.setTotalPoints(user.getTotalPoints() + achievement.getPoints());
-
-                    ActivateRequestDTO activateNotificationDto = new ActivateRequestDTO();
-                    AchievementsNotifications baseNotification = match.getSecond();
-                    activateNotificationDto.setUserId(user.getId());
-                    activateNotificationDto.setBaseId(baseNotification.getId());
-                    activateNotificationDto.setHoursToExpire(72);
-                    notificationService.activateForUser(activateNotificationDto);
-                }
+            if (!hasActiveNotification) {
+                // Activate missing notification
+                Instant now = Instant.now();
+                UserNotification un = new UserNotification(baseNotification.getId(), false, now, null);
+                user.getActiveNotifications().add(un);
             }
         }
 
@@ -206,6 +220,7 @@ public class AchievementService {
      * @return A list of achievements unlocked by the user.
      */
     public List<Achievement> getAchievementsFromUser(User user) {
+        validateAndUnlockAchievements(user);
         List<String> unlockedIds = user.getUnlockedAchievements().stream()
                 .map(UnlockedAchievement::getAchievementId)
                 .toList();

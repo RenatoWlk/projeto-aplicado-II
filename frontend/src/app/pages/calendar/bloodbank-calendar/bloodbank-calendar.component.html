@@ -64,16 +64,14 @@
         <div class="app-card schedule-card">
             <div class="app-card-header">
                 <i class="fa-solid fa-calendar-check app-card-icon"></i>
-                <h2 class="app-card-title">Datas disponibilizadas para doação:</h2>
+                <h2 class="app-card-title">Datas disponibilizadas para doação</h2>
             </div>
 
-            <!-- Mostrar mensagem se não houver datas -->
             <div *ngIf="availableDates().length === 0" class="no-data">
                 <i class="fas fa-calendar-times"></i>
                 <p>Nenhuma data de doação disponibilizada</p>
             </div>
 
-            <!-- Lista de datas disponibilizadas -->
             <div *ngIf="availableDates().length > 0">
                 <div class="dates-list">
                     <div *ngFor="let dateItem of paginatedDates()" class="date-card">
@@ -125,7 +123,6 @@
                     </div>
                 </div>
 
-                <!-- Paginação -->
                 <div class="pagination-container" *ngIf="totalPages() > 1">
                     <div class="pagination-info">
                         Mostrando {{ (currentPage() - 1) * itemsPerPage + 1 }} - 

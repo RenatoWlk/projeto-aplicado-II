@@ -6,7 +6,7 @@ import { NotificationDto } from './notifications.model';
 export interface ActivateNotification {
   userId?: string;
   baseId: string;
-  hoursToExpire: number;
+  hoursToExpire: number | null;
 }
 
 export interface ActivateNotificationAll {
@@ -30,7 +30,7 @@ export class NotificationService {
     return this.http.get<number>(`${this.baseUrl}/${userId}/unread-count`);
   }
 
-  activateForUser(userId: string, baseId: string, hoursToExpire: number = 24): Observable<ActivateNotification> {
+  activateForUser(userId: string, baseId: string, hoursToExpire: number | null = 24): Observable<ActivateNotification> {
     const payload: ActivateNotification = { userId: userId, baseId: baseId, hoursToExpire: hoursToExpire };
     return this.http.post<ActivateNotification>(`${this.baseUrl}/activate-user`, payload);
   }

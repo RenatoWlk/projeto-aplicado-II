@@ -32,20 +32,22 @@ export class RegisterComponent implements OnInit, OnDestroy{
 
   @ViewChild(MatStepper) stepper!: MatStepper;
 
-  constructor(private fb: FormBuilder, private registerService: RegisterService, private notificationService: NotificationBannerService) {}
+  constructor(
+    private fb: FormBuilder,
+    private registerService: RegisterService,
+    private notificationBannerService: NotificationBannerService,
+  ) {}
 
   selectedOption: string = '';
 
-  // Método para selecionar o tipo de usuário e avançar
   selectUserType(type: string): void {
     this.selectedOption = type;
-    // Aguardar um ciclo de detecção de mudanças antes de avançar
+
     setTimeout(() => {
       this.stepper.next();
     }, 0);
   }
 
-  // Validator customizado para verificar se as senhas coincidem
   private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
     const password = group.get('password')?.value;
     const confirmedPassword = group.get('confirmed_password')?.value;
@@ -133,7 +135,6 @@ export class RegisterComponent implements OnInit, OnDestroy{
     
     if (value.length > 11) value = value.substring(0, 11);
 
-    // Máscara (XX) X XXXX-XXXX
     if (value.length > 10) {
       value = value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
     } else if (value.length > 5) {
@@ -144,7 +145,6 @@ export class RegisterComponent implements OnInit, OnDestroy{
 
     input.value = value;
     
-    // Atualizar o FormControl apropriado baseado no tipo de usuário
     if (this.selectedOption === 'donator') {
       this.personalInfoGroup.get('telephone')?.setValue(value, { emitEvent: false });
     } else if (this.selectedOption === 'bloodbank') {
@@ -160,7 +160,6 @@ export class RegisterComponent implements OnInit, OnDestroy{
     
     if (value.length > 11) value = value.substring(0, 11);
 
-    // Máscara 000.000.000-00
     value = value.replace(/(\d{3})(\d)/, '$1.$2');
     value = value.replace(/(\d{3})(\d)/, '$1.$2');
     value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
@@ -175,14 +174,12 @@ export class RegisterComponent implements OnInit, OnDestroy{
     
     if (value.length > 8) value = value.substring(0, 8);
 
-    // Máscara 00000-000
     if (value.length > 5) {
       value = value.replace(/^(\d{5})(\d{0,3}).*/, '$1-$2');
     }
 
     input.value = value;
     
-    // Atualizar o FormControl apropriado baseado no tipo de usuário
     if (this.selectedOption === 'donator') {
       this.personalInfoGroup.get('zipcode')?.setValue(value, { emitEvent: false });
     } else if (this.selectedOption === 'bloodbank') {
@@ -210,7 +207,6 @@ export class RegisterComponent implements OnInit, OnDestroy{
 
     input.value = value;
 
-    // Atualizar o FormControl apropriado baseado no tipo de usuário
     if (this.selectedOption === 'bloodbank') {
       this.bloodbankInfoFormGroup.get('cnpj')?.setValue(value, { emitEvent: false });
     } else if (this.selectedOption === 'partner') {
@@ -251,10 +247,10 @@ export class RegisterComponent implements OnInit, OnDestroy{
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
+          this.notificationBannerService.show('Cadastro realizado com sucesso', "success", 3000);
         },
         error: (err) => {
-          this.notificationService.show('Erro ao cadastrador doador', "error", 3000);
+          this.notificationBannerService.show('Erro ao cadastrador doador', "error", 3000);
         }
       });
 
@@ -281,10 +277,10 @@ export class RegisterComponent implements OnInit, OnDestroy{
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
+          this.notificationBannerService.show('Cadastro realizado com sucesso', "success", 3000);
         },
         error: (err) => {
-          this.notificationService.show('Erro ao cadastrador banco de sangue', "error", 3000);
+          this.notificationBannerService.show('Erro ao cadastrador banco de sangue', "error", 3000);
         }
       });
 
@@ -311,10 +307,10 @@ export class RegisterComponent implements OnInit, OnDestroy{
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.notificationService.show('Cadastro realizado com sucesso', "success", 3000);
+          this.notificationBannerService.show('Cadastro realizado com sucesso', "success", 3000);
         },
         error: (err) => {
-          this.notificationService.show('Erro ao cadastrador parceiro', "error", 3000);
+          this.notificationBannerService.show('Erro ao cadastrador parceiro', "error", 3000);
         }
       });
     }

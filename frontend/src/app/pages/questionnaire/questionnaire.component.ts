@@ -132,12 +132,10 @@ export class QuestionnaireComponent {
       const value = this.form.get(field)?.value;
       
       if (this.invalidIfYes.includes(field) && value === true) {
-        console.error(`REPROVADO POR SIM: O campo '${field}' é true e está na lista invalidIfYes`);
         this.invalidQuestions.push(field);
       }
       
       else if (this.invalidIfNo.includes(field) && value === false) {
-        console.error(`REPROVADO POR NÃO: O campo '${field}' é false e está na lista invalidIfNo`);
         this.invalidQuestions.push(field);
       }
     });

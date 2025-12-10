@@ -35,7 +35,7 @@ export class ScrtComponent {
 
       if (!alreadyUnlocked) {
         this.achievementsService.unlockScrtAchievement().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-        this.notificationService.activateForUser(userId, "achievement_secret_found", 72).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+        this.notificationService.activateForUser(userId, "achievement_secret_found", null).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
       }
     });
   }
