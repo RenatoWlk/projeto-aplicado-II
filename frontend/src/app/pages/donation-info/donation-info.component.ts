@@ -293,12 +293,16 @@ export class DonationInfoComponent implements OnInit {
     return status === DonationStatus.PENDING;
   }
 
-  /**
-   * Checks if donation can be completed
-   */
-  canComplete(status: DonationStatus): boolean {
-    return status === DonationStatus.PENDING || status === DonationStatus.CONFIRMED;
-  }
+  public isToday = (dateString: string | number | Date) => {
+    const today = new Date();
+    const donationDate = new Date(dateString);
+    return today.toDateString() === donationDate.toDateString();
+  };
+
+  public canComplete = (donation: any) => {
+    const validStatus = donation.status === 'pending' || donation.status === 'confirmed';
+    return validStatus && this.isToday(donation.date);
+  };
 
   sortByHour() {
     this.todayDonations.sort((a, b) => {
