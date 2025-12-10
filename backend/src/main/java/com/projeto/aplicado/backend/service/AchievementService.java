@@ -1,7 +1,6 @@
 package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.constants.AchievementsConditionsTypes;
-import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.exception.AchievementException;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.Donation;

@@ -9,7 +9,6 @@ import com.projeto.aplicado.backend.dto.donation.DailyAvailabilityDTO;
 import com.projeto.aplicado.backend.dto.donation.SlotDTO;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.*;
-import com.projeto.aplicado.backend.model.enums.BloodType;
 import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.BloodBank;
 import com.projeto.aplicado.backend.model.Donation;
@@ -55,16 +54,7 @@ public class BloodBankService {
         bloodBank.setRole(Role.BLOODBANK);
         bloodBank.setCnpj(dto.getCnpj());
         bloodBank.setCampaigns(new ArrayList<>());
-        bloodBank.setTotalDonations(0);
         bloodBank.setScheduledDonations(0);
-
-        // Initialize all blood types with zero blood bags
-        Map<BloodType, Integer> initialBags = new EnumMap<>(BloodType.class);
-        Arrays.stream(BloodType.values()).forEach(type -> initialBags.put(type, 0));
-        bloodBank.setBloodTypeBloodBags(initialBags);
-
-        // Start with an empty donation history
-        bloodBank.setDonationsOverTime(new ArrayList<>());
 
         bloodBank = bloodBankRepository.save(bloodBank);
         return toResponseDTO(bloodBank);
@@ -277,9 +267,6 @@ public class BloodBankService {
      */
     private BloodBankStatsDTO toStatsDTO(BloodBank bloodBank) {
         BloodBankStatsDTO dto = new BloodBankStatsDTO();
-        dto.setTotalDonations(bloodBank.getTotalDonations());
-        dto.setDonationsOverTime(bloodBank.getDonationsOverTime());
-        dto.setBloodTypeBloodBags(bloodBank.getBloodTypeBloodBags());
         dto.setScheduledDonations(bloodBank.getScheduledDonations());
         return dto;
     }

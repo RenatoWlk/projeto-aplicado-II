@@ -131,7 +131,7 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getCampaigns()
     .pipe(takeUntil(this.destroy$))
     .subscribe((posts: Campaign[]) => {
-      this.posts = posts;
+      this.posts = this.sortCampaigns(posts);
       this.loadingPosts = false;
     });
   }
@@ -143,7 +143,7 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getOffers()
     .pipe(takeUntil(this.destroy$))
     .subscribe((offers: Offer[]) => {
-      this.offers = offers;
+      this.offers = this.sortOffers(offers);
       this.loadingOffers = false;
     });
   }
@@ -307,5 +307,21 @@ export class DashboardComponent implements OnInit {
 
   calculateLitersDonated(donations: number): string {
     return (donations * this.LITERS_PER_DONATION).toFixed(2).toString() + " Litros";
+  }
+
+  private sortCampaigns(campaigns: Campaign[]): Campaign[] {
+    return campaigns.sort((a, b) => {
+      const startA = new Date(a.startDate).getTime();
+      const startB = new Date(b.startDate).getTime();
+      return startB - startA; // newest first
+    });
+  }
+
+  private sortOffers(offers: Offer[]): Offer[] {
+    return offers.sort((a, b) => {
+      const dateA = new Date(a.validUntil).getTime();
+      const dateB = new Date(b.validUntil).getTime();
+      return dateA - dateB; // earlier expiration first
+    });
   }
 }
