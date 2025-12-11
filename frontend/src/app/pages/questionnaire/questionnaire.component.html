@@ -147,7 +147,7 @@
     </label>
 
     <label *ngIf="form.get('gender')?.value === 'masculino'">
-      Doou sangue há menos de 2 meses?
+      Doou sangue há menos de 3 meses?
       <select formControlName="lastDonationMale" [ngClass]="{'erro': form.get('lastDonationMale')?.invalid && submitted}">
         <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
@@ -157,7 +157,7 @@
     </label>
 
     <label *ngIf="form.get('gender')?.value === 'feminino'">
-      Doou sangue há menos de 3 meses?
+      Doou sangue há menos de 4 meses?
       <select formControlName="lastDonationFemale" [ngClass]="{'erro': form.get('lastDonationFemale')?.invalid && submitted}">
         <option [ngValue]="" disabled selected hidden>Selecione</option>
         <option [ngValue]="true">Sim</option>
@@ -204,4 +204,16 @@
     <p>Vá até a seção em sua conta para checar seu resultado!</p>
     <button (click)="resetForm()" class="app-button">Responder novamente</button>
   </div>
+
+  <footer class="disclaimer">
+    <i class="fa-solid fa-circle-info"></i>
+    <p>
+      <strong>Importante:</strong> Este questionário é baseado nos critérios de elegibilidade para doação de sangue 
+      estabelecidos pelo <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/d/doacao-de-sangue" target="_blank" rel="noopener noreferrer">Ministério da Saúde</a> 
+      e pelo Sistema Nacional de Sangue, Componentes e Derivados (SINASAN). 
+      Este é apenas um questionário de triagem inicial. A avaliação final de elegibilidade será realizada pelo hemocentro 
+      ou banco de sangue no momento da doação. Para mais informações sobre doação de sangue, acesse o 
+      <a href="https://www.gov.br/saude/pt-br/composicao/saes/sangue" target="_blank" rel="noopener noreferrer">portal oficial do Ministério da Saúde</a>.
+    </p>
+  </footer>
 </div>
