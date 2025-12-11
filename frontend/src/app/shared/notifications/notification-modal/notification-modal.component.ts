@@ -25,7 +25,8 @@ export class NotificationModalComponent implements OnChanges, OnDestroy {
   private typeLabels: Record<string, string> = {
     OFFERS: 'Ofertas',
     CAMPAIGNS: 'Campanhas',
-    ACHIEVEMENT: 'Conquista'
+    ACHIEVEMENT: 'Conquista',
+    DONATION: 'Doação',
   };
 
   private redirectMap: Record<string, string> = {

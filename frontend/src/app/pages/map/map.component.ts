@@ -8,6 +8,8 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { NotificationBannerService } from '../../shared/notification-banner/notification-banner.service';
 
 const MAP_ZOOM = 16;
+const MAP_MIN_ZOOM = 8;
+const MAP_MAX_ZOOM = 17;
 
 /** Blue icon (user marker) */
 const blueIcon = new L.Icon({
@@ -98,6 +100,10 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
       next: (locations) => {
         this.locations = locations;
         this.isLoadingLocations = false;
+
+        if (this.userLocation) {
+          this.sortLocationsByDistance();
+        }
         if (this.locations.length > 0 && this.userLocation) {
           this.tryInitMap();
         }
@@ -119,8 +125,8 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
     this.map = L.map('map', {
       center: [this.userLocation.latitude, this.userLocation.longitude] as L.LatLngExpression,
       zoom: MAP_ZOOM,
-      minZoom: 11,
-      maxZoom: 17,
+      minZoom: MAP_MIN_ZOOM,
+      maxZoom: MAP_MAX_ZOOM,
       zoomControl: true,
     });
 
@@ -195,5 +201,35 @@ export class MapComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.selectedLocation = location;
     this.map.setView([location.latitude, location.longitude] as L.LatLngExpression, 15);
+  }
+
+  /** Calculate distance between two coordinates using Haversine formula */
+  private getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Earth radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // returns km
+  }
+
+  /** Sort locations by distance to the current user */
+  private sortLocationsByDistance(): void {
+    if (!this.userLocation) return;
+
+    const { latitude, longitude } = this.userLocation;
+
+    this.locations.sort((a, b) => {
+      const distA = this.getDistance(latitude, longitude, a.latitude, a.longitude);
+      const distB = this.getDistance(latitude, longitude, b.latitude, b.longitude);
+      return distA - distB;
+    });
   }
 }

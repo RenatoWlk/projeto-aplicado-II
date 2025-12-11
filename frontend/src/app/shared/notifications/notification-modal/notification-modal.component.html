@@ -57,7 +57,7 @@
           </div>
         </div>
 
-        <p class="empty" *ngIf="filtered.length === 0">Sem novas notificações.</p>
+        <p class="empty" *ngIf="filtered.length === 0">Nenhuma notificação.</p>
       </div>
 
       <!-- Preview -->
@@ -65,15 +65,17 @@
         <h3 class="preview-title">{{ selected.title }}</h3>
         <p class="preview-body">{{ selected.body }}</p>
 
-        <div class="preview-info">
-          <p>Tipo: {{ getTypeLabel(selected.type) }}</p>
-          <p>Criado: {{ selected.createdAt | date:'short' }}</p>
-          <p *ngIf="selected.expireAt">Expira: {{ selected.expireAt | date:'short' }}</p>
-        </div>
+        <div class="preview-footer">
+          <div class="preview-info">
+            <p>Tipo: {{ getTypeLabel(selected.type) }}</p>
+            <p>Criado: {{ selected.createdAt | date:'short' }}</p>
+            <p *ngIf="selected.expireAt">Expira: {{ selected.expireAt | date:'short' }}</p>
+          </div>
 
-        <button class="app-button redirect-button" (click)="redirectSelected()" *ngIf="selected.redirectTo">
-          Ir para página
-        </button>
+          <button class="app-button redirect-button" (click)="redirectSelected()" *ngIf="selected.redirectTo">
+            Ir para página
+          </button>
+        </div>
       </div>
 
     </div>

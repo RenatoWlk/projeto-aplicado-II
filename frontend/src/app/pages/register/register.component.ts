@@ -132,26 +132,32 @@ export class RegisterComponent implements OnInit, OnDestroy{
   formatPhone(event: any): void {
     let input = event.target;
     let value = input.value.replace(/\D/g, '');
-    
+
     if (value.length > 11) value = value.substring(0, 11);
 
-    if (value.length > 10) {
-      value = value.replace(/^(\d\d)(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
-    } else if (value.length > 5) {
-      value = value.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    // Example: (19) 9 9999-9999
+    if (value.length === 11) {
+      value = value.replace(/^(\d{2})(\d)(\d{4})(\d{4}).*/, '($1) $2 $3-$4');
+
+    // Example: (19) 9999-9999
+    } else if (value.length === 10) {
+      value = value.replace(/^(\d{2})(\d{4})(\d{4}).*/, '($1) $2-$3');
+
+    } else if (value.length > 6) {
+      value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
     } else if (value.length > 2) {
-      value = value.replace(/^(\d\d)(\d{0,5}).*/, '($1) $2');
+      value = value.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
     }
 
     input.value = value;
-    
-    if (this.selectedOption === 'donator') {
-      this.personalInfoGroup.get('telephone')?.setValue(value, { emitEvent: false });
-    } else if (this.selectedOption === 'bloodbank') {
-      this.bloodbankInfoFormGroup.get('telephone')?.setValue(value, { emitEvent: false });
-    } else if (this.selectedOption === 'partner') {
-      this.partnerInfoFormGroup.get('telephone')?.setValue(value, { emitEvent: false });
-    }
+
+    const control = this.selectedOption === 'donator'
+        ? this.personalInfoGroup.get('telephone')
+        : this.selectedOption === 'bloodbank'
+        ? this.bloodbankInfoFormGroup.get('telephone')
+        : this.partnerInfoFormGroup.get('telephone');
+
+    control?.setValue(value, { emitEvent: false });
   }
 
   formatCPF(event: any): void {

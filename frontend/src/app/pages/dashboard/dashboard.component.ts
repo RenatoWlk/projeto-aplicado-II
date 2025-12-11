@@ -155,7 +155,7 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getNearbyBloodbanks(this.userId)
     .pipe(takeUntil(this.destroy$))
     .subscribe((banks: Bloodbank[]) => {
-      this.nearbyBloodbanks = banks;
+      this.nearbyBloodbanks = this.sortBloodbanks(banks);
       this.loadingBloodbanks = false;
     });
   }
@@ -323,5 +323,9 @@ export class DashboardComponent implements OnInit {
       const dateB = new Date(b.validUntil).getTime();
       return dateA - dateB; // earlier expiration first
     });
+  }
+
+  private sortBloodbanks(banks: Bloodbank[]): Bloodbank[] {
+    return banks.sort((a, b) => a.distance - b.distance);
   }
 }

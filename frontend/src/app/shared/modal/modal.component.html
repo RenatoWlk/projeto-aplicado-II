@@ -1,7 +1,7 @@
 <div class="modal-overlay" *ngIf="visible">
   <div class="modal-structure">
     <h2>{{ title }}</h2>
-    <div class="modal-content">
+    <div [ngClass]="modalOverflow === 'auto' ? 'modal-content-overflow' : 'modal-content'">
       <ng-content></ng-content>
     </div>
     <div class="modal-footer">

@@ -3,8 +3,10 @@ package com.projeto.aplicado.backend.service;
 import com.projeto.aplicado.backend.dto.notification.ActivateAllRequestDTO;
 import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.dto.notification.NotificationDTO;
+import com.projeto.aplicado.backend.exception.UserNotFoundException;
 import com.projeto.aplicado.backend.model.NotificationBase;
 import com.projeto.aplicado.backend.model.UserNotification;
+import com.projeto.aplicado.backend.model.enums.Role;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.repository.NotificationRepository;
 import com.projeto.aplicado.backend.repository.UserRepository;
@@ -51,7 +53,7 @@ public class NotificationService {
 
         for (User user : users) {
             boolean alreadyActive = user.getActiveNotifications().stream().anyMatch(n ->
-                            n.getNotificationBaseId().equals(dto.getBaseId()) && n.getExpireAt().isAfter(now));
+                            n.getNotificationBaseId().equals(dto.getBaseId()) && n.getExpireAt() != null && n.getExpireAt().isAfter(now));
             if (!alreadyActive) {
                 UserNotification notification = new UserNotification(dto.getBaseId(), false, now, expireAt);
                 user.getActiveNotifications().add(notification);
@@ -69,11 +71,18 @@ public class NotificationService {
 
     // Fetch notifications
     public List<NotificationDTO> getAllNotificationsForUser(String userId) {
-        User user = userRepository.findUserById(userId).orElseThrow();
+        User user = userRepository.findUserById(userId).orElseThrow(() -> new UserNotFoundException(Role.USER, "User not found with ID provided when getting all notifications for user"));
 
         // Filter expired
         user.getActiveNotifications().removeIf(n -> n.getExpireAt() != null && n.getExpireAt().isBefore(Instant.now()));
         userRepository.save(user);
+
+        System.out.println("Active notifications ids: " +
+                user.getActiveNotifications().stream()
+                        .map(UserNotification::getNotificationBaseId)
+                        .toList()
+        );
+
 
         return user.getActiveNotifications().stream()
                 .map(this::mapToDto)
@@ -100,7 +109,7 @@ public class NotificationService {
 
     // Mapper
     private NotificationDTO mapToDto(UserNotification n) {
-        NotificationBase base = baseRepository.findById(n.getNotificationBaseId()).orElseThrow();
+        NotificationBase base = baseRepository.findById(n.getNotificationBaseId()).orElseThrow(() -> new RuntimeException("Base notification not found with id: " + n.getNotificationBaseId()));
 
         NotificationDTO dto = new NotificationDTO();
         dto.setNotificationBaseId(base.getId());

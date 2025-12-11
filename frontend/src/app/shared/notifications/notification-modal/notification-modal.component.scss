@@ -76,6 +76,7 @@
 /* List */
 .list {
   width: 45%;
+  height: 40vh;
   border-right: 1px solid rgba(0, 0, 0, 0.05);
   overflow-y: auto;
   padding-right: 1rem;
@@ -191,6 +192,136 @@
     &:disabled {
       opacity: 0.4;
       cursor: not-allowed;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .notifications-root {
+    padding: 0.3rem;
+  }
+
+  /* Tabs + Mark All on one row */
+  .tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.9rem;
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+    }
+
+    .mark-all {
+      flex: 0 0 auto;
+      padding: 0.45rem 0.7rem;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .spacer {
+      display: none;
+    }
+  }
+
+  /* Search + type selector on same row */
+  .filters {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    input {
+      flex: 1;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.9rem;
+    }
+
+    select {
+      flex: 0 0 140px;
+      padding: 0.55rem 0.6rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Content vertical stack */
+  .content {
+    flex-direction: column;
+    height: auto;
+    gap: 1rem;
+  }
+
+  /* List slightly larger and better spaced */
+  .list {
+    width: 100%;
+    height: 20vh;
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    margin-bottom: 0.8rem;
+
+    .item {
+      padding: 0.7rem 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .item-header h4 {
+      font-size: 0.9rem;
+      margin: 3px 0;
+    }
+
+    .time {
+      font-size: 0.75rem;
+    }
+
+    .meta-row .type,
+    .meta-row .expired {
+      font-size: 0.7rem;
+    }
+  }
+
+  /* Preview more compact */
+  .preview {
+    padding: 0.2rem 0;
+    max-height: 40vh;
+    overflow-y: auto;
+
+    .preview-title {
+      font-size: 1rem;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .preview-body {
+      font-size: 0.85rem;
+      margin-bottom: 0.7rem;
+      opacity: 0.85;
+    }
+
+    .preview-info {
+      font-size: 0.8rem;
+      opacity: 0.7;
+
+      p {
+        margin: 2px 0;
+      }
+    }
+  }
+
+  .preview-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    .redirect-button {
+      width: 100%;
+      padding: 0.55rem;
+      font-size: 0.85rem;
     }
   }
 }

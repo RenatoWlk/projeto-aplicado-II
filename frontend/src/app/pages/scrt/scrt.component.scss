@@ -122,6 +122,27 @@
     }
 }
 
+p.thx {
+  font-family: 'Comic Sans MS', cursive;
+  font-size: 4rem;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #ff6ad5, #6a5af9, #00d9ff);
+  background-size: 250% 250%;
+  color: #fff;
+  border-radius: 14px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 16px rgba(255, 106, 213, 0.6);
+  transform: skew(-1deg);
+  animation: smoothShift 3s infinite alternate;
+}
+
+/* Smooth psychedelic color shift */
+@keyframes smoothShift {
+  0%   { background-position: 0% 50%;   transform: skew(-1deg) rotate(-1deg); }
+  50%  { background-position: 100% 50%; transform: skew(1deg) rotate(1deg); }
+  100% { background-position: 0% 50%;   transform: skew(-1deg) rotate(-1deg); }
+}
+
 // Responsividade
 @media (max-width: 768px) {
     .member-header {

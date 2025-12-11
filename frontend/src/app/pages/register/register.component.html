@@ -115,7 +115,7 @@
               <mat-select formControlName="gender" required>
                 <mat-option value="Masculino">Masculino</mat-option>
                 <mat-option value="Feminino">Feminino</mat-option>
-                <mat-option value="Other">Não informar</mat-option>
+                <mat-option value="Other">Outro</mat-option>
               </mat-select>
               <mat-error *ngIf="personalInfoGroup.get('gender')?.hasError('required')">
                 Gênero é obrigatório
@@ -254,7 +254,7 @@
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Telefone</mat-label>
-              <input matInput formControlName="telephone" required (input)="formatPhone($event)" maxlength="15" />
+              <input matInput formControlName="telephone" required (input)="formatPhone($event)" maxlength="16" />
               <mat-error *ngIf="bloodbankInfoFormGroup.get('telephone')?.hasError('required')">
                 Telefone é obrigatório
               </mat-error>
@@ -334,7 +334,7 @@
 
             <mat-form-field appearance="outline" class="custom-form-field">
               <mat-label class="input-label">Telefone</mat-label>
-              <input matInput formControlName="telephone" required (input)="formatPhone($event)" maxlength="15" />
+              <input matInput formControlName="telephone" required (input)="formatPhone($event)" maxlength="16" />
               <mat-error *ngIf="partnerInfoFormGroup.get('telephone')?.hasError('required')">
                 Telefone é obrigatório
               </mat-error>

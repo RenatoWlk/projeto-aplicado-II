@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 export class ModalComponent {
   @Input() title: string = 'Modal';
   @Input() visible: boolean = false;
+  @Input() modalOverflow: 'none' | 'auto' = 'auto';
   @Output() close = new EventEmitter<void>();
 
   onClose() {
