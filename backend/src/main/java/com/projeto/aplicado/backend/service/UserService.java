@@ -153,6 +153,7 @@ public class UserService {
         if (dto.getEmail() != null) user.setEmail(dto.getEmail());
         if (dto.getPhone() != null) user.setPhone(dto.getPhone());
         if (dto.getGender() != null) user.setGender(dto.getGender());
+        if (dto.getCpf() != null) user.setCpf(dto.getCpf());
 
         if (dto.getAddress() != null) {
             if (user.getAddress() == null) user.setAddress(new Address());
