@@ -532,7 +532,6 @@ canDonateNow(): boolean {
           this.loadingStatsAndAchievements = false;
         },
         error: (err) => {
-          console.error("Erro ao carregar stats", err);
           this.loadingStatsAndAchievements = false;
           this.hasAchievements = false;
         },
@@ -561,10 +560,6 @@ canDonateNow(): boolean {
       .subscribe({
         next: (questionnaire) => {
           this.lastQuestionnaire = questionnaire[0] || null;
-          console.log(
-            "DEBUG: loaded lastQuestionnaire:",
-            this.lastQuestionnaire,
-          );
           this.isLoading = false;
         },
         error: () => {

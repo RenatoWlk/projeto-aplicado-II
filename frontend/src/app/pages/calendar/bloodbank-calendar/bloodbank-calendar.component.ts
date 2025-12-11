@@ -295,7 +295,6 @@ export class BloodbankCalendarComponent {
                 }
                 return dateObj;
               } catch (error) {
-                console.error(`Erro ao buscar slots para ${dateObj.date}:`, error);
                 return dateObj;
               }
             })

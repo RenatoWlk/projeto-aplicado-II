@@ -107,8 +107,7 @@ export class RewardsComponent implements OnInit {
         this.loadRewards();
         this.closeModal();
       },
-      error: (err) => {
-        console.error('Redeem failed', err);
+      error: () => {
         this.closeModal();
       }
     });

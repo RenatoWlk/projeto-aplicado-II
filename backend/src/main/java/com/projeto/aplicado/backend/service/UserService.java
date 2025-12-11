@@ -1,12 +1,14 @@
 package com.projeto.aplicado.backend.service;
 
 import com.projeto.aplicado.backend.dto.ChangePasswordDTO;
+import com.projeto.aplicado.backend.dto.donation.DonationDTO;
 import com.projeto.aplicado.backend.dto.notification.ActivateRequestDTO;
 import com.projeto.aplicado.backend.dto.user.UserLocationDTO;
 import com.projeto.aplicado.backend.dto.user.UserStatsDTO;
 import com.projeto.aplicado.backend.dto.user.UserRequestDTO;
 import com.projeto.aplicado.backend.dto.user.UserResponseDTO;
 import com.projeto.aplicado.backend.exception.UserNotFoundException;
+import com.projeto.aplicado.backend.model.Donation;
 import com.projeto.aplicado.backend.model.users.User;
 import com.projeto.aplicado.backend.model.Address;
 import com.projeto.aplicado.backend.model.enums.Role;
@@ -18,7 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -30,6 +35,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final GeolocationService geolocationService;
     private final NotificationService notificationService;
+    private final DonationService donationService;
 
     /**
      * Creates a new user in the system.
@@ -164,6 +170,17 @@ public class UserService {
 
     private UserStatsDTO toStatsDTO(User user) {
         UserStatsDTO dto = new UserStatsDTO();
+
+        List<DonationDTO> completedDonations = donationService.getUserDonations(user.getId(), false).stream().filter(donation -> donation.getStatus() == Donation.DonationStatus.COMPLETED).toList();
+        user.setTimesDonated(completedDonations.size());
+        Optional<LocalDate> lastDonationDate = completedDonations.stream()
+                .map(DonationDTO::getCreatedAt)
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder())
+                .map(LocalDateTime::toLocalDate);
+        user.setLastDonationDate(lastDonationDate.orElse(null));
+        userRepository.save(user);
+
         dto.setTimesDonated(user.getTimesDonated());
         dto.setLastDonationDate(user.getLastDonationDate());
         dto.setAchievements(achievementService.getAchievementsFromUser(user));

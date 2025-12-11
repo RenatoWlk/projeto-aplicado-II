@@ -24,7 +24,6 @@
       background: #f5f5f5;
       box-shadow: 0 8px 24px rgba(183, 28, 28, 0.15);
       transition: transform 0.3s ease;
-      margin-top: 30%;
 
       &:hover {
         transform: scale(1.05);
@@ -1068,15 +1067,30 @@ form {
     }
   }
 
-  .donation-status .donation-info {
-    .donation-item {
-      flex-direction: column;
-      text-align: center;
-    }
+  .donation-list {
+    width: fit-content;
+  }
+
+  .donation-list li {
+    gap: 1rem !important;
+  }
+
+  .name {
+    width: 30vw;
+  }
+
+  .donation-status {
+    overflow-y: auto;
   }
 
   .account-actions {
+    display: flex;
+    flex-direction: row;
     grid-template-columns: 1fr;
+  }
+
+  .account-action-btn {
+    flex: 1;
   }
 
   form {
@@ -1086,6 +1100,14 @@ form {
 
   .badges-list {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .status {
+    height: 1.5rem;
+  }
+
+  .journey-card {
+    flex-direction: row;
   }
 }
 
@@ -1158,15 +1180,19 @@ form {
 }
 
 .donation-list li {
-  justify-content: space-around;
+  justify-content: space-between;
   display: flex;
   flex-direction: row;
-  gap: 6px;
+  gap: 20px;
   background: #ffffff;
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 10px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.name {
+  width: 50vw;
 }
 
 .donation-list li span {

@@ -23,10 +23,11 @@ export class NotificationModalComponent implements OnChanges, OnDestroy {
   @Output() close = new EventEmitter<void>();
 
   private typeLabels: Record<string, string> = {
-    OFFERS: 'Ofertas',
-    CAMPAIGNS: 'Campanhas',
+    OFFERS: 'Oferta',
+    CAMPAIGNS: 'Campanha',
     ACHIEVEMENT: 'Conquista',
     DONATION: 'Doação',
+    REWARDS: 'Recompensa',
   };
 
   private redirectMap: Record<string, string> = {
@@ -224,6 +225,11 @@ export class NotificationModalComponent implements OnChanges, OnDestroy {
   getTypeLabel(type?: string): string {
     if (!type) return 'N/A';
     return this.typeLabels[type] || type;
+  }
+
+  getTypeClass(type?: string): string {
+    if (!type) return '';
+    return 'type-' + type.toLowerCase();
   }
 
   trackById(_i: number, item: NotificationDto) {

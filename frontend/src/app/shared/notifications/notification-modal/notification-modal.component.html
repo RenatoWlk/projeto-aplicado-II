@@ -52,7 +52,7 @@
           </div>
 
           <div class="meta-row">
-            <span class="type" *ngIf="n.type">{{ getTypeLabel(n.type) }}</span>
+            <span class="type" [ngClass]="getTypeClass(n.type)" *ngIf="n.type">{{ getTypeLabel(n.type) }}</span>
             <span class="expired" *ngIf="isExpired(n)">Expirado</span>
           </div>
         </div>

@@ -137,7 +137,6 @@ export class DonatorCalendarComponent implements OnInit, OnDestroy {
                 this.cdr.markForCheck();
               },
               error: (error) => {
-                console.error('Erro ao cancelar:', error);
                 this.notificationService.show(
                   'Erro ao cancelar agendamento. Tente novamente ou contate suporte4vidas@gmail.com', 
                   'error', 
@@ -396,7 +395,6 @@ export class DonatorCalendarComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          console.error('Erro ao buscar slots:', err);
           this.availableDonationHours = [];
           this.notificationService.show('Erro ao carregar horários disponíveis', 'error', 3000);
           this.cdr.markForCheck();

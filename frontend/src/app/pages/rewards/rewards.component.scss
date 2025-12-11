@@ -97,25 +97,36 @@ textarea {
   background: #f3f3f3;
 }
 
+.reward-meta .card-title {
+  font-size: 1.1rem;
+}
+
 .reward-meta .card-subtitle {
   margin: 6px 0 0 0;
   color: #666;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .reward-actions {
   margin-left: auto;
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: 4px;
+  margin-block-start: auto;
 }
 
 /* ---------------- Reward action button styles ---------------- */
 
 /* Base button reset for reward state logic */
 .reward-actions .app-button {
-  width: 150px;
+  width: 200px;
   text-align: center;
   font-weight: 600;
   transition: all 0.2s ease;
@@ -163,11 +174,16 @@ textarea {
 }
 
 .required-points {
+  margin: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.3rem;
   font-weight: 700;
   color: #333;
 }
 
 .stock {
+  margin: 0;
+  margin-bottom: 0.2rem;
   font-size: 0.85rem;
   color: #666;
 }
@@ -283,8 +299,12 @@ textarea {
     font-size: 1rem;
   }
 
+  .reward-meta .card-title {
+    font-size: 1rem;
+  }
+
   .reward-meta .card-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .reward-actions {
