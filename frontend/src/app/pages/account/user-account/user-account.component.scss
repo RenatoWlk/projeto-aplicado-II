@@ -182,23 +182,28 @@
       margin-bottom: 0.5rem;
     }
 
-    .cta-button {
-      padding: 1rem 2rem;
-      background: #b71c1c;
+    .back-button {
+      margin-top: 2rem;
+      margin-right: 1rem; 
+      align-self: flex-start;
+      width: 14srem;
+      height: 3.2rem;
+      font-size: large;
+      padding: 0.5rem 1rem;
+      background-color: #c62828;
       color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
+      border: 2px solid transparent;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 1rem;
-      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      font-family: "Poppins", sans-serif;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+    }
 
-      &:hover {
-        background: linear-gradient(135deg, #43a047 0%, #5cb85c 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
-      }
+    .back-button:hover {
+      background-color: white;
+      color: #c62828;
+      border: 2px solid #c62828;
     }
   }
 }

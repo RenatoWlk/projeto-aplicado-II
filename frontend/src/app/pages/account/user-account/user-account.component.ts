@@ -454,39 +454,33 @@ export class UserAccountComponent implements OnInit {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
-  // Verifica se está apto pelo tempo
-  canDonateNow(): boolean {
-    console.log("=== DEBUG canDonateNow() ===");
-    console.log("user:", this.user);
-    console.log("user.lastDonation:", this.user?.lastDonation);
-    console.log("user.nextEligibleDonation:", this.user?.nextEligibleDonation);
-    console.log("lastQuestionnaire:", this.lastQuestionnaire);
-    console.log(
-      "lastQuestionnaire?.eligible:",
-      this.lastQuestionnaire?.eligible,
-    );
+ // Verifica se está apto APENAS pelo tempo desde a última doação
+isEligibleByTime(): boolean {
+  const neverDonated = !this.user?.lastDonation;
+  const timeEligible = neverDonated || this.calculateDaysUntilNextDonation() <= 0;
+  return timeEligible;
+}
 
-    // Se nunca doou, pode doar pelo tempo
-    const neverDonated = !this.user?.lastDonation;
-    console.log("neverDonated:", neverDonated);
-
-    // Se já doou, verifica se já passou o tempo
-    const timeEligible =
-      neverDonated || this.calculateDaysUntilNextDonation() <= 0;
-    console.log("timeEligible:", timeEligible);
-
-    // Se existe questionário, precisa estar apto
-    if (this.lastQuestionnaire) {
-      const result = timeEligible && !!this.lastQuestionnaire.eligible;
-      console.log("RESULT (com questionário):", result);
-      return result;
-    }
-
-    // Se não tem questionário, só considera o tempo
-    console.log("RESULT (sem questionário):", timeEligible);
-    return timeEligible;
+// Verifica se pode doar agora (tempo + questionário)
+canDonateNow(): boolean {
+  
+  // verifica se já passou o tempo necessário
+  if (!this.isEligibleByTime()) {
+    return false;
   }
 
+  // SE NÃO TEM QUESTIONÁRIO, NÃO PODE DOAR
+  if (!this.lastQuestionnaire) {
+    return false;
+  }
+
+  // SE O QUESTIONÁRIO DIZ QUE NÃO ESTÁ APTO, NÃO PODE DOAR
+  if (!this.lastQuestionnaire.eligible) {
+    return false;
+  }
+
+  return true;
+}
   // Verifica se o usuário já doou alguma vez
   hasEverDonated(): boolean {
     return !!this.user?.lastDonation;
@@ -857,6 +851,10 @@ export class UserAccountComponent implements OnInit {
 
   onFindBloodBank(): void {
     this.router.navigate(["/" + this.appRoutesPaths.MAP]);
+  }
+
+  onSchedulePreDonation(): void {
+  this.router.navigate(["/" + this.appRoutesPaths.CALENDAR]);
   }
 
   downloadQuestionnairePDF(): void {

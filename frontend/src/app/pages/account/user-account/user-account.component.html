@@ -105,7 +105,7 @@
               </ng-container>
               
               <ng-template #cantDonateYet>
-                <ng-container *ngIf="hasEverDonated(); else neverDonatedYet">
+                <ng-container *ngIf="hasEverDonated() && !isEligibleByTime(); else neverDonatedYet">
                   <span>{{ user?.nextEligibleDonation | date:'dd/MM/yyyy' }}</span>
                   <small class="status-waiting">
                     (em {{ calculateDaysUntilNextDonation() }} dias)
@@ -113,8 +113,15 @@
                 </ng-container>
                 
                 <ng-template #neverDonatedYet>
-                  <span class="status-waiting">Aguardando elegibilidade</span>
-                  <small>Complete o questionário de elegibilidade.</small>
+                    <ng-container *ngIf="lastQuestionnaire && !lastQuestionnaire.eligible; else noQuestionnaireYet">
+                      <span class="status-waiting">Não elegível no momento</span>
+                      <small>Preencha novamente o questionário quando sua situação mudar.</small>
+                    </ng-container>
+                    
+                    <ng-template #noQuestionnaireYet>
+                      <span class="status-waiting">Aguardando elegibilidade</span>
+                      <small>Complete o questionário de elegibilidade.</small>
+                    </ng-template>
                 </ng-template>
               </ng-template>
             </ng-template>
@@ -138,6 +145,10 @@
           <button type="button" class="secondary back-button" (click)="onFindBloodBank()">
             <i class="fa-solid fa-map-marker-alt"></i>
             Encontrar Banco de Sangue
+          </button>
+          <button type="button" class="secondary back-button" (click)="onSchedulePreDonation()">
+            <i class="fa-solid fa-calendar-days"></i>
+            Pré-agendar Doação
           </button>
         </ng-container>
 
