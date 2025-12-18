@@ -1,16 +1,18 @@
-<a href="https://quatrovidas-frontend-331626707561.southamerica-east1.run.app"><img src="https://github.com/RenatoWlk/projeto-aplicado/blob/master/frontend/public/assets/logo.png" alt="Logo" width="152px" height="69px" style="align-items: end;"/></a>
-
 # Applied Project II
 
-Repository for the Applied Project II. Continuation of the [4 vidas (four lives) application](https://github.com/RenatoWlk/projeto-aplicado).
+<a href="https://quatrovidas-331626707561.southamerica-east1.run.app/"><img src="https://github.com/RenatoWlk/projeto-aplicado/blob/master/frontend/public/assets/logo.png" alt="Logo" width="152px" height="69px" style="align-items: end;"/></a>
+
+Repository for the Applied Project II, a continuation of the [4 Vidas (Four Lives)](https://github.com/RenatoWlk/projeto-aplicado).
 
 ## Description
 
-**Quatro Vidas**  is a web platform focused on promoting blood donation, connecting donors, blood banks, and partners. The system allows the registration of different user profiles, enables the monitoring of donation history, tracks blood stock levels at banks, and facilitates scheduling blood collections through a personal calendar, among other features.
+**Quatro Vidas** is a web platform designed to promote blood donation by connecting donors, blood banks, and partners in a single ecosystem.
 
-Key features include an interactive dashboard, an achievement-based rewards system, a map to locate nearby blood banks, and a donor eligibility questionnaire. Built with usability and accessibility in mind, the architecture uses Angular for the frontend, Java with Spring Boot for the backend, and MongoDB as the database.
+The platform enables donors to schedule blood donations through a personal calendar, track their donation history, complete eligibility questionnaires, earn rewards, and locate nearby blood banks using an interactive map. Blood banks can manage campaigns, donation schedules, and appointment statuses while accessing detailed donation statistics. Partners can create and manage offers and rewards linked to donor participation.
 
-## Dependencies
+The system was developed with usability, accessibility, and scalability in mind, using **Angular** for the frontend, **Spring Boot** for the backend, **MongoDB** for data storage, and **Docker** for containerized deployment on **Google Cloud Platform (GCP)**.
+
+## Requirements
 
 * [Node.js](https://nodejs.org/en/download)
 * Angular 19+ `npm install -g @angular/cli@latest`
@@ -19,9 +21,12 @@ Key features include an interactive dashboard, an achievement-based rewards syst
 
 ## How to Use
 
-**Access the website [4 Vidas](https://quatrovidas-frontend-331626707561.southamerica-east1.run.app)** or download it locally:
+### Online Access
+- Access the website [4 Vidas](https://quatrovidas-331626707561.southamerica-east1.run.app/)
 
-**Step 1:**
+### Local Setup
+
+- **Step 1:**
 
 Download or clone this repository using the link:
 
@@ -29,7 +34,7 @@ Download or clone this repository using the link:
 https://github.com/RenatoWlk/projeto-aplicado-II
 ```
 
-**Step 2:**
+- **Step 2:**
 
 Open a command prompt, navigate to the `projeto-aplicado-II/backend` folder, and run the following commands:
 
@@ -38,13 +43,12 @@ gradlew build
 gradlew bootRun
 ```
 
-**Step 3:**
+- **Step 3:**
 
 Open another command prompt, navigate to the `projeto-aplicado-II/frontend` folder, and run the following commands:
 
 ```
 yarn install
-yarn run build
 yarn run start
 ```
 
@@ -52,104 +56,117 @@ If you're not using Yarn, use:
 
 ```
 npm install
-ng build
 ng serve --proxy-config proxy.conf.json
 ```
 
 ## Features
 
-🔐 **Authentication and Registration**
+The platform provides a complete ecosystem connecting donors, blood banks, and partners to streamline blood donation management.
 
-* Donor registration and login
-* Blood bank registration and login
-* Partner registration and login
+### 🩸 **Donor Features**
 
-🩸 **Donor Features**
-
-* Dashboard with:
+* Dashboard providing:
   - Blood bank campaigns
   - Partner offers
-  - Nearby blood banks and distance
-  - Stats and achievements
+  - Nearby blood banks and distance calculation
+  - Statistics and achievements
   - Leaderboards (top 50 most donations and most points)
+* Personal calendar providing:
+  - Schedule blood donations with blood bank, date, and available time
+  - View appointment details such as blood bank contact info and scheduling status
+  - Rest period control displaying the next eligible donation date
+* Interactive map showing all nearby blood bank locations
 * Donation eligibility questionnaire
-* Track remaining time until the next allowed donation
-* Personal calendar for scheduling donations
-* View personal donation appointments
-* Map showing nearby blood banks
-* Profile screen with user data, achievements, management and last questionnaire
-* Reward system based on achievements and participation
-* Personal donation history
-* Donation statistics
+* Rewards system based on achievements and participation
+* Personal notifications system
+* Profile screen including:
+  - User data management
+  - Achievements
+  - Last questionnaire answered with download button
+  - Personal donation history
 
-🏥 **Blood Bank Features**
+### 🏥 **Blood Bank Features**
 
-* Publish blood donation campaigns
-* Publish specific blood needs
-* Dashboard with:
-  - Blood donation over time line chart (last 8 months)
-  - Blood types distribution doughnut chart (with total blood bags and total liters by blood type)
-  - Total donations since account creation
-  - Total scheduled donations by users
-  - Average donations per month
-* publish available dates and times for donations
-* Profile screen with blood bank data
+* Dashboard providing:
+  - Creation and management of campaigns
+  - Donation statistics:
+    - Completed donations over time line chart (last 8 months)
+    - Completed donations by blood type distribution (doughnut chart)
+    - Total scheduled donations by users
+    - Total donations since account creation
+    - Average donations per month
+* Calendar providing:
+  - Publish available dates, times, and slots per time period
+  - View published dates, times, slots and slot availability
+  - Manage published dates
+* Donation management:
+  - Check dates with scheduled donations by users
+  - View and change the status of appointments
+  - View stats by status (pending, confirmed, completed, cancelled)
+  - View general stats
+* Profile screen for blood bank data management
 
-🤝 **Partner Features**
+### 🤝 **Partner Features**
 
-* Publish promotional offers for donors
-* Share available rewards
+* Dashboard providing:
+  - Creation and management of offers
+  - Creation and management of rewards
+* Profile screen including:
+  - Partner data management
+  - Offers stats
+  - Rewards stats
 
-🌐 **Interface and Access**
+### 🌐 **Interface and Access**
 
+* PWA (Progressive Web App) integration to deliver a user experience similar to a native mobile app
 * Responsive and user-friendly UI
-* Fully online system (requires internet connection)
-* REST API communication between frontend and backend
-* Charts integration for donations and blood levels management
-* Map integration showing blood bank locations
+* Online and offline access
+* Charts integration for donation management
+* Geolocation integration via Nominatim API
+* Leaflet map integration showing blood bank locations
 
-🛡️ **Other Technical Features**
+### 🛡️ **Other Technical Features**
 
-* Secure data storage using MongoDB
-* Password encryption and decryption
 * Scalable and high-performance architecture
 * Asynchronous communication between Angular frontend and Spring Boot backend
 * JSON-based data exchange
+* Secure data storage using MongoDB
+* Docker-based containerization for deployment on Google Cloud Platform (GCP)
+* Secure password encryption
 
-### Folder Structure and definition
+## Folder Structure and Definitions
 
-Main folder structure and definitions:
+Main project folder structure and responsibilities:
 
 ```
 projeto-aplicado-II/
 ├── backend/
 │   └── src/main/java/com/projeto/aplicado/
-│       ├── constants/                        # Centralized constants used across the backend
-│       ├── controller/                       # REST controllers that handle API requests and responses
-│       ├── dto/                              # Data Transfer Objects for request/response formatting
-│       ├── model/                            # Domain models, including MongoDB documents and other core entities
-│       ├── repository/                       # Interfaces extending MongoRepository for MongoDB operations
-│       ├── security/                         # JWT-based authentication and authorization setup
-│       ├── service/                          # Business logic layer and service abstractions
-│       └── BackendApplication.java           # Main Spring Boot application entry point
+│       ├── constants/                       # Centralized constants used across the backend
+│       ├── controller/                      # REST controllers that handle API requests and responses
+│       ├── dto/                             # Data Transfer Objects for request/response formatting
+│       ├── exception/                       # Custom exceptions and global exception handling
+│       ├── model/                           # Domain models, including MongoDB documents and core entities
+│       ├── repository/                      # Interfaces extending MongoRepository for database operations
+│       ├── security/                        # JWT-based authentication and authorization setup
+│       └── service/                         # Business logic layer and service abstractions
 └── frontend/
-    ├── public/                               # Main application assets (icons, logos, map-markers, etc.)
-    └── src/
-        ├── app/
-        │   ├── core/services/                # Centralized services for authentication, route protection and token management
-        │   ├── layout/                       # Layout-related components (main-layout, header, subheader and footer)
-        │   ├── pages/                        # Main pages components (dashboard, calendar, map, account, questionnaire, register, login, forgot-password)
-        │   ├── shared/                       # Reusable components and constants (modal, form, preloader, notification, constants and enums)
-        │   └── app.routes.ts                 # Main route definitions for the application
-        ├── index.html                        # Main HTML file loaded in the browser
-        ├── main.ts                           # Entry point for bootstrapping the Angular application
-        └── styles.scss                       # Global styles applied across the entire app
+    ├── public/                              # Main application assets (icons, logos, map markers, etc.)
+    └── src/app/
+        ├── core/services/                   # Centralized services for authentication, route protection, and token management
+        ├── layout/                          # Layout-related components (main layout, header, subheader, and footer)
+        ├── pages/                           # Main pages components (dashboard, calendar, map, etc.)
+        └── shared/                          # Reusable components and constants (constants, modals, preloaders, notifications, etc.)
 ```
 
 ## Credits
 
 * [Renato Wilker de Paula Silva](https://github.com/RenatoWlk)
-* [Pedro Barboza Valente](https://github.com/PedroBarboz4)
 * [Vinicius Ferreira Paiola](https://github.com/vifp)
+* [Pedro Barboza Valente](https://github.com/PedroBarboz4)
 * [Gabriel Trindade](https://github.com/trindadegabriel)
 * [Enzo Fischer](https://github.com/efsantoss)
+
+---
+
+Thank you for taking the time to explore this project!
